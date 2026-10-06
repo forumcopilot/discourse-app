@@ -71,6 +71,7 @@ export 'src/data/post/discourse_reaction_users.dart';
 export 'src/data/post/discourse_live_reactions.dart';
 export 'src/data/post/discourse_poll_extras.dart';
 export 'src/data/emoji/discourse_custom_emoji.dart';
+export 'src/data/emoji/discourse_emoji_set.dart';
 export 'src/data/topic/discourse_topic_slugs.dart';
 export 'src/data/topic/discourse_topic_tracking.dart';
 export 'src/data/topic/discourse_topic_status.dart';

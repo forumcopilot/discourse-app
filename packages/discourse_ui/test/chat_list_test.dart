@@ -95,12 +95,18 @@ Map<String, dynamic> _threads(String title) => {
 
 void main() {
   late _Chat chat;
+  var emojiListFetches = 0;
 
   setUp(() {
     DiscourseChatChannelDetails.clear();
     DiscourseChatSettings.clear();
     DiscourseCustomEmoji.clear();
-    DiscourseCustomEmoji.fetchOverride = (_) async => <String, dynamic>{};
+    DiscourseEmojiSet.clear();
+    emojiListFetches = 0;
+    DiscourseCustomEmoji.fetchOverride = (_) async {
+      emojiListFetches++;
+      return <String, dynamic>{};
+    };
     ChatUnread.clear();
     chat = _Chat(_ctx());
     SiteProxyFactory.register('chat-test', _Factory(chat));
@@ -261,7 +267,27 @@ void main() {
   });
 
   testWidgets(
-      'live: a new message moves its excerpt and badge without a refresh',
+      "channel emoji: the forum's artwork without /emojis.json, and no "
+      'shortcode read before the name', (tester) async {
+    final semantics = tester.ensureSemantics();
+    DiscourseEmojiSet.set(_site, 'twitter');
+    chat.list = {
+      'public_channels': [_channel(2, 'support', emoji: 'computer')],
+      'direct_message_channels': [],
+    };
+    await pump(tester);
+    expect(emojiListFetches, 0,
+        reason: 'a standard emoji has a known address in the set');
+    final image = tester.widget<Image>(find.descendant(
+        of: find.byType(ChatChannelAvatar), matching: find.byType(Image)));
+    expect(((image.image as ResizeImage).imageProvider as NetworkImage).url,
+        '$_site/images/emoji/twitter/computer.png?v=15');
+    expect(find.bySemanticsLabel(RegExp(':computer:|💻')), findsNothing);
+    expect(find.bySemanticsLabel(RegExp('support')), findsWidgets);
+    semantics.dispose();
+  });
+
+  testWidgets('live: a new message moves its excerpt and badge without a refresh',
       (tester) async {
     chat.list = {
       'public_channels': [],

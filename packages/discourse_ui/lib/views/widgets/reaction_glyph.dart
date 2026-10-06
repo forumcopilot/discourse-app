@@ -1,4 +1,5 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseCustomEmoji;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseCustomEmoji, DiscourseEmojiSet;
 import 'package:flutter/material.dart';
 
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -7,16 +8,18 @@ import '../../utils/emoji_shortcodes.dart';
 import '../../utils/discourse_emoji_data.dart';
 
 /// Renders a Discourse reaction id (an emoji shortcode like `heart`,
-/// `+1`, `party_parrot`) as a glyph.
-///
-/// Channel avatars can prefer the forum artwork via [preferImage], with
-/// Unicode as a loading or network-error fallback.
+/// `+1`, `party_parrot`, with an optional skin tone: `wave:t3`) as a glyph.
 ///
 /// Resolution order:
 ///   1. Unicode emoji, when Discourse's own table maps the shortcode to one.
+///      With [preferImage] (channel icons, which should look as the forum
+///      draws them) the forum's artwork for it instead: its address follows
+///      from the forum's emoji set ([DiscourseEmojiSet]), so nothing is
+///      fetched; the character stands in while the set is unknown or the
+///      image fails.
 ///   2. The forum's own image for it, from its `/emojis.json`
 ///      ([DiscourseCustomEmoji]): emoji an admin uploaded have no unicode
-///      form. The list is read once per forum, the first time a glyph
+///      form. The list is read once per forum, the first time such a name
 ///      needs it, and the glyph redraws when it arrives.
 ///   3. A neutral emoji outline while the list is loading or lacks the
 ///      name. It was a red heart, so a forum's own reaction read as a like.
@@ -32,7 +35,9 @@ class ReactionGlyph extends StatelessWidget {
   /// Unicode cannot be looked up and shows the outline.
   final SiteContext? siteContext;
 
-  /// Channel icons match the forum artwork, including its chosen emoji set.
+  /// Draw a standard emoji as the forum's artwork (its emoji set) rather
+  /// than the platform's character: channel icons, which should match the
+  /// web.
   final bool preferImage;
 
   const ReactionGlyph({
@@ -86,79 +91,62 @@ class ReactionGlyph extends StatelessWidget {
           ? tone
           : null;
 
-  /// [url] (an emoji's `<name>.png`) for [tone], as the web builds it:
-  /// `…/wave.png?v=15` → `…/wave/3.png?v=15`.
-  static String _withTone(String url, int? tone) {
-    if (tone == null) return url;
-    final uri = Uri.tryParse(url);
-    if (uri == null || !uri.path.endsWith('.png')) return url;
-    final base = uri.path.substring(0, uri.path.length - '.png'.length);
-    return uri.replace(path: '$base/$tone.png').toString();
-  }
-
-  static final Map<String, List<String>> _namesByUnicode = () {
-    final names = <String, List<String>>{};
-    for (final entry in discourseEmojiByName.entries) {
-      (names[entry.value] ??= []).add(entry.key);
-    }
-    return names;
-  }();
-
-  String? _imageUrl(String siteUrl, String name, int? tone) {
-    final exact = DiscourseCustomEmoji.urlFor(siteUrl, name);
-    if (exact != null) return _withTone(exact, _artworkTone(name, tone));
-    final unicode = discourseEmojiChar(name);
-    if (unicode == null) return null;
-    // /emojis.json lists canonical names, while channel settings also accept
-    // aliases such as art (artist_palette) and computer (laptop).
-    for (final alias in _namesByUnicode[unicode] ?? const <String>[]) {
-      final url = DiscourseCustomEmoji.urlFor(siteUrl, alias);
-      if (url != null) return _withTone(url, _artworkTone(alias, tone));
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final unicode = unicodeFor(reactionId);
-    if (unicode != null && !preferImage) {
-      return Text(unicode, style: TextStyle(fontSize: size));
-    }
+    if (unicode != null && !preferImage) return _character(unicode);
     final site = siteContext;
     final (:name, :tone) = parse(reactionId);
     if (site == null || name.isEmpty) {
-      return unicode == null
-          ? _fallback(context)
-          : Text(unicode, style: TextStyle(fontSize: size));
+      return unicode == null ? _fallback(context) : _character(unicode);
+    }
+    if (unicode != null) {
+      // A standard emoji: the forum's artwork is at a known address in its
+      // emoji set (aliases included), so the ~250 KB /emojis.json is not
+      // needed for it.
+      final url = DiscourseEmojiSet.urlFor(site.site.url, name,
+          tone: _artworkTone(name, tone));
+      return url == null
+          ? _character(unicode)
+          : _image(context, url, () => _character(unicode));
     }
     return ValueListenableBuilder<int>(
       valueListenable: DiscourseCustomEmoji.revision,
       builder: (context, _, __) {
-        final url = _imageUrl(site.site.url, name, tone);
+        final url = DiscourseCustomEmoji.urlFor(site.site.url, name);
         if (url == null) {
           if (!DiscourseCustomEmoji.isLoaded(site.site.url)) {
             // ignore: discarded_futures
             DiscourseCustomEmoji.ensureLoaded(site);
           }
-          return unicode == null
-              ? _fallback(context)
-              : Text(unicode, style: TextStyle(fontSize: size));
+          return _fallback(context);
         }
-        // Decode at display size: a custom emoji PNG can be hundreds of
-        // pixels wide, and there are several per reaction row.
-        final px = (size * MediaQuery.devicePixelRatioOf(context)).ceil();
-        return Image.network(
-          url,
-          width: size,
-          height: size,
-          cacheWidth: px,
-          cacheHeight: px,
-          semanticLabel: ':${normalize(reactionId)}:',
-          errorBuilder: (_, __, ___) => unicode == null
-              ? _fallback(context)
-              : Text(unicode, style: TextStyle(fontSize: size)),
-        );
+        return _image(context, url, () => _fallback(context));
       },
+    );
+  }
+
+  Widget _character(String unicode) =>
+      Text(unicode, style: TextStyle(fontSize: size));
+
+  /// The image at [url], blank (not another glyph) until it has loaded, so
+  /// a channel icon does not flash the platform's emoji before the forum's.
+  Widget _image(BuildContext context, String url, Widget Function() onError) {
+    // Decode at display size: a custom emoji PNG can be hundreds of
+    // pixels wide, and there are several per reaction row.
+    final px = (size * MediaQuery.devicePixelRatioOf(context)).ceil();
+    return Image.network(
+      url,
+      width: size,
+      height: size,
+      cacheWidth: px,
+      cacheHeight: px,
+      semanticLabel: ':${normalize(reactionId)}:',
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) =>
+          wasSynchronouslyLoaded || frame != null
+              ? child
+              : SizedBox(width: size, height: size),
+      errorBuilder: (_, __, ___) => onError(),
     );
   }
 

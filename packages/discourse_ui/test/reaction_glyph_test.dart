@@ -1,6 +1,4 @@
-import 'dart:async';
-
-import 'package:discourse_core/discourse_core.dart' show DiscourseCustomEmoji;
+import 'package:discourse_core/discourse_core.dart' show DiscourseEmojiSet;
 import 'package:discourse_ui/utils/emoji_shortcodes.dart';
 import 'package:discourse_ui/views/widgets/reaction_glyph.dart';
 import 'package:flutter/material.dart';
@@ -79,26 +77,21 @@ void main() {
 
     testWidgets("the forum's artwork is the toned image, as the web's",
         (tester) async {
-      DiscourseCustomEmoji.clear();
-      final arrived = Completer<Object?>();
-      DiscourseCustomEmoji.fetchOverride = (_) => arrived.future;
-      addTearDown(() {
-        DiscourseCustomEmoji.fetchOverride = null;
-        DiscourseCustomEmoji.clear();
-      });
+      DiscourseEmojiSet.set(_forum, 'twitter');
+      addTearDown(DiscourseEmojiSet.clear);
       await tester.pumpWidget(_app(ReactionGlyph(
           reactionId: 'wave:t3',
           size: 20,
           siteContext: _ctx(),
           preferImage: true)));
-      arrived.complete({
-        'people': [
-          {'name': 'wave', 'url': '/images/emoji/twitter/wave.png?v=12'},
-        ],
-      });
-      await tester.pump();
-      await tester.pump();
-      expect(_imageUrl(tester), '$_forum/images/emoji/twitter/wave/3.png?v=12');
+      expect(_imageUrl(tester), '$_forum/images/emoji/twitter/wave/3.png?v=15');
+      // An emoji that takes no tone keeps its one image.
+      await tester.pumpWidget(_app(ReactionGlyph(
+          reactionId: 'computer:t3',
+          size: 20,
+          siteContext: _ctx(),
+          preferImage: true)));
+      expect(_imageUrl(tester), '$_forum/images/emoji/twitter/computer.png?v=15');
     });
   });
 }

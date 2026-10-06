@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../../network/discourse_client.dart';
 import '../../util/site_url.dart';
+import 'discourse_emoji_set.dart';
 
 /// A forum's emoji images by name, from its `/emojis.json`.
 ///
@@ -15,9 +16,11 @@ import '../../util/site_url.dart';
 /// reactions could read as two hearts.
 ///
 /// The list is about 250 KB (every emoji the forum knows), so it is fetched
-/// once a session per forum, and only when a name is missing from the
-/// app's own emoji table. [revision] ticks when a forum's list arrives, so
-/// a glyph drawn before it can redraw.
+/// once a session per forum, and only for a name missing from the app's
+/// own emoji table: a standard emoji is drawn as its character, or, where
+/// the forum's artwork is wanted (channel icons), from the address its
+/// emoji set gives ([DiscourseEmojiSet]). [revision] ticks when a forum's
+/// list arrives, so a glyph drawn before it can redraw.
 class DiscourseCustomEmoji {
   DiscourseCustomEmoji._();
 
