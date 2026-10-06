@@ -173,6 +173,36 @@ void main() {
   }
 
   testWidgets(
+      'a delete that fails after the reader left the page still says so',
+      (tester) async {
+    final showDrafts = ValueNotifier(true);
+    addTearDown(showDrafts.dispose);
+    await tester.pumpWidget(MaterialApp(
+      theme: AppTheme.lightTheme,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: ValueListenableBuilder<bool>(
+        valueListenable: showDrafts,
+        builder: (_, visible, __) => visible
+            ? DraftsListPage(siteContext: site)
+            : const Scaffold(body: Text('Away')),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    drafts.deleteError = 'Delete unavailable';
+    await discard(tester);
+    showDrafts.value = false;
+    await tester.pump();
+    await expireUndo(tester);
+    expect(drafts.deleted, ['new_topic_0']);
+    expect(
+        find.text(
+            "Draft not discarded. It's still in Drafts. Delete unavailable"),
+        findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
       'older drafts load beyond the first 50 and stop after a short page',
       (tester) async {
     drafts.items = List.generate(55, _draft);

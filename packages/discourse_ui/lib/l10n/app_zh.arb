@@ -1204,6 +1204,7 @@
   "noReminder": "无提醒",
   "failedToLoadDrafts": "无法加载草稿。",
   "failedToDiscardDraft": "无法丢弃草稿",
+  "draftNotDiscardedAway": "草稿未丢弃，仍在“草稿”中。{error}",
   "messagesLoadFailed": "无法加载消息",
   "moreMessagesLoadFailed": "无法加载更多消息",
   "messageUnknownUser": "未知",

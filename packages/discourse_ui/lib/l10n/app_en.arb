@@ -4831,6 +4831,15 @@
   "@failedToDiscardDraft": {
     "description": "Drafts page: snackbar when discarding a draft fails"
   },
+  "draftNotDiscardedAway": "Draft not discarded. It's still in Drafts. {error}",
+  "@draftNotDiscardedAway": {
+    "description": "Drafts page: a discard sent after the Undo ran out failed when the reader had already left the page; the draft was not deleted. {error} is the reason.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "messagesLoadFailed": "Failed to load messages",
   "@messagesLoadFailed": {
     "description": "Message list (Inbox, Sent, Archive…): shown when the forum could not return the list and gave no reason"

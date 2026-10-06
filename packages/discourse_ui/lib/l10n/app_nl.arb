@@ -1361,6 +1361,7 @@
   "noReminder": "Geen herinnering",
   "failedToLoadDrafts": "Concepten laden mislukt.",
   "failedToDiscardDraft": "Concept verwijderen mislukt",
+  "draftNotDiscardedAway": "Concept niet verwijderd. Het staat nog bij Concepten. {error}",
   "messagesLoadFailed": "Berichten laden mislukt",
   "moreMessagesLoadFailed": "Meer berichten laden mislukt",
   "messageUnknownUser": "Onbekend",

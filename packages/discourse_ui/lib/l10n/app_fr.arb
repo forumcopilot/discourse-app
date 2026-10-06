@@ -1204,6 +1204,7 @@
   "noReminder": "Pas de rappel",
   "failedToLoadDrafts": "Impossible de charger les brouillons.",
   "failedToDiscardDraft": "Impossible de supprimer le brouillon",
+  "draftNotDiscardedAway": "Le brouillon n'a pas été supprimé. Il est toujours dans Brouillons. {error}",
   "messagesLoadFailed": "Impossible de charger les messages",
   "moreMessagesLoadFailed": "Impossible de charger plus de messages",
   "messageUnknownUser": "Inconnu",

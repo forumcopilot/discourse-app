@@ -3950,6 +3950,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get failedToDiscardDraft => 'Concept verwijderen mislukt';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Concept niet verwijderd. Het staat nog bij Concepten. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Berichten laden mislukt';
 
   @override

@@ -1204,6 +1204,7 @@
   "noReminder": "Sin recordatorio",
   "failedToLoadDrafts": "No se pudieron cargar los borradores.",
   "failedToDiscardDraft": "No se pudo descartar el borrador",
+  "draftNotDiscardedAway": "No se descartó el borrador. Sigue en Borradores. {error}",
   "messagesLoadFailed": "No se pudieron cargar los mensajes",
   "moreMessagesLoadFailed": "No se pudieron cargar más mensajes",
   "messageUnknownUser": "Desconocido",

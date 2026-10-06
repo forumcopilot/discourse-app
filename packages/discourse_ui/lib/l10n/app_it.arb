@@ -1204,6 +1204,7 @@
   "noReminder": "Nessun promemoria",
   "failedToLoadDrafts": "Impossibile caricare le bozze.",
   "failedToDiscardDraft": "Impossibile scartare la bozza",
+  "draftNotDiscardedAway": "Bozza non scartata. È ancora in Bozze. {error}",
   "messagesLoadFailed": "Impossibile caricare i messaggi",
   "moreMessagesLoadFailed": "Impossibile caricare altri messaggi",
   "messageUnknownUser": "Sconosciuto",

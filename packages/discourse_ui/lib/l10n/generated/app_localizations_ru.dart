@@ -3987,6 +3987,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get failedToDiscardDraft => 'Не удалось удалить черновик';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Черновик не удалён и остаётся в разделе «Черновики». $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Не удалось загрузить сообщения';
 
   @override

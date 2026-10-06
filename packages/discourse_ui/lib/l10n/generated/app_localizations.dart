@@ -6406,6 +6406,12 @@ abstract class AppLocalizations {
   /// **'Failed to discard draft'**
   String get failedToDiscardDraft;
 
+  /// Drafts page: a discard sent after the Undo ran out failed when the reader had already left the page; the draft was not deleted. {error} is the reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft not discarded. It\'s still in Drafts. {error}'**
+  String draftNotDiscardedAway(String error);
+
   /// Message list (Inbox, Sent, Archive…): shown when the forum could not return the list and gave no reason
   ///
   /// In en, this message translates to:

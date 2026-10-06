@@ -3966,6 +3966,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get failedToDiscardDraft => 'Impossibile scartare la bozza';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Bozza non scartata. È ancora in Bozze. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Impossibile caricare i messaggi';
 
   @override

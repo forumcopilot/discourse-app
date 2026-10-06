@@ -3714,6 +3714,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get failedToDiscardDraft => '无法丢弃草稿';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return '草稿未丢弃，仍在“草稿”中。$error';
+  }
+
+  @override
   String get messagesLoadFailed => '无法加载消息';
 
   @override

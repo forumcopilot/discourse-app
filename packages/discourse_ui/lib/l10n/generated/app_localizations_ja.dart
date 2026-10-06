@@ -3772,6 +3772,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get failedToDiscardDraft => '下書きを破棄できませんでした';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return '下書きを破棄できませんでした。下書きに残っています。$error';
+  }
+
+  @override
   String get messagesLoadFailed => 'メッセージを読み込めませんでした';
 
   @override

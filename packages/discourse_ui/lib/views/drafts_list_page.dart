@@ -21,6 +21,7 @@ import 'widgets/topic_taxonomy_chips.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../utils/error_message.dart';
+import '../utils/snackbar_helper.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 
@@ -133,7 +134,10 @@ class _DraftsListPageState extends State<DraftsListPage> {
     final index = drafts.indexWhere((d) => d.draftKey == draft.draftKey);
     if (index < 0 || !_pendingDeletes.add(draft.draftKey)) return;
     setState(() => _drafts = [...drafts]..removeAt(index));
+    // The app's messenger, which outlives this page: the delete runs when
+    // the Undo closes, often after the reader has moved on.
     final messenger = ScaffoldMessenger.of(context);
+    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     messenger.hideCurrentSnackBar();
     // Timed, not persistent: since Flutter 3.38 a snackbar with an action
@@ -175,10 +179,11 @@ class _DraftsListPageState extends State<DraftsListPage> {
       } catch (error) {
         if (!_checkSession()) return;
         restore();
-        if (!mounted) return;
-        messenger.showSnackBar(SnackBar(
-          content: Text(describeError(error, context: context)),
-        ));
+        final reason = describeError(error, context: mounted ? context : null);
+        // Here the draft is back in the list. A reader who has left the page
+        // would otherwise believe it gone: say it is still in Drafts.
+        SnackbarHelper.showErrorOn(messenger, theme,
+            mounted ? reason : l10n.draftNotDiscardedAway(reason));
       }
     });
   }

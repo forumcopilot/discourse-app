@@ -1204,6 +1204,7 @@
   "noReminder": "Keine Erinnerung",
   "failedToLoadDrafts": "Entwürfe konnten nicht geladen werden.",
   "failedToDiscardDraft": "Entwurf konnte nicht verworfen werden",
+  "draftNotDiscardedAway": "Entwurf nicht verworfen. Er ist weiterhin unter Entwürfe. {error}",
   "messagesLoadFailed": "Nachrichten konnten nicht geladen werden",
   "moreMessagesLoadFailed": "Weitere Nachrichten konnten nicht geladen werden",
   "messageUnknownUser": "Unbekannt",

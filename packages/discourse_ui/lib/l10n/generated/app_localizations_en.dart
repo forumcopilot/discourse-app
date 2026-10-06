@@ -3919,6 +3919,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToDiscardDraft => 'Failed to discard draft';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Draft not discarded. It\'s still in Drafts. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Failed to load messages';
 
   @override

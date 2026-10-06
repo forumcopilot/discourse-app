@@ -3959,6 +3959,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get failedToDiscardDraft => 'No se pudo descartar el borrador';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'No se descartó el borrador. Sigue en Borradores. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'No se pudieron cargar los mensajes';
 
   @override

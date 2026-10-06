@@ -3970,6 +3970,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get failedToDiscardDraft => 'Impossible de supprimer le brouillon';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Le brouillon n\'a pas été supprimé. Il est toujours dans Brouillons. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Impossible de charger les messages';
 
   @override

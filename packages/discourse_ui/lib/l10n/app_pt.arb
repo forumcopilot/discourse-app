@@ -1204,6 +1204,7 @@
   "noReminder": "Sem lembrete",
   "failedToLoadDrafts": "Não foi possível carregar os rascunhos.",
   "failedToDiscardDraft": "Não foi possível descartar o rascunho",
+  "draftNotDiscardedAway": "Rascunho não descartado. Continua em Rascunhos. {error}",
   "messagesLoadFailed": "Não foi possível carregar as mensagens",
   "moreMessagesLoadFailed": "Não foi possível carregar mais mensagens",
   "messageUnknownUser": "Desconhecido",

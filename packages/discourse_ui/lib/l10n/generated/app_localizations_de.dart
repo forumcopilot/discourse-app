@@ -3970,6 +3970,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get failedToDiscardDraft => 'Entwurf konnte nicht verworfen werden';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Entwurf nicht verworfen. Er ist weiterhin unter Entwürfe. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Nachrichten konnten nicht geladen werden';
 
   @override
