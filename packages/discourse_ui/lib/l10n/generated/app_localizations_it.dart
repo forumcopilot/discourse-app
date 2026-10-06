@@ -4840,6 +4840,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile attivare Non disturbare';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Non disturbare non è stato attivato: la tua sessione è cambiata.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb =>
       'Impossibile disattivare Non disturbare';
 

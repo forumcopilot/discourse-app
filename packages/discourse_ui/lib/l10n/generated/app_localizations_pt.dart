@@ -4832,6 +4832,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não foi possível ativar o Não perturbe';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'O Não perturbe não foi ativado: sua sessão mudou.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb =>
       'Não foi possível desativar o Não perturbe';
 

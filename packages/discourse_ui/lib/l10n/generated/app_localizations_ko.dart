@@ -4595,6 +4595,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get couldNotEnableDoNotDisturb => '방해 금지를 켤 수 없습니다';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      '로그인 상태가 변경되어 방해 금지를 켜지 않았습니다.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb => '방해 금지를 끌 수 없습니다';
 
   @override

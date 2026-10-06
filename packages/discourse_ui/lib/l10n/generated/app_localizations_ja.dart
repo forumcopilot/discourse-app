@@ -4594,6 +4594,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get couldNotEnableDoNotDisturb => 'おやすみモードをオンにできませんでした';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'ログイン状態が変わったため、おやすみモードはオンになりませんでした。';
+
+  @override
   String get couldNotTurnOffDoNotDisturb => 'おやすみモードをオフにできませんでした';
 
   @override

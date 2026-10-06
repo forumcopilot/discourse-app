@@ -4771,6 +4771,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotEnableDoNotDisturb => 'Couldn\'t enable do not disturb';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Do not disturb wasn\'t turned on: your sign-in changed.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb => 'Couldn\'t turn off do not disturb';
 
   @override

@@ -1440,6 +1440,7 @@
   "whenPostingDoNothing": "Non fare nulla",
   "pauseNotificationsUntilTomorrow": "Fino a domani",
   "couldNotEnableDoNotDisturb": "Impossibile attivare Non disturbare",
+  "doNotDisturbNotEnabledSessionChanged": "Non disturbare non è stato attivato: la tua sessione è cambiata.",
   "couldNotTurnOffDoNotDisturb": "Impossibile disattivare Non disturbare",
   "passwordResetEmailSent": "Email per reimpostare la password inviata.",
   "couldNotSendResetEmail": "Impossibile inviare l'email di reimpostazione",

@@ -7824,6 +7824,12 @@ abstract class AppLocalizations {
   /// **'Couldn\'t enable do not disturb'**
   String get couldNotEnableDoNotDisturb;
 
+  /// Snackbar: a Do not disturb duration was picked after the profile tile closed, but the reader had signed in to another account meanwhile, so nothing was sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not disturb wasn\'t turned on: your sign-in changed.'**
+  String get doNotDisturbNotEnabledSessionChanged;
+
   /// Snackbar when turning off Do not disturb failed
   ///
   /// In en, this message translates to:

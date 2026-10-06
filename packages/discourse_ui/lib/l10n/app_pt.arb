@@ -1440,6 +1440,7 @@
   "whenPostingDoNothing": "Não fazer nada",
   "pauseNotificationsUntilTomorrow": "Até amanhã",
   "couldNotEnableDoNotDisturb": "Não foi possível ativar o Não perturbe",
+  "doNotDisturbNotEnabledSessionChanged": "O Não perturbe não foi ativado: sua sessão mudou.",
   "couldNotTurnOffDoNotDisturb": "Não foi possível desativar o Não perturbe",
   "passwordResetEmailSent": "E-mail de redefinição de senha enviado.",
   "couldNotSendResetEmail": "Não foi possível enviar o e-mail de redefinição",

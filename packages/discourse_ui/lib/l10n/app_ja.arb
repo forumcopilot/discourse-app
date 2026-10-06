@@ -1440,6 +1440,7 @@
   "whenPostingDoNothing": "何もしない",
   "pauseNotificationsUntilTomorrow": "明日まで",
   "couldNotEnableDoNotDisturb": "おやすみモードをオンにできませんでした",
+  "doNotDisturbNotEnabledSessionChanged": "ログイン状態が変わったため、おやすみモードはオンになりませんでした。",
   "couldNotTurnOffDoNotDisturb": "おやすみモードをオフにできませんでした",
   "passwordResetEmailSent": "パスワードリセットのメールを送信しました。",
   "couldNotSendResetEmail": "リセットメールを送信できませんでした",

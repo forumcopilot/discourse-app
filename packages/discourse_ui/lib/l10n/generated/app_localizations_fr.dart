@@ -4845,6 +4845,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible d’activer Ne pas déranger';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Ne pas déranger n’a pas été activé : votre session a changé.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb =>
       'Impossible de désactiver Ne pas déranger';
 

@@ -4852,6 +4852,10 @@ class AppLocalizationsDe extends AppLocalizations {
       '„Nicht stören“ konnte nicht aktiviert werden';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      '„Nicht stören“ wurde nicht aktiviert: Deine Anmeldung hat sich geändert.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb =>
       '„Nicht stören“ konnte nicht ausgeschaltet werden';
 

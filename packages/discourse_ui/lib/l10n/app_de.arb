@@ -1440,6 +1440,7 @@
   "whenPostingDoNothing": "Nichts tun",
   "pauseNotificationsUntilTomorrow": "Bis morgen",
   "couldNotEnableDoNotDisturb": "„Nicht stören“ konnte nicht aktiviert werden",
+  "doNotDisturbNotEnabledSessionChanged": "„Nicht stören“ wurde nicht aktiviert: Deine Anmeldung hat sich geändert.",
   "couldNotTurnOffDoNotDisturb": "„Nicht stören“ konnte nicht ausgeschaltet werden",
   "passwordResetEmailSent": "E-Mail zum Zurücksetzen des Passworts gesendet.",
   "couldNotSendResetEmail": "E-Mail zum Zurücksetzen konnte nicht gesendet werden",

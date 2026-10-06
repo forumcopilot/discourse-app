@@ -4829,6 +4829,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get couldNotEnableDoNotDisturb => 'No se pudo activar No molestar';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'No molestar no se activó: tu sesión ha cambiado.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb => 'No se pudo desactivar No molestar';
 
   @override

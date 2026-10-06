@@ -5996,6 +5996,10 @@
   "@couldNotEnableDoNotDisturb": {
     "description": "Snackbar when turning on Do not disturb failed"
   },
+  "doNotDisturbNotEnabledSessionChanged": "Do not disturb wasn't turned on: your sign-in changed.",
+  "@doNotDisturbNotEnabledSessionChanged": {
+    "description": "Snackbar: a Do not disturb duration was picked after the profile tile closed, but the reader had signed in to another account meanwhile, so nothing was sent."
+  },
   "couldNotTurnOffDoNotDisturb": "Couldn't turn off do not disturb",
   "@couldNotTurnOffDoNotDisturb": {
     "description": "Snackbar when turning off Do not disturb failed"

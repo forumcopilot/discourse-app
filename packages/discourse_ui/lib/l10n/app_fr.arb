@@ -1440,6 +1440,7 @@
   "whenPostingDoNothing": "Ne rien faire",
   "pauseNotificationsUntilTomorrow": "Jusqu'à demain",
   "couldNotEnableDoNotDisturb": "Impossible d’activer Ne pas déranger",
+  "doNotDisturbNotEnabledSessionChanged": "Ne pas déranger n’a pas été activé : votre session a changé.",
   "couldNotTurnOffDoNotDisturb": "Impossible de désactiver Ne pas déranger",
   "passwordResetEmailSent": "E-mail de réinitialisation du mot de passe envoyé.",
   "couldNotSendResetEmail": "Impossible d’envoyer l’e-mail de réinitialisation",

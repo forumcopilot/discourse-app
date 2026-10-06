@@ -1597,6 +1597,7 @@
   "whenPostingDoNothing": "Niets doen",
   "pauseNotificationsUntilTomorrow": "Tot morgen",
   "couldNotEnableDoNotDisturb": "Kon Niet storen niet inschakelen",
+  "doNotDisturbNotEnabledSessionChanged": "Niet storen is niet ingeschakeld: je aanmelding is gewijzigd.",
   "couldNotTurnOffDoNotDisturb": "Kon Niet storen niet uitschakelen",
   "passwordResetEmailSent": "E-mail om je wachtwoord opnieuw in te stellen is verzonden.",
   "couldNotSendResetEmail": "Kon de herstel-e-mail niet verzenden",

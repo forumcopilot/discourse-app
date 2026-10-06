@@ -4530,6 +4530,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotEnableDoNotDisturb => '无法开启请勿打扰';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged => '登录状态已改变，未开启请勿打扰。';
+
+  @override
   String get couldNotTurnOffDoNotDisturb => '无法关闭请勿打扰';
 
   @override

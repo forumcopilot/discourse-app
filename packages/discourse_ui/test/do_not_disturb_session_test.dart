@@ -81,6 +81,7 @@ void main() {
       (tester) async {
     final visible = ValueNotifier(true);
     addTearDown(visible.dispose);
+    users.writeGate = Completer<DiscourseDoNotDisturbResult>();
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -112,8 +113,64 @@ void main() {
     await tester.tap(find.text('Until tomorrow'));
     await tester.pumpAndSettle();
     expect(find.text('Until tomorrow'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  Future<ValueNotifier<bool>> openDisposablePicker(WidgetTester tester) async {
+    final visible = ValueNotifier(true);
+    addTearDown(visible.dispose);
+    users.writeGate = Completer<DiscourseDoNotDisturbResult>();
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(
+          body: ValueListenableBuilder<bool>(
+        valueListenable: visible,
+        builder: (_, shown, __) => shown
+            ? DoNotDisturbTile(siteContext: site, users: users)
+            : const SizedBox.shrink(),
+      )),
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Do not disturb'));
+    await tester.pumpAndSettle();
+    visible.value = false;
+    await tester.pumpAndSettle();
+    return visible;
+  }
+
+  testWidgets(
+      'a duration picked after the tile was disposed is still sent and shown',
+      (tester) async {
+    final visible = await openDisposablePicker(tester);
+    await tester.tap(find.text('Until tomorrow'));
+    await tester.pumpAndSettle();
+    expect(users.enters, 1);
+    expect(users.lastDuration, 'tomorrow');
+    // The profile list builds the tile again while the request is out.
+    visible.value = true;
+    await tester.pumpAndSettle();
+    expect(find.text('Turn off'), findsNothing);
+    users.initial = DiscourseDoNotDisturbResult(result: true, endsAt: until);
+    users.writeGate
+        .complete(DiscourseDoNotDisturbResult(result: true, endsAt: until));
+    await tester.pumpAndSettle();
+    expect(find.text('Turn off'), findsOneWidget,
+        reason: 'the rebuilt tile reads the new state');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'a duration picked after the tile was disposed under another sign-in '
+      'is not sent, and says so', (tester) async {
+    await openDisposablePicker(tester);
+    await switchAccount();
+    await tester.tap(find.text('Until tomorrow'));
+    await tester.pumpAndSettle();
     expect(users.enters, 0);
     expect(calls, isEmpty);
+    expect(find.text("Do not disturb wasn't turned on: your sign-in changed."),
+        findsOneWidget);
   });
 
   for (final textScale in [1.0, 2.0]) {

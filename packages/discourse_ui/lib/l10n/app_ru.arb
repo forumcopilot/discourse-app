@@ -1441,6 +1441,7 @@
   "whenPostingDoNothing": "Ничего не делать",
   "pauseNotificationsUntilTomorrow": "До завтра",
   "couldNotEnableDoNotDisturb": "Не удалось включить режим «Не беспокоить»",
+  "doNotDisturbNotEnabledSessionChanged": "Режим «Не беспокоить» не включён: сеанс входа изменился.",
   "couldNotTurnOffDoNotDisturb": "Не удалось отключить режим «Не беспокоить»",
   "passwordResetEmailSent": "Письмо для сброса пароля отправлено.",
   "couldNotSendResetEmail": "Не удалось отправить письмо для сброса",

@@ -1440,6 +1440,7 @@
   "whenPostingDoNothing": "No hacer nada",
   "pauseNotificationsUntilTomorrow": "Hasta mañana",
   "couldNotEnableDoNotDisturb": "No se pudo activar No molestar",
+  "doNotDisturbNotEnabledSessionChanged": "No molestar no se activó: tu sesión ha cambiado.",
   "couldNotTurnOffDoNotDisturb": "No se pudo desactivar No molestar",
   "passwordResetEmailSent": "Correo para restablecer la contraseña enviado.",
   "couldNotSendResetEmail": "No se pudo enviar el correo de restablecimiento",

@@ -4814,6 +4814,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get couldNotEnableDoNotDisturb => 'Kon Niet storen niet inschakelen';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Niet storen is niet ingeschakeld: je aanmelding is gewijzigd.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb => 'Kon Niet storen niet uitschakelen';
 
   @override

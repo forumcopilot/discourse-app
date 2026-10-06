@@ -4866,6 +4866,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось включить режим «Не беспокоить»';
 
   @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Режим «Не беспокоить» не включён: сеанс входа изменился.';
+
+  @override
   String get couldNotTurnOffDoNotDisturb =>
       'Не удалось отключить режим «Не беспокоить»';
 

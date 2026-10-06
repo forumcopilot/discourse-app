@@ -1434,6 +1434,7 @@
   "whenPostingDoNothing": "아무것도하지 않음",
   "pauseNotificationsUntilTomorrow": "내일까지",
   "couldNotEnableDoNotDisturb": "방해 금지를 켤 수 없습니다",
+  "doNotDisturbNotEnabledSessionChanged": "로그인 상태가 변경되어 방해 금지를 켜지 않았습니다.",
   "couldNotTurnOffDoNotDisturb": "방해 금지를 끌 수 없습니다",
   "passwordResetEmailSent": "비밀번호 재설정 이메일을 보냈습니다.",
   "couldNotSendResetEmail": "재설정 이메일을 보낼 수 없습니다",
