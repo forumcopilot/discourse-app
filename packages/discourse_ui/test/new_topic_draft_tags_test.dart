@@ -111,6 +111,35 @@ void main() {
     });
   }
 
+  testWidgets(
+      'a reader who may no longer tag keeps the draft\'s tags but does not '
+      'submit them', (tester) async {
+    DiscourseSiteCapabilities.store(site.site.pluginUrl, {
+      'top_menu_items': ['latest'],
+      'can_tag_topics': false,
+    });
+    drafts.data = {
+      'reply': 'Draft body',
+      'title': 'Draft title',
+      'tags': ['design']
+    };
+    await open(tester);
+    expect(find.byType(TagInputField), findsNothing);
+    expect(composer(tester).hasChanges!(), isFalse);
+    await expectLater(composer(tester).onSubmit('Draft title', 'Draft body'),
+        throwsA(isA<Exception>()));
+    expect(topics.calls, 1);
+    expect(topics.tags, isNull,
+        reason: 'Discourse refuses tags from a reader who may not tag');
+    composer(tester).contentController!.text = 'More writing';
+    await composer(tester).onSaveDraft!();
+    expect(drafts.saves.last['tags'], [
+      {'name': 'design'}
+    ], reason: 'the tags come back if the reader may tag again');
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
   testWidgets('retrying a failed draft read restores tags before saving',
       (tester) async {
     drafts.loadError = 'Cannot load draft';

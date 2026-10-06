@@ -53,9 +53,20 @@ class _NewTopicPageState extends State<NewTopicPage> {
   final List<String> _attachmentIds = [];
   String? _groupId;
 
-  // Discourse-native: tags attached to the new topic.
+  // Discourse-native: tags attached to the new topic. They are the draft's
+  // tags too, so a draft resumed by a reader who may no longer tag keeps
+  // them here (saved back with the draft) while the field is hidden and the
+  // submit leaves them out: [_canTagTopics] decides both.
   List<String> _tags = const [];
   bool _tagsChanged = false;
+
+  /// Whether this reader may tag (`can_tag_topics` on /site.json). Discourse
+  /// refuses a topic carrying tags from anyone else ("You're not allowed to
+  /// tag topics"), and with the field hidden the writer could not take
+  /// restored tags off to get past that.
+  bool get _canTagTopics =>
+      DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl)
+          .canTagTopics;
 
   // A category is draft metadata, not part of its server identity. New
   // topics must not share a key or one category can overwrite another's work.
@@ -131,7 +142,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
       content,
       attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
       groupId: _groupId,
-      tags: _tags.isNotEmpty ? _tags : null,
+      tags: _canTagTopics && _tags.isNotEmpty ? _tags : null,
     );
 
     if (!result.result) {
@@ -210,9 +221,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
       // (`can_tag_topics` on /site.json). Previously the field was always
       // shown and the server refused the tags on submit — the user typed
       // them, lost them, and was told why only after the round trip.
-      extraHeader: DiscourseSiteCapabilities.forSite(
-                  widget.siteContext.site.pluginUrl)
-              .canTagTopics
+      extraHeader: _canTagTopics
           ? TagInputField(
               initial: _tags,
               onChanged: (tags) {
