@@ -6,6 +6,43 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.49] - 2026-10-06
+
+### Added
+- **Ranked-choice polls can be voted on.** Tap options in order of preference; options left unranked count as Abstain. Once results are visible, you see your ranks and the winner, or which options tied. Before, every vote on a ranked-choice poll failed.
+- **Browse channels in chat**, as on the web: search by name, with the Open, Closed and Archived tabs (Archived where the forum allows archiving), and Join or Leave on each channel. A channel that was closed after you joined it can still be found and left.
+- **Private notifications on Android are shown only to their account.** When the notifications backend supports it, a notification's text is shown only if it is meant for the account signed in to that forum on this phone. After switching accounts, the previous account's notifications are no longer shown, and taps on them don't open.
+
+### Changed
+- **Chat's channel list keeps your place.** The channels you could join stay loaded when you come back from a channel, join one or refresh, instead of starting again from the first page. Channel icons use the forum's emoji set, skin tones included, without downloading the forum's full emoji list. The wording is Discourse's own ("Browse channels", "Read Only", "Closed", "Archived").
+- **Featured-topic search matches titles of topics you started**, as the web's picker does, and its pages no longer repeat or skip topics.
+- **Bottom tab labels stay on one line.** Long words in some languages no longer break across two lines. The German notifications tab reads "Mitteilungen".
+
+### Fixed
+- **Signing in and out works for every forum address**, including hosts with an underscore or non-Latin characters.
+- **Your forum key stays inside the forum.** A redirect that leaves the forum's subfolder on the same host no longer receives the key.
+- **Switching accounts keeps them apart.**
+  - Message counts reset when the account changes.
+  - A late answer meant for the previous account is ignored.
+  - Live message updates resume after you sign in again.
+- **Sign-in no longer waits on a slow forum.** It finishes within 10 seconds; the forum's settings keep loading in the background.
+- **Drafts:**
+  - A resumed draft's tags are no longer sent when you may not tag, so the topic posts; the tags stay in the draft.
+  - A delete that fails after you've left Drafts now tells you.
+  - A failed delete no longer cuts short another draft's Undo.
+- **Do Not Disturb** picked while the profile list was rebuilding is applied.
+- **Invitations:** refreshing keeps the list where it was, and revoking or creating an invite updates it in place.
+- **Renaming a message** shows the new title even when closing it in the same edit fails.
+- **Polls:**
+  - Removing a vote and Show voters stay on the poll's own forum.
+  - A poll quoted in a reply is no longer live.
+- **Videos:**
+  - The player keeps its controls in step with playback, and shows the app's own message when a video fails.
+  - The audio player recovers from errors mid-playback.
+  - Screen readers can start a video preview.
+- **Pushes for a forum open it** even when the notifications backend has its address with the other scheme (http vs https).
+- **Profiles no longer show raw plugin data.**
+
 ## [1.0.48] - 2026-10-05
 
 ### Added
