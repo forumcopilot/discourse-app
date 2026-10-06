@@ -102,6 +102,88 @@ void main() {
     expect(server.count(path: '/notifications.json'), 1);
   });
 
+  group('per forum, not per SiteContext', () {
+    // A multi-forum host (ABDA) builds a new SiteContext every time a forum
+    // is reopened; the reader is the same, and so are the forum's answers.
+    test('the same sign-in in a new SiteContext reuses cached reads',
+        () async {
+      final first = contextFor(server);
+      await first.setUserApiCredentials(
+          userApiKey: 'dummy-a', userApiClientId: 'client');
+      await client.get(first, '/categories.json');
+
+      final reopened = contextFor(server);
+      await reopened.loadUserApiCredentials();
+      await client.get(reopened, '/categories.json');
+
+      expect(server.count(path: '/categories.json'), 1);
+    });
+
+    test('changed credentials are not served the previous ones\' reads',
+        () async {
+      final first = contextFor(server);
+      await first.setUserApiCredentials(
+          userApiKey: 'dummy-a', userApiClientId: 'client');
+      await client.get(first, '/notifications.json');
+
+      // Another account, in a new context.
+      final other = contextFor(server);
+      await other.setUserApiCredentials(
+          userApiKey: 'dummy-b', userApiClientId: 'client');
+      expect((await client.get(other, '/notifications.json')).body,
+          contains('dummy-b'));
+
+      // Signed out and back in with the first account's key.
+      await other.clearUserApiCredentials();
+      final back = contextFor(server);
+      await back.setUserApiCredentials(
+          userApiKey: 'dummy-a', userApiClientId: 'client');
+      expect((await client.get(back, '/notifications.json')).body,
+          contains('dummy-a'));
+
+      expect(server.count(path: '/notifications.json'), 3);
+    });
+
+    test('another forum does not share the reads', () async {
+      final second = await CountingServer.start();
+      addTearDown(second.close);
+      for (final forum in [server, second]) {
+        final context = contextFor(forum);
+        await context.setUserApiCredentials(
+            userApiKey: 'dummy-a', userApiClientId: 'client');
+        await client.get(context, '/categories.json');
+      }
+      expect(server.count(path: '/categories.json'), 1);
+      expect(second.count(path: '/categories.json'), 1);
+    });
+
+    test('a change of sign-in drops that forum\'s reads, and only those',
+        () async {
+      final second = await CountingServer.start();
+      addTearDown(second.close);
+      final context = contextFor(server);
+      await context.setUserApiCredentials(
+          userApiKey: 'dummy-a', userApiClientId: 'client');
+      await client.get(context, '/categories.json');
+      await client.get(context, '/about.json');
+      await client.get(contextFor(second), '/categories.json');
+      expect(DiscourseClient.debugCachedReads(server.baseUrl), 2);
+
+      await contextFor(server).loadUserApiCredentials();
+      expect(DiscourseClient.debugCachedReads(server.baseUrl), 2,
+          reason: 'the same sign-in in another context keeps them');
+
+      await context.clearUserApiCredentials();
+      expect(DiscourseClient.debugCachedReads(server.baseUrl), 0);
+      expect(DiscourseClient.debugCachedReads(second.baseUrl), 1);
+
+      await context.setUserApiCredentials(
+          userApiKey: 'dummy-b', userApiClientId: 'client');
+      await client.get(context, '/categories.json');
+      expect(DiscourseClient.debugCachedReads(server.baseUrl), 1);
+    });
+  });
+
   test('effective header overrides partition cached and pending requests',
       () async {
     final context = contextFor(server);

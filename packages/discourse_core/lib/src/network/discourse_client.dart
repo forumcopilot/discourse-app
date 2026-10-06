@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
+import 'package:flutter/foundation.dart'
+    show debugPrint, kDebugMode, visibleForTesting;
 
 import 'package:dio/dio.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -76,6 +77,9 @@ class DiscourseClient {
     // Initialization yields even when the transport is already ready. Work
     // started by one account must not pick up replacement credentials there.
     final session = context.configurationSession;
+    // Which sign-in on this forum the read cache files the request under.
+    final forum = context.site.pluginUrl;
+    final generation = _readGeneration(forum);
     final headers = <String, String>{
       'Accept': 'application/json',
       ...context.userApiAuthHeaders(),
@@ -119,11 +123,14 @@ class DiscourseClient {
       _inFlight.clear();
     }
 
-    // Both completed responses and pending requests belong to the session
-    // that issued them. A logout/re-login starts a new generation even if
-    // the same credentials are restored. Header overrides and SDK cookies
-    // can also change the identity/representation without changing context.
-    // Keep only a digest in the key, never raw credentials or cookie values.
+    // Both completed responses and pending requests belong to the forum's
+    // sign-in generation that issued them ([noteCredentials]): a logout/
+    // re-login starts a new one even if the same credentials are restored,
+    // while another SiteContext for the same signed-in forum shares it.
+    // Accounts are kept apart by the digest of the effective headers
+    // (credentials, header overrides) and SDK cookies, which can also change
+    // the identity/representation without changing context. Keep only a
+    // digest in the key, never raw credentials or cookie values.
     final cookieValues = method == 'GET'
         ? (await FCDioClient.instance.cookieJar?.loadForRequest(url) ?? [])
             .map((cookie) => cookie.toString())
@@ -135,8 +142,12 @@ class DiscourseClient {
       for (final name in headerNames) [name, headers[name]],
       cookieValues,
     ])));
-    final readKey = method == 'GET'
-        ? (session, '$url|${_canonicalQuery(effectiveQuery)}|$variant')
+    final _ReadKey? readKey = method == 'GET'
+        ? (
+            forum: forum,
+            generation: generation,
+            request: '$url|${_canonicalQuery(effectiveQuery)}|$variant',
+          )
         : null;
     if (!useCache && readKey != null) {
       // A refresh must also stop a later ordinary read from going back to
@@ -171,6 +182,7 @@ class DiscourseClient {
       final future = _sendAfterClearance(
         method,
         url,
+        forum: base,
         headers: headers,
         encodedBody: encodedBody,
         effectiveQuery: effectiveQuery,
@@ -181,6 +193,7 @@ class DiscourseClient {
         // Only successful reads are worth repeating; an error must not be
         // pinned for the next few seconds.
         if (identical(context.configurationSession, session) &&
+            _readGeneration(forum) == generation &&
             identical(_inFlight[cacheKey], future) &&
             result.statusCode >= 200 &&
             result.statusCode < 300) {
@@ -197,6 +210,7 @@ class DiscourseClient {
     return _sendAfterClearance(
       method,
       url,
+      forum: base,
       headers: headers,
       encodedBody: encodedBody,
       effectiveQuery: effectiveQuery,
@@ -212,6 +226,7 @@ class DiscourseClient {
   Future<FCCallResult> _sendAfterClearance(
     String method,
     Uri url, {
+    required Uri forum,
     required Map<String, String> headers,
     required String? encodedBody,
     required Map<String, dynamic>? effectiveQuery,
@@ -226,14 +241,67 @@ class DiscourseClient {
     return _send(
       method,
       url,
+      forum: forum,
       headers: headers,
       encodedBody: encodedBody,
       effectiveQuery: effectiveQuery,
     );
   }
 
-  /// Concurrent identical GETs, keyed by session, URL, query and headers/cookies.
-  static final Map<(Object, String), Future<FCCallResult>> _inFlight = {};
+  /// Concurrent identical GETs, keyed by forum, sign-in generation, URL,
+  /// query and headers/cookies.
+  static final Map<_ReadKey, Future<FCCallResult>> _inFlight = {};
+
+  /// Per forum (`site.pluginUrl`): a digest of the credentials signed in
+  /// there, and the generation the read cache files that sign-in's reads
+  /// under.
+  ///
+  /// Per forum rather than per [SiteContext]: a multi-forum host (ABDA)
+  /// builds a new context each time a forum is reopened, and a per-context
+  /// key made the same signed-in reader miss every long-lived entry
+  /// (`/categories.json`, `/about.json`) and leave the old ones behind.
+  static final Map<String, ({String? credentials, int generation})>
+      _readSessions = {};
+
+  static int _readGeneration(String forum) =>
+      _readSessions[forum]?.generation ?? 0;
+
+  /// Records the credentials now signed in to [forum] ([authHeaders] as
+  /// `userApiAuthHeaders` gives them; empty when signed out). Called by
+  /// [DiscourseSiteContextExtension] whenever a context's credentials are
+  /// set, loaded or cleared.
+  ///
+  /// The same sign-in seen again — another SiteContext loading the same
+  /// key — changes nothing, so its cached reads stay usable. Any change
+  /// (sign-in, sign-out, another account; signing back in with the same key
+  /// counts, as it follows a sign-out) starts a new generation and drops the
+  /// forum's cached and pending reads, which no later request can match.
+  static void noteCredentials(String forum, Map<String, String> authHeaders) {
+    final names = authHeaders.keys.toList()..sort();
+    final credentials = authHeaders.isEmpty
+        ? null
+        : sha256
+            .convert(utf8.encode(jsonEncode([
+              for (final name in names) [name, authHeaders[name]],
+            ])))
+            .toString();
+    final previous = _readSessions[forum];
+    if (previous?.credentials == credentials) {
+      // Unchanged; an unknown forum with no credentials stays signed out.
+      return;
+    }
+    _readSessions[forum] = (
+      credentials: credentials,
+      generation: (previous?.generation ?? 0) + 1,
+    );
+    _readCache.removeWhere((key, _) => key.forum == forum);
+    _inFlight.removeWhere((key, _) => key.forum == forum);
+  }
+
+  /// Completed reads held for [forum], whether or not still fresh.
+  @visibleForTesting
+  static int debugCachedReads(String forum) =>
+      _readCache.keys.where((key) => key.forum == forum).length;
 
   /// Writes that change nothing the app subsequently reads, and so must not
   /// drop the read cache.
@@ -302,7 +370,7 @@ class DiscourseClient {
   /// Deliberately shorter than any human refresh gesture, and dropped
   /// wholesale on any write, so a user-initiated refresh always hits the
   /// network.
-  static final Map<(Object, String), _CachedResponse> _readCache = {};
+  static final Map<_ReadKey, _CachedResponse> _readCache = {};
 
   /// Clears cached reads. Call when the session changes — a different user
   /// may see entirely different content at the same URLs.
@@ -350,6 +418,7 @@ class DiscourseClient {
   Future<FCCallResult> _send(
     String method,
     Uri url, {
+    required Uri forum,
     required Map<String, String> headers,
     required String? encodedBody,
     required Map<String, dynamic>? effectiveQuery,
@@ -367,6 +436,7 @@ class DiscourseClient {
         final response = await _sendWithRedirects(
           method,
           url,
+          forum: forum,
           headers: headers,
           body: encodedBody,
           queryParameters: effectiveQuery,
@@ -421,6 +491,22 @@ class DiscourseClient {
   static bool _sameOrigin(Uri a, Uri b) =>
       a.scheme == b.scheme && a.host == b.host && a.port == b.port;
 
+  /// Whether [target] is on the forum at [forum]: its origin, and under its
+  /// subfolder when it has one. A forum at https://example.com/forum shares
+  /// its host with whatever else is served there, and a redirect to /blog/x
+  /// must not carry the forum's key to it. The rule ForumMediaAuth applies
+  /// to media. Dot segments are already gone: [Uri.resolve] removes them,
+  /// escaped ones included.
+  static bool _onForum(Uri forum, Uri target) {
+    if (!_sameOrigin(forum, target)) return false;
+    var base = forum.path;
+    while (base.endsWith('/')) {
+      base = base.substring(0, base.length - 1);
+    }
+    if (base.isEmpty) return true;
+    return target.path == base || target.path.startsWith('$base/');
+  }
+
   static Uri? _redirectTarget(Uri from, String? location) {
     if (location == null || location.trim().isEmpty) return null;
     try {
@@ -432,11 +518,13 @@ class DiscourseClient {
 
   /// dart:io forwards custom User-Api-* headers across automatic redirects.
   /// Check every hop before sending it through the SDK's cookie/Cloudflare
-  /// stack. Only reads on the original origin may be followed; a write must
-  /// never be replayed, nor turned into a GET by a 303.
+  /// stack. Only reads that stay on the forum ([_onForum]: its origin and
+  /// subfolder) may be followed; a write must never be replayed, nor turned
+  /// into a GET by a 303.
   Future<Response<String>> _sendWithRedirects(
     String method,
     Uri url, {
+    required Uri forum,
     required Map<String, String> headers,
     String? body,
     Map<String, dynamic>? queryParameters,
@@ -467,7 +555,7 @@ class DiscourseClient {
       if (target == null ||
           (target.scheme != 'http' && target.scheme != 'https') ||
           target.userInfo.isNotEmpty ||
-          !_sameOrigin(url, target)) {
+          !_onForum(forum, target)) {
         return response;
       }
       current = target;
@@ -602,8 +690,9 @@ class DiscourseClient {
   /// Turns a redirect into an actionable message instead of letting an edge
   /// server's HTML error page reach the user as "HTTP 302".
   ///
-  /// A 3xx surfacing here was not followed: it left the forum's origin,
-  /// tried to redirect a write, or exceeded the bounded read-redirect chain.
+  /// A 3xx surfacing here was not followed: it left the forum (its origin,
+  /// or its subfolder), tried to redirect a write, or exceeded the bounded
+  /// read-redirect chain.
   String _redirectDiagnostic(
     int status,
     Map<String, String> headers, {
@@ -622,15 +711,30 @@ class DiscourseClient {
       message = 'The forum redirected $method ${url.path} to '
           '${target.path} (HTTP $status). The request was not retried.';
     } else {
-      message = 'The forum redirected $method ${url.path} to another origin '
-          '(HTTP $status). For security, the request was not followed. '
-          'Check that the forum address is correct.';
+      // Name where it went — usually the forum's canonical address, which is
+      // what the configured one should be — but only its origin: a path or
+      // query (a signed URL, a token) stays out of the message.
+      message = 'The forum redirected $method ${url.path} to another origin, '
+          '${_originForMessage(target)} (HTTP $status). For security, the '
+          'request was not followed. Check that the forum address is correct.';
     }
     return jsonEncode({
       'errors': [message],
       'error_type': 'redirect',
       if (location.isNotEmpty) 'location': location,
     });
+  }
+
+  /// [target]'s origin for an error message. [Uri.origin] throws for a scheme
+  /// other than http(s) or an empty host, so those are named by scheme alone.
+  static String _originForMessage(Uri target) {
+    if ((target.scheme == 'http' || target.scheme == 'https') &&
+        target.host.isNotEmpty) {
+      return target.origin;
+    }
+    return target.scheme.isEmpty
+        ? 'an unknown address'
+        : 'a ${target.scheme}: address';
   }
 
   FCCallResult _toCallResultFromException(
@@ -680,6 +784,11 @@ class DiscourseClient {
   }
 }
 
+
+/// A cached or pending read: the forum (`site.pluginUrl`), the sign-in
+/// generation it was made under ([DiscourseClient.noteCredentials]), and the
+/// request itself.
+typedef _ReadKey = ({String forum, int generation, String request});
 
 class _CachedResponse {
   final FCCallResult result;

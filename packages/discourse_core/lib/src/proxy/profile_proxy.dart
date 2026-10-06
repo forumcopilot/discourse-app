@@ -48,27 +48,34 @@ class DiscourseProfileProxy extends BaseDiscourseProxy {
 
   /// What this forum lets members do with their profile, and its profile
   /// questions. Read at startup with the forum's settings; fetched here
-  /// only when startup could not.
+  /// only when startup could not. A reply that comes back after the sign-in
+  /// changed is not stored ([DiscourseSiteCapabilities.readGuard]).
   Future<({DiscourseProfileSettings settings, List<DiscourseUserFieldDef> fields})>
       forumRules() async {
     final key = siteContext.site.pluginUrl;
-    var caps = DiscourseSiteCapabilities.forSite(key);
-    if (caps.profileSettings == null) {
+    bool Function() guard() => DiscourseSiteCapabilities.readGuard(
+        key, () => siteContext.configurationSession);
+    if (DiscourseSiteCapabilities.forSite(key).profileSettings == null) {
       try {
-        DiscourseSiteCapabilities.storeClientSettings(
-            key, await apiGet('/site/settings.json'));
+        final current = guard();
+        final settings = await apiGet('/site/settings.json');
+        if (current()) {
+          DiscourseSiteCapabilities.storeClientSettings(key, settings);
+        }
       } catch (_) {
         // Stock defaults below.
       }
     }
     if (!DiscourseSiteCapabilities.isResolved(key)) {
       try {
-        DiscourseSiteCapabilities.store(key, await apiGet('/site.json'));
+        final current = guard();
+        final site = await apiGet('/site.json');
+        if (current()) DiscourseSiteCapabilities.store(key, site);
       } catch (_) {
         // No profile questions known.
       }
     }
-    caps = DiscourseSiteCapabilities.forSite(key);
+    final caps = DiscourseSiteCapabilities.forSite(key);
     return (
       settings: caps.profileSettings ?? const DiscourseProfileSettings(),
       fields: caps.userFields,

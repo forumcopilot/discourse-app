@@ -41,6 +41,25 @@ class DiscourseSiteCapabilities {
     _sessions.remove(pluginUrl);
   }
 
+  /// For a capability read that does not begin a session — a proxy filling
+  /// in what startup did not read (flag types, profile rules) — the check to
+  /// make before storing its reply. Call it as the request goes out, with
+  /// the reader's `configurationSession`.
+  ///
+  /// The config proxy's guard: the reply may be stored only while the
+  /// forum's capabilities are the ones the read began with (a change of
+  /// sign-in, a forced refresh or a new session replaces them) and the
+  /// reader's sign-in is the one it was sent with. The second matters when
+  /// there were none: a sign-out leaves none either, and the previous
+  /// account's reply would otherwise become the signed-out reader's.
+  static bool Function() readGuard(
+      String pluginUrl, Object Function() session) {
+    final before = _bySite[pluginUrl];
+    final began = session();
+    return () =>
+        identical(_bySite[pluginUrl], before) && identical(session(), began);
+  }
+
   /// `top_menu_items` — the list routes this forum offers ("latest",
   /// "hot", "unread", …). Empty when unknown, which callers must treat as
   /// "don't know" rather than "offers nothing".
