@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:discourse_core/discourse_core.dart';
@@ -21,9 +22,13 @@ class GrantedAuth extends DiscourseAuthManager {
 }
 
 class LoginClient extends DiscourseClient {
-  LoginClient({this.configOffline = false, this.sessionStatus = 200});
+  LoginClient(
+      {this.configOffline = false, this.sessionStatus = 200, this.siteHold});
   final bool configOffline;
   final int sessionStatus;
+
+  /// Holds `/site.json` until completed: a forum slow to answer it.
+  final Completer<void>? siteHold;
   final paths = <String>[];
   @override
   Future<FCCallResult> get(SiteContext context, String path,
@@ -43,6 +48,7 @@ class LoginClient extends DiscourseClient {
           }));
     }
     expect(useCache, isFalse);
+    if (path == '/site.json') await siteHold?.future;
     if (configOffline) {
       return FCCallResult(statusCode: 0, body: '{"error":"offline"}');
     }
@@ -85,6 +91,38 @@ void main() {
         throwsStateError);
     expect(context.isLoggedIn, isFalse);
     expect(client.paths, contains('/site.json'));
+    expect(DiscourseSiteCapabilities.forSite(url).canCreateTag, isTrue);
+  });
+
+  test('a slow forum configuration does not hold sign-in on a spinner',
+      () async {
+    const url = 'https://forum.example';
+    final context = SiteContext(
+        siteType: 'discourse',
+        site: Site(
+            name: 'Forum',
+            url: url,
+            baseUrl: url,
+            description: '',
+            siteType: 'discourse'));
+    final saved = DiscourseLoginService.configurationRefreshTimeout;
+    DiscourseLoginService.configurationRefreshTimeout =
+        const Duration(milliseconds: 100);
+    addTearDown(
+        () => DiscourseLoginService.configurationRefreshTimeout = saved);
+    final hold = Completer<void>();
+    final client = LoginClient(siteHold: hold);
+    // Without the budget this waits for /site.json, which Dio lets run for
+    // its 15 s connect and 30 s idle timeouts.
+    await DiscourseLoginService(context,
+            client: client, authManager: GrantedAuth(context))
+        .finishLogin('dummy-payload')
+        .timeout(const Duration(seconds: 5));
+    expect(context.isLoggedIn, isTrue);
+    expect(DiscourseSiteCapabilities.forSite(url).canCreateTag, isFalse);
+    // The configuration carries on and lands after sign-in.
+    hold.complete();
+    await pumpEventQueue();
     expect(DiscourseSiteCapabilities.forSite(url).canCreateTag, isTrue);
   });
 
