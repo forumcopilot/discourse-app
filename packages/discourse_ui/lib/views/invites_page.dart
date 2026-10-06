@@ -99,6 +99,13 @@ class _InvitesPageState extends State<InvitesPage> {
         t.contains('not permitted');
   }
 
+  /// Loads the first page of the current filter, or with [more] the next.
+  ///
+  /// A first page replaces the rows only once it has arrived: a refresh
+  /// (pull to refresh, Retry) keeps the list on screen meanwhile, and if
+  /// it fails the rows stay and the reason shows in a snack bar. Only a
+  /// filter change ([_selectFilter]) empties the list first. It used to
+  /// empty it on every reload, so a refresh showed a full-screen spinner.
   Future<void> _load({bool more = false}) async {
     if (more && (_loading || _nextOffset == null)) return;
     final generation = more ? _generation : ++_generation;
@@ -107,44 +114,140 @@ class _InvitesPageState extends State<InvitesPage> {
     setState(() {
       _loading = true;
       _error = null;
-      if (!more) {
-        _invites = null;
-        _nextOffset = null;
-        _forbiddenText = null;
-      }
     });
+    String? failure;
     try {
       final result =
           await _proxy.getMyInvitesAsync(filter: filter, offset: offset);
       if (!mounted || generation != _generation) return;
-      setState(() {
-        _loading = false;
-        if (!result.result) {
-          if (!more) _invites = [];
-          if (!more && _looksForbidden(result.resultText)) {
+      if (!result.result) {
+        if (!more && _looksForbidden(result.resultText)) {
+          setState(() {
+            _loading = false;
             _forbiddenText = result.resultText;
-          } else {
-            _error = result.resultText?.isNotEmpty == true
-                ? result.resultText
-                : AppLocalizations.of(context)!.invitesLoadFailed;
-          }
+          });
           return;
         }
-        _forbiddenText = null;
-        _invites = [if (more) ...?_invites, ...result.invites];
-        _nextOffset = result.nextOffset;
-        _pendingCount = result.pendingCount;
-        _expiredCount = result.expiredCount;
-        _redeemedCount = result.redeemedCount;
-      });
+        failure = result.resultText?.isNotEmpty == true
+            ? result.resultText
+            : AppLocalizations.of(context)!.invitesLoadFailed;
+      } else {
+        setState(() {
+          _loading = false;
+          _forbiddenText = null;
+          if (more) {
+            // The server pages by row offset, so a row added or moved up
+            // on the forum meanwhile comes round again: list it once.
+            final listed = {for (final i in _invites ?? const []) i.id};
+            _invites = [
+              ...?_invites,
+              for (final i in result.invites)
+                if (listed.add(i.id)) i,
+            ];
+          } else {
+            _invites = [...result.invites];
+          }
+          _nextOffset = result.nextOffset;
+          _pendingCount = result.pendingCount;
+          _expiredCount = result.expiredCount;
+          _redeemedCount = result.redeemedCount;
+        });
+        return;
+      }
     } catch (e) {
       if (!mounted || generation != _generation) return;
-      setState(() {
-        _loading = false;
-        if (!more) _invites = [];
-        _error = describeError(e);
-      });
+      failure = describeError(e);
     }
+    final keptRows = !more && (_invites?.isNotEmpty ?? false);
+    setState(() {
+      _loading = false;
+      _invites ??= [];
+      // A failed Load more says so on its own row, with Retry; a failed
+      // refresh keeps the rows it would have replaced.
+      if (!keptRows) _error = failure;
+    });
+    if (keptRows) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(describeError(failure, context: context))),
+      );
+    }
+  }
+
+  /// Shows [filter]'s invites, from the first page.
+  void _selectFilter(String filter) {
+    if (_filter == filter) return;
+    setState(() {
+      _filter = filter;
+      _invites = null;
+      _nextOffset = null;
+      _error = null;
+    });
+    _load();
+  }
+
+  /// A change made here (a revoke, a new invite) moves the server's rows
+  /// under a page still on its way, which would then land at the wrong
+  /// offset. That page is dropped; Load more asks again from the
+  /// adjusted offset.
+  void _dropPageInFlight() {
+    if (!_loading) return;
+    _generation++;
+    _loading = false;
+  }
+
+  /// Takes a revoked invite off the list where it is, as the forum's own
+  /// Invites page does (user-invited/show.js destroyInvite), instead of
+  /// loading the list again: that showed a full-screen spinner and came
+  /// back with the first page only, however far the reader had scrolled.
+  /// The server's later rows move up one, so the next page starts a row
+  /// earlier.
+  void _removeInvite(int id) {
+    final invites = _invites;
+    if (invites == null || !invites.any((i) => i.id == id)) return;
+    _dropPageInFlight();
+    _invites = [
+      for (final i in invites)
+        if (i.id != id) i,
+    ];
+    final next = _nextOffset;
+    if (next != null) _nextOffset = next > 0 ? next - 1 : 0;
+    switch (_filter) {
+      case 'pending':
+        if (_pendingCount > 0) _pendingCount--;
+      case 'expired':
+        if (_expiredCount > 0) _expiredCount--;
+      case 'redeemed':
+        if (_redeemedCount > 0) _redeemedCount--;
+    }
+  }
+
+  /// Puts a new invite at the top of Pending, as the forum's invite dialog
+  /// does (create-invite.gjs), instead of loading the list again. Pending
+  /// lists the most recently updated first (`Invite.pending`), and inviting
+  /// an address again renews its pending invite (`Invite.generate`), so an
+  /// invite already listed moves to the top rather than counting twice.
+  void _addInvite(DiscourseInvite invite) {
+    final invites = _invites;
+    // A new invite is pending; Redeemed rows carry another kind of id.
+    final listed = _filter == 'pending' &&
+        (invites?.any((i) => i.id == invite.id) ?? false);
+    if (_filter == 'pending' && invites == null) {
+      // The first page is still on its way: ask for it again.
+      _load();
+      return;
+    }
+    setState(() {
+      if (!listed) _pendingCount++;
+      if (_filter != 'pending' || invites == null) return;
+      _dropPageInFlight();
+      _invites = [
+        invite,
+        for (final i in invites)
+          if (i.id != invite.id) i,
+      ];
+      final next = _nextOffset;
+      if (!listed && next != null) _nextOffset = next + 1;
+    });
   }
 
   Future<void> _createInviteLink() async {
@@ -167,8 +270,8 @@ class _InvitesPageState extends State<InvitesPage> {
       );
       return;
     }
+    _addInvite(result.invite!);
     await _showInviteLinkSheet(result.invite!);
-    await _load();
   }
 
   /// Bottom sheet showing a freshly minted link with Copy / Share.
@@ -350,7 +453,12 @@ class _InvitesPageState extends State<InvitesPage> {
       SnackBar(
           content: Text(AppLocalizations.of(context)!.inviteSentTo(email))),
     );
-    await _load();
+    final invite = result.invite;
+    if (invite != null) {
+      _addInvite(invite);
+    } else {
+      await _load();
+    }
   }
 
   Future<void> _delete(DiscourseInvite invite) async {
@@ -383,8 +491,7 @@ class _InvitesPageState extends State<InvitesPage> {
     final result = await _proxy.destroyInviteAsync(invite.id);
     if (!mounted) return;
     if (result.result) {
-      setState(() => _invites?.removeWhere((i) => i.id == invite.id));
-      await _load();
+      setState(() => _removeInvite(invite.id));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -479,12 +586,7 @@ class _InvitesPageState extends State<InvitesPage> {
               label: Text(_filterLabel(AppLocalizations.of(context)!, f)),
               selected: _filter == f,
               onSelected: (selected) {
-                if (!selected || _filter == f) return;
-                setState(() {
-                  _filter = f;
-                  _invites = null;
-                });
-                _load();
+                if (selected) _selectFilter(f);
               },
             ),
             if (f != _filters.last)

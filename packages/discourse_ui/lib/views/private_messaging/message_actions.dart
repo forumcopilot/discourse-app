@@ -219,19 +219,26 @@ class MessageActions {
   }
 
   /// Edit the message's title (and, for those who may, close it).
+  ///
+  /// Whether anything changed on the forum, for the caller to refresh. Also
+  /// true when only part of a save went through (the title saved, closing
+  /// was refused) and the editor was then left without saving the rest:
+  /// the message used to keep its old title on screen.
   static Future<bool> editTitle(
     BuildContext context, {
     required SiteContext siteContext,
     required String topicId,
     required bool canClose,
   }) async {
+    var changed = false;
     final saved = await Navigator.of(context).push<bool>(FormPageRoute(
       builder: (_) => EditConversationPage(
         siteContext: siteContext,
         conversationId: topicId,
         canClose: canClose,
+        onSaved: () => changed = true,
       ),
     ));
-    return saved == true;
+    return saved == true || changed;
   }
 }

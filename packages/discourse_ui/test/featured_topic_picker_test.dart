@@ -50,6 +50,18 @@ void main() {
     expect(choice?.topicId, 2);
   });
 
+  testWidgets('a topic that comes round again on a later page is listed once',
+      (tester) async {
+    // A topic started between Load more taps pushes the list down a row,
+    // so the next page begins with the last one already shown.
+    proxy.repeatOnPage1 = true;
+    await pump(tester);
+    await tester.tap(find.text('Load more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Recent topic'), findsOneWidget);
+    expect(find.text('Older topic'), findsOneWidget);
+  });
+
   testWidgets('search resets pagination, pages with the query, and clears',
       (tester) async {
     await pump(tester);
@@ -155,19 +167,45 @@ class _Profile extends DiscourseProfileProxy {
               resultText: '',
               user: FCUser(id: '2', username: 'alice'))));
   final calls = <(String, int)>[];
+  bool repeatOnPage1 = false;
   int? failPage;
   Completer<Map<String, dynamic>>? delayed;
   @override
   Future<Map<String, dynamic>> apiGet(String path,
       {Map<String, dynamic>? query}) async {
-    final search = query?['search'] as String? ?? '';
-    final page = int.parse(query?['page'] as String? ?? '0');
+    // A search goes to the forum's search, whose pages count from 1; the
+    // list's count from 0.
+    final searching = path == '/search.json';
+    final search =
+        searching ? (query!['q'] as String).split(' @alice ').first : '';
+    final page = searching
+        ? int.parse(query!['page'] as String? ?? '1') - 1
+        : int.parse(query?['page'] as String? ?? '0');
     calls.add((search, page));
     if (failPage == page) throw StateError('Please retry');
-    if (search.isNotEmpty) {
-      return _page('Search match ${page + 1}', 10 + page, more: page == 0);
+    if (searching) {
+      final id = 10 + page;
+      return {
+        'posts': [
+          {'topic_id': id}
+        ],
+        'topics': [
+          {'id': id, 'title': 'Search match ${page + 1}'}
+        ],
+        'grouped_search_result': {'more_full_page_results': page == 0},
+      };
     }
     if (page > 0 && delayed != null) return delayed!.future;
+    if (page == 1 && repeatOnPage1) {
+      return {
+        'topic_list': {
+          'topics': [
+            {'id': 1, 'title': 'Recent topic'},
+            {'id': 2, 'title': 'Older topic'},
+          ],
+        },
+      };
+    }
     return _page(page == 0 ? 'Recent topic' : 'Older topic', page + 1,
         more: page == 0);
   }

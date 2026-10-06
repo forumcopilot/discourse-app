@@ -28,30 +28,86 @@ void main() {
     await proxy.myTopicsPage(page: 1);
     expect(proxy.paths, everyElement('/topics/created-by/alice.json'));
     expect(proxy.queries, [
-      {},
-      {'page': '1'}
+      {'order': 'created'},
+      {'order': 'created', 'page': '1'}
     ]);
   });
 
-  test('search reaches the server on every page and keeps content matches',
+  test('lists by creation, so a reply between pages cannot move a topic',
       () async {
+    // Discourse's default for this list is bumped_at: a topic that got a
+    // reply between Load more taps jumped to the top, the next page
+    // repeated a row and the bumped one was never shown.
+    final proxy = _Profile()..response = {'topic_list': {'topics': []}};
+    await proxy.myTopicsPage();
+    await proxy.myTopicsPage(page: 3);
+    expect(proxy.queries.map((q) => q['order']), ['created', 'created']);
+    expect(proxy.queries.any((q) => q.containsKey('ascending')), isFalse,
+        reason: 'newest first, as the list reads');
+  });
+
+  test("search asks for the member's public topics by title, every page",
+      () async {
+    // topics_by's `search` matched any post in a topic, replies by others
+    // included; the forum's own picker searches titles (ChooseTopic).
     final proxy = _Profile()
       ..response = {
-        'topic_list': {
-          'topics': [
-            {'id': 7, 'title': 'A matching term in the body'}
-          ],
-          'more_topics_url': '/topics/created-by/alice?page=1&search=needle',
-        }
+        'posts': [
+          {'id': 70, 'topic_id': 8, 'post_number': 1},
+          {'id': 71, 'topic_id': 7, 'post_number': 1},
+        ],
+        'topics': [
+          {
+            'id': 7,
+            'title': 'Flutter tips',
+            'posts_count': 3,
+            'category_id': 2,
+            'created_at': '2026-01-01T00:00:00Z'
+          },
+          {'id': 8, 'title': 'Flutter news', 'posts_count': 1},
+        ],
+        'grouped_search_result': {'more_full_page_results': true},
       };
-    final result = await proxy.myTopicsPage(query: ' needle ');
-    expect(result.topics.single.id, 7,
-        reason: 'server results must not be filtered again against the title');
-    await proxy.myTopicsPage(query: 'needle', page: 1);
-    expect(proxy.queries, [
-      {'search': 'needle'},
-      {'page': '1', 'search': 'needle'}
-    ]);
+    final result = await proxy.myTopicsPage(query: ' flutter ');
+    expect(proxy.paths, ['/search.json']);
+    expect(proxy.queries.single, {
+      'q': 'flutter @alice in:title in:first status:public order:latest_topic',
+    });
+    // In the results' order, which is their posts'.
+    expect(result.topics.map((t) => t.id), [8, 7]);
+    expect(result.topics.last.replies, 2);
+    expect(result.topics.last.categoryId, 2);
+    expect(result.topics.last.createdAt, DateTime.utc(2026));
+    expect(result.nextPage, 1);
+    // /search.json counts pages from 1.
+    await proxy.myTopicsPage(query: 'flutter', page: 1);
+    expect(proxy.queries.last['page'], '2');
+    expect(proxy.queries.last['q'], startsWith('flutter @alice in:title'));
+  });
+
+  test("search stops where the forum's search does", () async {
+    final proxy = _Profile()
+      ..response = {
+        'posts': [
+          {'topic_id': 7}
+        ],
+        'topics': [
+          {'id': 7, 'title': 'Flutter tips'}
+        ],
+        'grouped_search_result': {'more_full_page_results': false},
+      };
+    expect((await proxy.myTopicsPage(query: 'flutter')).nextPage, isNull);
+    proxy.response = {
+      ...proxy.response,
+      'grouped_search_result': {'more_full_page_results': true},
+    };
+    // SearchController::PAGE_LIMIT is 10: page 9 here is its last.
+    expect((await proxy.myTopicsPage(query: 'flutter', page: 9)).nextPage,
+        isNull);
+    final calls = proxy.paths.length;
+    final beyond = await proxy.myTopicsPage(query: 'flutter', page: 10);
+    expect(beyond.topics, isEmpty);
+    expect(proxy.paths.length, calls, reason: 'the server would refuse it');
   });
 
   test('a final nonempty page has no continuation', () async {
