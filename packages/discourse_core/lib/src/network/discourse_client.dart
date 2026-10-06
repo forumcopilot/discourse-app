@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
+import 'package:flutter/foundation.dart'
+    show debugPrint, kDebugMode, visibleForTesting;
 
 import 'package:dio/dio.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -76,6 +77,9 @@ class DiscourseClient {
     // Initialization yields even when the transport is already ready. Work
     // started by one account must not pick up replacement credentials there.
     final session = context.configurationSession;
+    // Which sign-in on this forum the read cache files the request under.
+    final forum = context.site.pluginUrl;
+    final generation = _readGeneration(forum);
     final headers = <String, String>{
       'Accept': 'application/json',
       ...context.userApiAuthHeaders(),
@@ -119,11 +123,14 @@ class DiscourseClient {
       _inFlight.clear();
     }
 
-    // Both completed responses and pending requests belong to the session
-    // that issued them. A logout/re-login starts a new generation even if
-    // the same credentials are restored. Header overrides and SDK cookies
-    // can also change the identity/representation without changing context.
-    // Keep only a digest in the key, never raw credentials or cookie values.
+    // Both completed responses and pending requests belong to the forum's
+    // sign-in generation that issued them ([noteCredentials]): a logout/
+    // re-login starts a new one even if the same credentials are restored,
+    // while another SiteContext for the same signed-in forum shares it.
+    // Accounts are kept apart by the digest of the effective headers
+    // (credentials, header overrides) and SDK cookies, which can also change
+    // the identity/representation without changing context. Keep only a
+    // digest in the key, never raw credentials or cookie values.
     final cookieValues = method == 'GET'
         ? (await FCDioClient.instance.cookieJar?.loadForRequest(url) ?? [])
             .map((cookie) => cookie.toString())
@@ -135,8 +142,12 @@ class DiscourseClient {
       for (final name in headerNames) [name, headers[name]],
       cookieValues,
     ])));
-    final readKey = method == 'GET'
-        ? (session, '$url|${_canonicalQuery(effectiveQuery)}|$variant')
+    final _ReadKey? readKey = method == 'GET'
+        ? (
+            forum: forum,
+            generation: generation,
+            request: '$url|${_canonicalQuery(effectiveQuery)}|$variant',
+          )
         : null;
     if (!useCache && readKey != null) {
       // A refresh must also stop a later ordinary read from going back to
@@ -182,6 +193,7 @@ class DiscourseClient {
         // Only successful reads are worth repeating; an error must not be
         // pinned for the next few seconds.
         if (identical(context.configurationSession, session) &&
+            _readGeneration(forum) == generation &&
             identical(_inFlight[cacheKey], future) &&
             result.statusCode >= 200 &&
             result.statusCode < 300) {
@@ -236,8 +248,60 @@ class DiscourseClient {
     );
   }
 
-  /// Concurrent identical GETs, keyed by session, URL, query and headers/cookies.
-  static final Map<(Object, String), Future<FCCallResult>> _inFlight = {};
+  /// Concurrent identical GETs, keyed by forum, sign-in generation, URL,
+  /// query and headers/cookies.
+  static final Map<_ReadKey, Future<FCCallResult>> _inFlight = {};
+
+  /// Per forum (`site.pluginUrl`): a digest of the credentials signed in
+  /// there, and the generation the read cache files that sign-in's reads
+  /// under.
+  ///
+  /// Per forum rather than per [SiteContext]: a multi-forum host (ABDA)
+  /// builds a new context each time a forum is reopened, and a per-context
+  /// key made the same signed-in reader miss every long-lived entry
+  /// (`/categories.json`, `/about.json`) and leave the old ones behind.
+  static final Map<String, ({String? credentials, int generation})>
+      _readSessions = {};
+
+  static int _readGeneration(String forum) =>
+      _readSessions[forum]?.generation ?? 0;
+
+  /// Records the credentials now signed in to [forum] ([authHeaders] as
+  /// `userApiAuthHeaders` gives them; empty when signed out). Called by
+  /// [DiscourseSiteContextExtension] whenever a context's credentials are
+  /// set, loaded or cleared.
+  ///
+  /// The same sign-in seen again — another SiteContext loading the same
+  /// key — changes nothing, so its cached reads stay usable. Any change
+  /// (sign-in, sign-out, another account; signing back in with the same key
+  /// counts, as it follows a sign-out) starts a new generation and drops the
+  /// forum's cached and pending reads, which no later request can match.
+  static void noteCredentials(String forum, Map<String, String> authHeaders) {
+    final names = authHeaders.keys.toList()..sort();
+    final credentials = authHeaders.isEmpty
+        ? null
+        : sha256
+            .convert(utf8.encode(jsonEncode([
+              for (final name in names) [name, authHeaders[name]],
+            ])))
+            .toString();
+    final previous = _readSessions[forum];
+    if (previous?.credentials == credentials) {
+      // Unchanged; an unknown forum with no credentials stays signed out.
+      return;
+    }
+    _readSessions[forum] = (
+      credentials: credentials,
+      generation: (previous?.generation ?? 0) + 1,
+    );
+    _readCache.removeWhere((key, _) => key.forum == forum);
+    _inFlight.removeWhere((key, _) => key.forum == forum);
+  }
+
+  /// Completed reads held for [forum], whether or not still fresh.
+  @visibleForTesting
+  static int debugCachedReads(String forum) =>
+      _readCache.keys.where((key) => key.forum == forum).length;
 
   /// Writes that change nothing the app subsequently reads, and so must not
   /// drop the read cache.
@@ -306,7 +370,7 @@ class DiscourseClient {
   /// Deliberately shorter than any human refresh gesture, and dropped
   /// wholesale on any write, so a user-initiated refresh always hits the
   /// network.
-  static final Map<(Object, String), _CachedResponse> _readCache = {};
+  static final Map<_ReadKey, _CachedResponse> _readCache = {};
 
   /// Clears cached reads. Call when the session changes — a different user
   /// may see entirely different content at the same URLs.
@@ -720,6 +784,11 @@ class DiscourseClient {
   }
 }
 
+
+/// A cached or pending read: the forum (`site.pluginUrl`), the sign-in
+/// generation it was made under ([DiscourseClient.noteCredentials]), and the
+/// request itself.
+typedef _ReadKey = ({String forum, int generation, String request});
 
 class _CachedResponse {
   final FCCallResult result;

@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../network/discourse_client.dart';
 import '../storage/discourse_secure_storage.dart';
 import '../data/site/discourse_site_capabilities.dart';
 
@@ -49,8 +50,10 @@ extension DiscourseSiteContextExtension on SiteContext {
 
   Map<String, dynamic> _data() => _store[this] ??= <String, dynamic>{};
 
-  /// Opaque identity for user-dependent configuration and HTTP reads.
-  /// Changes whenever credentials change; contains no key data.
+  /// Opaque identity for user-dependent configuration, and for work this
+  /// context started under its current credentials. Changes whenever this
+  /// context's credentials change; contains no key data. Per context: the
+  /// HTTP read cache keys by forum instead ([DiscourseClient.noteCredentials]).
   Object get configurationSession =>
       _data()['configurationSession'] ??= Object();
 
@@ -58,6 +61,13 @@ extension DiscourseSiteContextExtension on SiteContext {
     _data()['configurationSession'] = Object();
     DiscourseSiteCapabilities.invalidate(site.pluginUrl);
   }
+
+  /// Tells the HTTP read cache who is now signed in to this forum. It keeps
+  /// reads across SiteContexts for the same sign-in and drops them when it
+  /// changes; see [DiscourseClient.noteCredentials]. Call after every change
+  /// to the in-memory credentials.
+  void _noteCredentialsForReadCache() =>
+      DiscourseClient.noteCredentials(site.pluginUrl, userApiAuthHeaders());
 
   /// The User API Key returned by Discourse after a successful handshake.
   String? get userApiKey => _data()['userApiKey'] as String?;
@@ -102,6 +112,7 @@ extension DiscourseSiteContextExtension on SiteContext {
     data['userApiKey'] = userApiKey;
     data['userApiClientId'] = userApiClientId;
     data['userApiPushEnabled'] = pushEnabled;
+    _noteCredentialsForReadCache();
 
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
@@ -124,6 +135,7 @@ extension DiscourseSiteContextExtension on SiteContext {
     data.remove('userApiKey');
     data.remove('userApiClientId');
     data.remove('userApiPushEnabled');
+    _noteCredentialsForReadCache();
     // The reader's sidebar and trust level go with the session.
     setSidebar();
     setTrustLevel(null);
@@ -236,6 +248,7 @@ extension DiscourseSiteContextExtension on SiteContext {
     }
     data['userApiKey'] = key;
     data['userApiClientId'] = clientId;
+    _noteCredentialsForReadCache();
     if (key == null && readError == null && data['userApiClientId'] != null) {
       // The signature of a lost key: the non-secret half of the credential
       // survived and the secret half did not. Sign-out and never-signed-in
