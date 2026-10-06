@@ -974,7 +974,13 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
             children: _buildTabWidgets(),
           ),
         ),
-        bottomNavigationBar: NavigationBar(
+        // One line per label, ellipsized: a long word ("Nachrichten",
+        // "Сообщения" at large text) broke mid-word onto a second line.
+        bottomNavigationBar: DefaultTextStyle.merge(
+          maxLines: 1,
+          softWrap: false,
+          overflow: TextOverflow.ellipsis,
+          child: NavigationBar(
           onDestinationSelected: (int index) {
             AppLogger.debug('🎯 [SITE_HOME] NavigationBar onDestinationSelected: index=$index, TabController.length=${_tabController.length}');
             setState(() {
@@ -989,6 +995,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           selectedIndex: _tabController.index,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: _buildNavigationDestinations(),
+          ),
         ),
         floatingActionButton: shouldShowFAB
             ? FloatingActionButton.extended(

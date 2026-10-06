@@ -49,8 +49,18 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
     if (mounted) setState(() {});
   }
 
+  /// What the page shows of the playback. The controller notifies about
+  /// ten times a second while playing (position); the progress bar listens
+  /// for that itself, so the page rebuilds only when this changes.
+  (bool, bool, bool)? _shown;
+
   void _playbackChanged() {
-    if (mounted) setState(() {});
+    final value = _controller?.value;
+    if (value == null || !mounted) return;
+    final now = (value.isInitialized, value.isPlaying, value.hasError);
+    if (now == _shown) return;
+    _shown = now;
+    setState(() {});
   }
 
   @override
@@ -113,9 +123,10 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
+                  // Not the player's own description: on Android that is
+                  // the raw ExoPlayer exception.
                   child: Text(
-                    controller?.value.errorDescription ??
-                        l10n.failedToLoadVideo,
+                    l10n.failedToLoadVideo,
                     style: const TextStyle(color: Colors.white),
                     textAlign: TextAlign.center,
                   ),

@@ -99,7 +99,9 @@ void main() {
     player.events.addError(
         PlatformException(code: 'VideoError', message: 'Playback interrupted'));
     await tester.pumpAndSettle();
-    expect(find.text('Playback interrupted'), findsOneWidget);
+    // The app's own words, not the player's raw exception text.
+    expect(find.text('Failed to load video'), findsOneWidget);
+    expect(find.text('Playback interrupted'), findsNothing);
     expect(find.byIcon(Icons.pause_circle_filled), findsNothing);
     await tester.pumpWidget(const SizedBox());
   });

@@ -402,7 +402,8 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
 
   void _changed() {
     if (!mounted) return;
-    setState(() {});
+    // An error mid-playback left Play showing, doing nothing.
+    setState(() => _failed = _failed || (_controller?.value.hasError ?? false));
     updateKeepAlive();
   }
 
