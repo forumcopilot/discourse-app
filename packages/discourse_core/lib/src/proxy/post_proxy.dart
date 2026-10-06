@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../context/discourse_site_context_extension.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../data/post/discourse_accepted_answer.dart';
 import '../data/post/discourse_reaction_users.dart';
@@ -697,19 +698,22 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   static const int flagSpam = 8;
 
   /// The forum's flag types for a post (DiscourseSiteCapabilities.flagTypes),
-  /// reading `/site.json` first if this forum's has not been read yet.
+  /// reading `/site.json` first if this forum's has not been read yet. A
+  /// reply that comes back after the sign-in changed is not stored
+  /// ([DiscourseSiteCapabilities.readGuard]).
   Future<List<DiscourseFlagType>> flagTypesAsync() async {
     final key = siteContext.site.pluginUrl;
-    var caps = DiscourseSiteCapabilities.forSite(key);
-    if (caps.flagTypes.isEmpty) {
+    if (DiscourseSiteCapabilities.forSite(key).flagTypes.isEmpty) {
       try {
-        DiscourseSiteCapabilities.store(key, await apiGet('/site.json'));
-        caps = DiscourseSiteCapabilities.forSite(key);
+        final current = DiscourseSiteCapabilities.readGuard(
+            key, () => siteContext.configurationSession);
+        final site = await apiGet('/site.json');
+        if (current()) DiscourseSiteCapabilities.store(key, site);
       } catch (_) {
         // None known: the caller says flagging is unavailable.
       }
     }
-    return caps.flagTypes;
+    return DiscourseSiteCapabilities.forSite(key).flagTypes;
   }
 
   /// Flag a post with a SPECIFIC Discourse flag type.
