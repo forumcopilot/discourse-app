@@ -109,8 +109,11 @@ class ChatChannelPages extends ChangeNotifier {
       return;
     }
     final offset = kind == _Fetch.more ? _consumed : 0;
+    // A refresh asks for one more than it has, so a full answer means more
+    // exist; asking for exactly as many came back "full" with nothing left,
+    // and a dead Load more reappeared.
     final limit = kind == _Fetch.refresh
-        ? _consumed.clamp(pageSize, maxLimit)
+        ? (_consumed + 1).clamp(pageSize, maxLimit)
         : pageSize;
     final result = await proxy.browseChannelsAsync(
         filter: filter, status: status, offset: offset, limit: limit);

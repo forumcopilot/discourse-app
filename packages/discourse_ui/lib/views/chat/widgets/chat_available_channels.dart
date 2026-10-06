@@ -80,8 +80,10 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
     super.dispose();
   }
 
-  bool _offered(FCChatChannel c) =>
-      !widget.joinedIds.contains(c.id) && !c.isFollowing;
+  /// The reader's own list decides, not the row's following flag: that is
+  /// a snapshot from when the page was read, and a channel left elsewhere
+  /// since was then in neither list.
+  bool _offered(FCChatChannel c) => !widget.joinedIds.contains(c.id);
 
   List<FCChatChannel> get _available =>
       widget.pages.channels.where(_offered).toList();
@@ -192,14 +194,10 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
             child: Center(child: CircularProgressIndicator()))
       else if (error == null && pages.hasMore)
         Center(
-            child: TextButton(onPressed: _loadMore, child: Text(l10n.loadMore)))
-      else if (error == null && available.isEmpty)
-        // The web's Browse channels says this when it has nothing to list.
-        Padding(
-            padding: const EdgeInsets.all(DesignTokens.spacingL),
-            child: Text(l10n.chatNoChannelsFound,
-                style:
-                    text.bodyMedium?.copyWith(color: colors.onSurfaceVariant))),
+            child: TextButton(onPressed: _loadMore, child: Text(l10n.loadMore))),
+      // Nothing left to join: nothing to say under the reader's own
+      // channels (the web's list has no such state; its "No channels found"
+      // belongs to Browse channels, which lists joined ones too).
     ]);
   }
 }

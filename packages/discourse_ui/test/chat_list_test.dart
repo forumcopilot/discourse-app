@@ -431,8 +431,11 @@ void main() {
   testWidgets(
       'pagination advances past followed channels without false empty state',
       (tester) async {
+    // Followed open channels are the reader's own list (/me/channels).
     chat.list = {
-      'public_channels': [_channel(1, 'general')],
+      'public_channels': [
+        for (var id = 1; id <= 25; id++) _channel(id, 'followed $id')
+      ],
       'direct_message_channels': []
     };
     chat.browsePages = {
@@ -452,6 +455,9 @@ void main() {
       },
     };
     await pump(tester);
+    await tester.dragUntilVisible(find.text('Browse channels'),
+        find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
     // A page of channels the reader has all joined reads the next at once,
     // rather than leaving only Load more.
     expect(chat.browseOffsets, [0, 25]);
@@ -462,13 +468,18 @@ void main() {
 
   testWidgets('reading on alone stops after a few pages', (tester) async {
     chat.list = {
-      'public_channels': [_channel(1, 'general')],
+      'public_channels': [
+        for (var id = 1; id <= 200; id++) _channel(id, 'followed $id')
+      ],
       'direct_message_channels': []
     };
     chat.browseAll = [
       for (var id = 1; id <= 200; id++) _channel(id, 'followed $id')
     ];
     await pump(tester);
+    await tester.dragUntilVisible(find.text('Browse channels'),
+        find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
     expect(chat.browseOffsets, [0, 25, 50, 75]);
     await tester.ensureVisible(find.text('Load more'));
       await tester.pumpAndSettle();
@@ -542,8 +553,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(chat.browseQueries, hasLength(3));
       expect(chat.browseQueries.last, containsPair('offset', 0));
-      expect(chat.browseQueries.last, containsPair('limit', 26));
+      expect(chat.browseQueries.last, containsPair('limit', 27),
+          reason: 'one more than loaded, to learn whether more exist');
       expect(find.text('open 26'), findsOneWidget);
+      expect(find.text('Load more'), findsNothing,
+          reason: 'all 26 were loaded; nothing more to load');
     });
 
     testWidgets('across DMs and back', (tester) async {
@@ -660,7 +674,7 @@ void main() {
     }
   });
 
-  testWidgets("every channel joined: the web's empty Browse channels line",
+  testWidgets('every channel joined: nothing is said under the reader\'s own',
       (tester) async {
     chat.list = {
       'public_channels': [_channel(1, 'general')],
@@ -670,8 +684,22 @@ void main() {
       'channels': [_channel(1, 'general')]
     };
     await pump(tester);
-    expect(find.text('No channels found'), findsOneWidget);
-    expect(find.text('You have joined all available channels.'), findsNothing);
+    // The web's list has no such state; "No channels found" belongs to
+    // Browse channels, which lists joined channels too.
+    expect(find.text('No channels found'), findsNothing);
+    expect(find.text('Load more'), findsNothing);
+  });
+
+  testWidgets('a channel left elsewhere is offered though its row says '
+      'followed', (tester) async {
+    // The browse row's following flag is a snapshot from when the page was
+    // read; the reader's own list is what is current.
+    chat.list = {'public_channels': [], 'direct_message_channels': []};
+    chat.browse = {
+      'channels': [_channel(5, 'left elsewhere')]
+    };
+    await pump(tester);
+    expect(find.text('left elsewhere'), findsOneWidget);
   });
 
   testWidgets('a channel with no members shows no count, as on the web',
