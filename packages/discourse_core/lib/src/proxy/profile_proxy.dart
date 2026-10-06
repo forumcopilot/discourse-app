@@ -128,14 +128,15 @@ class DiscourseProfileProxy extends BaseDiscourseProxy {
   }
 
   /// The member's own topics on one page. For pagination metadata, use
-  /// [myTopicsPage]. [query] uses Discourse's full-text topic search.
+  /// [myTopicsPage]. A [query] searches their topics' titles.
   Future<List<DiscourseProfileTopic>> myTopics(
       {String query = '', int page = 0}) async =>
       (await myTopicsPage(query: query, page: page)).topics;
 
   /// Topics created by the signed-in member, with the server's indication
-  /// of another page. Search is applied by Discourse before pagination,
-  /// rather than filtering only the first downloaded page by title.
+  /// of another page. A [query] is searched by Discourse before pagination
+  /// ([_searchMyTopics]), rather than filtering only the first downloaded
+  /// page by title.
   ///
   /// Newest created first (`order=created`: TopicQuery's SORTABLE_MAPPING
   /// sorts `topics.created_at`, descending unless `ascending=true`). The
@@ -144,10 +145,10 @@ class DiscourseProfileProxy extends BaseDiscourseProxy {
   /// it pushed down, and the bumped topic was never shown.
   Future<({List<DiscourseProfileTopic> topics, int? nextPage})> myTopicsPage(
       {String query = '', int page = 0}) async {
+    if (query.trim().isNotEmpty) return _searchMyTopics(query.trim(), page);
     final body = await apiGet('/topics/created-by/$_me.json', query: {
       'order': 'created',
       if (page > 0) 'page': '$page',
-      if (query.trim().isNotEmpty) 'search': query.trim(),
     });
     final list = (body['topic_list'] as Map?) ?? const {};
     final raw = (list['topics'] as List?) ?? const [];
@@ -155,20 +156,93 @@ class DiscourseProfileProxy extends BaseDiscourseProxy {
     return (
       topics: [
         for (final t in raw.whereType<Map>())
-          if (t['id'] is num)
-            (
-              id: (t['id'] as num).toInt(),
-              title: (t['fancy_title'] ?? t['title'] ?? '').toString(),
-              replies: ((t['posts_count'] as num?)?.toInt() ?? 1) - 1,
-              createdAt: DateTime.tryParse(t['created_at']?.toString() ?? ''),
-              categoryId: (t['category_id'] as num?)?.toInt(),
-            ),
+          if (_profileTopic(t) case final topic?) topic,
       ],
-      // Rebuild the known endpoint with the next page and same search;
+      // Rebuild the known endpoint with the next page;
       // never send credentials to a URL supplied in the response.
       nextPage: raw.isNotEmpty && more is String && more.isNotEmpty
           ? page + 1
           : null,
+    );
+  }
+
+  /// `SearchController::PAGE_LIMIT`: `/search.json` refuses later pages.
+  static const _searchPageLimit = 10;
+
+  /// The member's public topics whose titles match [query], as the forum's
+  /// own "Feature topic on profile" picker searches (ChooseTopic with
+  /// `status:public`: the title typed plus that filter, a topic search),
+  /// narrowed to the member's own topics as this picker lists them.
+  ///
+  /// topics_by's `search` matched the words anywhere in a topic, replies
+  /// by others included (TopicQuery joins every post's search data), so
+  /// many results did not have the words in their titles. Here:
+  ///   * `in:title` matches the words against titles only;
+  ///   * `@username in:first` keeps to topics the member started, even
+  ///     when Discourse drops words shorter than `min_search_term_length`
+  ///     (it then lists them all, as the forum's search page does);
+  ///   * `status:public` leaves out what cannot be featured
+  ///     (`can_feature_topic?` refuses read-restricted categories);
+  ///   * `order:latest_topic` sorts by creation, as the unfiltered list
+  ///     does, so pages hold still (relevance ties fall back to
+  ///     `bumped_at`, the order that made pages repeat).
+  /// Words match as Discourse's search matches them, from their start
+  /// ("Flut" finds Flutter, "utter" does not, and stop words like "the"
+  /// find nothing), the same as on the web.
+  ///
+  /// `/search.json` pages from 1 and says whether another follows with
+  /// `grouped_search_result.more_full_page_results`; [page] counts from 0
+  /// like the list's.
+  Future<({List<DiscourseProfileTopic> topics, int? nextPage})>
+      _searchMyTopics(String query, int page) async {
+    if (page >= _searchPageLimit) {
+      return (topics: const <DiscourseProfileTopic>[], nextPage: null);
+    }
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) {
+      throw StateError('Not signed in');
+    }
+    final body = await apiGet('/search.json', query: {
+      'q': '$query @$username in:title in:first status:public '
+          'order:latest_topic',
+      if (page > 0) 'page': '${page + 1}',
+    });
+    final byId = <int, DiscourseProfileTopic>{
+      for (final t
+          in ((body['topics'] as List?) ?? const []).whereType<Map>())
+        if (_profileTopic(t) case final topic?) topic.id: topic,
+    };
+    // The results' order is their posts' (one per topic); `topics` holds
+    // the side-loaded records.
+    final order = [
+      for (final p in ((body['posts'] as List?) ?? const []).whereType<Map>())
+        if (p['topic_id'] is num) (p['topic_id'] as num).toInt(),
+      ...byId.keys,
+    ];
+    final seen = <int>{};
+    final topics = [
+      for (final id in order)
+        if (byId[id] case final topic? when seen.add(id)) topic,
+    ];
+    final more = (body['grouped_search_result'] as Map?)
+            ?['more_full_page_results'] ==
+        true;
+    return (
+      topics: topics,
+      nextPage: topics.isNotEmpty && more && page + 1 < _searchPageLimit
+          ? page + 1
+          : null,
+    );
+  }
+
+  static DiscourseProfileTopic? _profileTopic(Map t) {
+    if (t['id'] is! num) return null;
+    return (
+      id: (t['id'] as num).toInt(),
+      title: (t['fancy_title'] ?? t['title'] ?? '').toString(),
+      replies: ((t['posts_count'] as num?)?.toInt() ?? 1) - 1,
+      createdAt: DateTime.tryParse(t['created_at']?.toString() ?? ''),
+      categoryId: (t['category_id'] as num?)?.toInt(),
     );
   }
 

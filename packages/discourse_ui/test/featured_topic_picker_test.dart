@@ -173,12 +173,27 @@ class _Profile extends DiscourseProfileProxy {
   @override
   Future<Map<String, dynamic>> apiGet(String path,
       {Map<String, dynamic>? query}) async {
-    final search = query?['search'] as String? ?? '';
-    final page = int.parse(query?['page'] as String? ?? '0');
+    // A search goes to the forum's search, whose pages count from 1; the
+    // list's count from 0.
+    final searching = path == '/search.json';
+    final search =
+        searching ? (query!['q'] as String).split(' @alice ').first : '';
+    final page = searching
+        ? int.parse(query!['page'] as String? ?? '1') - 1
+        : int.parse(query?['page'] as String? ?? '0');
     calls.add((search, page));
     if (failPage == page) throw StateError('Please retry');
-    if (search.isNotEmpty) {
-      return _page('Search match ${page + 1}', 10 + page, more: page == 0);
+    if (searching) {
+      final id = 10 + page;
+      return {
+        'posts': [
+          {'topic_id': id}
+        ],
+        'topics': [
+          {'id': id, 'title': 'Search match ${page + 1}'}
+        ],
+        'grouped_search_result': {'more_full_page_results': page == 0},
+      };
     }
     if (page > 0 && delayed != null) return delayed!.future;
     if (page == 1 && repeatOnPage1) {
