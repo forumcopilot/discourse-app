@@ -171,6 +171,7 @@ class DiscourseClient {
       final future = _sendAfterClearance(
         method,
         url,
+        forum: base,
         headers: headers,
         encodedBody: encodedBody,
         effectiveQuery: effectiveQuery,
@@ -197,6 +198,7 @@ class DiscourseClient {
     return _sendAfterClearance(
       method,
       url,
+      forum: base,
       headers: headers,
       encodedBody: encodedBody,
       effectiveQuery: effectiveQuery,
@@ -212,6 +214,7 @@ class DiscourseClient {
   Future<FCCallResult> _sendAfterClearance(
     String method,
     Uri url, {
+    required Uri forum,
     required Map<String, String> headers,
     required String? encodedBody,
     required Map<String, dynamic>? effectiveQuery,
@@ -226,6 +229,7 @@ class DiscourseClient {
     return _send(
       method,
       url,
+      forum: forum,
       headers: headers,
       encodedBody: encodedBody,
       effectiveQuery: effectiveQuery,
@@ -350,6 +354,7 @@ class DiscourseClient {
   Future<FCCallResult> _send(
     String method,
     Uri url, {
+    required Uri forum,
     required Map<String, String> headers,
     required String? encodedBody,
     required Map<String, dynamic>? effectiveQuery,
@@ -367,6 +372,7 @@ class DiscourseClient {
         final response = await _sendWithRedirects(
           method,
           url,
+          forum: forum,
           headers: headers,
           body: encodedBody,
           queryParameters: effectiveQuery,
@@ -421,6 +427,22 @@ class DiscourseClient {
   static bool _sameOrigin(Uri a, Uri b) =>
       a.scheme == b.scheme && a.host == b.host && a.port == b.port;
 
+  /// Whether [target] is on the forum at [forum]: its origin, and under its
+  /// subfolder when it has one. A forum at https://example.com/forum shares
+  /// its host with whatever else is served there, and a redirect to /blog/x
+  /// must not carry the forum's key to it. The rule ForumMediaAuth applies
+  /// to media. Dot segments are already gone: [Uri.resolve] removes them,
+  /// escaped ones included.
+  static bool _onForum(Uri forum, Uri target) {
+    if (!_sameOrigin(forum, target)) return false;
+    var base = forum.path;
+    while (base.endsWith('/')) {
+      base = base.substring(0, base.length - 1);
+    }
+    if (base.isEmpty) return true;
+    return target.path == base || target.path.startsWith('$base/');
+  }
+
   static Uri? _redirectTarget(Uri from, String? location) {
     if (location == null || location.trim().isEmpty) return null;
     try {
@@ -432,11 +454,13 @@ class DiscourseClient {
 
   /// dart:io forwards custom User-Api-* headers across automatic redirects.
   /// Check every hop before sending it through the SDK's cookie/Cloudflare
-  /// stack. Only reads on the original origin may be followed; a write must
-  /// never be replayed, nor turned into a GET by a 303.
+  /// stack. Only reads that stay on the forum ([_onForum]: its origin and
+  /// subfolder) may be followed; a write must never be replayed, nor turned
+  /// into a GET by a 303.
   Future<Response<String>> _sendWithRedirects(
     String method,
     Uri url, {
+    required Uri forum,
     required Map<String, String> headers,
     String? body,
     Map<String, dynamic>? queryParameters,
@@ -467,7 +491,7 @@ class DiscourseClient {
       if (target == null ||
           (target.scheme != 'http' && target.scheme != 'https') ||
           target.userInfo.isNotEmpty ||
-          !_sameOrigin(url, target)) {
+          !_onForum(forum, target)) {
         return response;
       }
       current = target;
@@ -602,8 +626,9 @@ class DiscourseClient {
   /// Turns a redirect into an actionable message instead of letting an edge
   /// server's HTML error page reach the user as "HTTP 302".
   ///
-  /// A 3xx surfacing here was not followed: it left the forum's origin,
-  /// tried to redirect a write, or exceeded the bounded read-redirect chain.
+  /// A 3xx surfacing here was not followed: it left the forum (its origin,
+  /// or its subfolder), tried to redirect a write, or exceeded the bounded
+  /// read-redirect chain.
   String _redirectDiagnostic(
     int status,
     Map<String, String> headers, {
@@ -622,15 +647,30 @@ class DiscourseClient {
       message = 'The forum redirected $method ${url.path} to '
           '${target.path} (HTTP $status). The request was not retried.';
     } else {
-      message = 'The forum redirected $method ${url.path} to another origin '
-          '(HTTP $status). For security, the request was not followed. '
-          'Check that the forum address is correct.';
+      // Name where it went — usually the forum's canonical address, which is
+      // what the configured one should be — but only its origin: a path or
+      // query (a signed URL, a token) stays out of the message.
+      message = 'The forum redirected $method ${url.path} to another origin, '
+          '${_originForMessage(target)} (HTTP $status). For security, the '
+          'request was not followed. Check that the forum address is correct.';
     }
     return jsonEncode({
       'errors': [message],
       'error_type': 'redirect',
       if (location.isNotEmpty) 'location': location,
     });
+  }
+
+  /// [target]'s origin for an error message. [Uri.origin] throws for a scheme
+  /// other than http(s) or an empty host, so those are named by scheme alone.
+  static String _originForMessage(Uri target) {
+    if ((target.scheme == 'http' || target.scheme == 'https') &&
+        target.host.isNotEmpty) {
+      return target.origin;
+    }
+    return target.scheme.isEmpty
+        ? 'an unknown address'
+        : 'a ${target.scheme}: address';
   }
 
   FCCallResult _toCallResultFromException(

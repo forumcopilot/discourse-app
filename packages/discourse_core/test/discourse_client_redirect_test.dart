@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:discourse_core/src/network/discourse_client.dart';
 import 'package:discourse_core/src/proxy/attachment_proxy.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 
 import 'discourse_client_measurement_test.dart' show CountingServer, contextFor;
 
@@ -133,6 +135,105 @@ void main() {
       });
     }
   }
+
+  group('a forum in a subfolder', () {
+    // https://example.com/forum: the host also serves whatever else lives
+    // beside the forum, which must never see the forum's key.
+    SiteContext subfolderContext() {
+      final url = '${forum.baseUrl}/forum';
+      return SiteContext(
+        siteType: 'discourse',
+        site: Site(
+          id: null,
+          name: 'Subfolder forum',
+          url: url,
+          description: '',
+          endpoint: null,
+          baseUrl: url,
+          logoUrl: null,
+          backgroundUrl: null,
+          siteType: 'discourse',
+        ),
+      );
+    }
+
+    for (final location in [
+      '/blog/capture',
+      '/forumx/capture', // shares the subfolder's spelling, not its path
+      '/forum/../blog/capture',
+      '/forum/%2E%2E/blog/capture',
+      '../../blog/capture',
+    ]) {
+      test('does not follow a read redirected outside it to $location',
+          () async {
+        final receivedKeys = <String?>[];
+        for (final path in ['/blog/capture', '/forumx/capture']) {
+          forum.routes[path] = (request) {
+            receivedKeys.add(request.headers.value('User-Api-Key'));
+            request.response.write('{}');
+          };
+        }
+        redirect('/forum/t/start.json', 302, location);
+
+        final result = await client.get(subfolderContext(), '/t/start.json',
+            extraHeaders: _credentials);
+
+        expect(forum.requests.map((r) => r.path), ['/forum/t/start.json']);
+        expect(receivedKeys, isEmpty);
+        expect(result.statusCode, 302);
+        expect(result.body, contains('redirect'));
+      });
+    }
+
+    for (final location in ['/forum/t/next.json', 'next.json', '/forum']) {
+      test('follows a read redirected within it to $location', () async {
+        final receivedKeys = <String?>[];
+        for (final path in ['/forum/t/next.json', '/forum']) {
+          forum.routes[path] = (request) {
+            receivedKeys.add(request.headers.value('User-Api-Key'));
+            request.response.write('{"ok":true}');
+          };
+        }
+        redirect('/forum/t/start.json', 302, location);
+
+        final result = await client.get(subfolderContext(), '/t/start.json',
+            extraHeaders: _credentials);
+
+        expect(result.statusCode, 200);
+        expect(receivedKeys, ['redirect-test-key']);
+      });
+    }
+  });
+
+  test('a refused cross-origin redirect names the origin, not the address',
+      () async {
+    redirect('/start.json', 302,
+        '${otherOrigin.baseUrl}/private/path?token=secret-value');
+
+    final result = await client.get(contextFor(forum), '/start.json',
+        extraHeaders: _credentials);
+
+    final message =
+        ((jsonDecode(result.body) as Map)['errors'] as List).single as String;
+    expect(message, contains(otherOrigin.baseUrl));
+    expect(message, isNot(contains('/private/path')));
+    expect(message, isNot(contains('secret-value')));
+    expect(otherOrigin.requests, isEmpty);
+  });
+
+  test('a redirect to a non-web scheme is described without throwing',
+      () async {
+    redirect('/start.json', 302, 'ftp://files.example/x?token=secret-value');
+
+    final result = await client.get(contextFor(forum), '/start.json',
+        extraHeaders: _credentials);
+
+    final message =
+        ((jsonDecode(result.body) as Map)['errors'] as List).single as String;
+    expect(result.statusCode, 302);
+    expect(message, contains('ftp:'));
+    expect(message, isNot(contains('secret-value')));
+  });
 
   test('missing and malformed locations remain actionable failures', () async {
     forum.routes['/missing.json'] =
