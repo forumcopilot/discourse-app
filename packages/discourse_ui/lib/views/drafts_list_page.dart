@@ -182,8 +182,11 @@ class _DraftsListPageState extends State<DraftsListPage> {
         final reason = describeError(error, context: mounted ? context : null);
         // Here the draft is back in the list. A reader who has left the page
         // would otherwise believe it gone: say it is still in Drafts.
+        // Queued, not replacing: another draft's Undo may be on screen, and
+        // removing it would delete that draft with no Undo left.
         SnackbarHelper.showErrorOn(messenger, theme,
-            mounted ? reason : l10n.draftNotDiscardedAway(reason));
+            mounted ? reason : l10n.draftNotDiscardedAway(reason),
+            replace: false);
       }
     });
   }

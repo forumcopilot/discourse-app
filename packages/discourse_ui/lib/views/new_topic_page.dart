@@ -68,6 +68,14 @@ class _NewTopicPageState extends State<NewTopicPage> {
       DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl)
           .canTagTopics;
 
+  /// Known to be refused, not merely unknown: until /site.json answers
+  /// (a 429, a slow sign-in) can_tag_topics reads false for everyone, and
+  /// dropping a tagging reader's tags then lost them for good.
+  bool get _tagsRefused {
+    final forum = widget.siteContext.site.pluginUrl;
+    return DiscourseSiteCapabilities.isResolved(forum) && !_canTagTopics;
+  }
+
   // A category is draft metadata, not part of its server identity. New
   // topics must not share a key or one category can overwrite another's work.
   late final TextEditingController _titleController;
@@ -142,7 +150,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
       content,
       attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
       groupId: _groupId,
-      tags: _canTagTopics && _tags.isNotEmpty ? _tags : null,
+      tags: !_tagsRefused && _tags.isNotEmpty ? _tags : null,
     );
 
     if (!result.result) {

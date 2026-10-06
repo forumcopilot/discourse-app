@@ -130,6 +130,19 @@ void main() {
     expect(find.text('Lunch?'), findsOneWidget);
   });
 
+  testWidgets('resetting the tab subscribes again', (tester) async {
+    // After a revoked key and a new sign-in on the same context, the old
+    // subscription drops everything as belonging to the previous session.
+    await pump(tester);
+    expect(pm.watches, 1);
+    tester
+        .state<PrivateMessageListTabState>(find.byType(PrivateMessageListTab))
+        .resetTab();
+    await tester.pumpAndSettle();
+    expect(pm.watches, 2);
+    expect(pm.stops, 1, reason: 'the old subscription is closed first');
+  });
+
   testWidgets('a message arriving is announced over the list, and a tap shows it', (tester) async {
     pm.inbox = [_topic(10, 'Lunch?', [2, 7])];
     await pump(tester);
@@ -184,11 +197,15 @@ class _Messages extends DiscoursePrivateConversationProxy {
     return const {};
   }
 
+  int watches = 0;
+  int stops = 0;
+
   @override
   void Function()? watchMessageTracking(
       List<int> groupIds, void Function(Map<String, dynamic> message, String type) onIncoming) {
     this.onIncoming = onIncoming;
-    return () {};
+    watches++;
+    return () => stops++;
   }
 }
 

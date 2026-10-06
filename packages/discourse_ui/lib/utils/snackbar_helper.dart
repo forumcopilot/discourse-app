@@ -48,6 +48,7 @@ class SnackbarHelper {
     String message, {
     SnackBarAction? action,
     Duration? duration,
+    bool replace = true,
   }) {
     if (!messenger.mounted) return;
     _show(
@@ -60,6 +61,7 @@ class SnackbarHelper {
       showCloseIcon: true,
       action: action,
       duration: duration,
+      replace: replace,
     );
   }
 
@@ -147,6 +149,7 @@ class SnackbarHelper {
     SnackBarAction? action,
     Duration? duration,
     bool? persist,
+    bool replace = true,
   }) {
     final text = Text(
       message,
@@ -154,7 +157,7 @@ class SnackbarHelper {
     );
     // ScaffoldMessenger queues: a second failed submit used to wait,
     // unseen, behind the first message.
-    messenger.clearSnackBars();
+    if (replace) messenger.clearSnackBars();
     messenger.showSnackBar(
       SnackBar(
         content: icon == null

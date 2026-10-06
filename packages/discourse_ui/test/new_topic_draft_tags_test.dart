@@ -140,6 +140,26 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets(
+      'a reader whose tagging is not known yet still sends the draft\'s tags',
+      (tester) async {
+    // /site.json has not answered (a 429, a slow sign-in): can_tag_topics
+    // reads false for everyone, which is not a refusal.
+    DiscourseSiteCapabilities.reset();
+    drafts.data = {
+      'reply': 'Draft body',
+      'title': 'Draft title',
+      'tags': ['design']
+    };
+    await open(tester);
+    await expectLater(composer(tester).onSubmit('Draft title', 'Draft body'),
+        throwsA(isA<Exception>()));
+    expect(topics.calls, 1);
+    expect(topics.tags, ['design']);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
   testWidgets('retrying a failed draft read restores tags before saving',
       (tester) async {
     drafts.loadError = 'Cannot load draft';
