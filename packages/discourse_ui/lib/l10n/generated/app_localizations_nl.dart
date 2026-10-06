@@ -5013,9 +5013,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get chatBrowseChannels => 'Kanalen bekijken';
 
   @override
-  String get chatBrowseAllChannels => 'Alle kanalen bekijken';
-
-  @override
   String get chatFilterAll => 'Alles';
 
   @override
@@ -5276,25 +5273,17 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze melding kan niet worden geopend met het huidige account. Open Meldingen om updates voor dit account te bekijken.';
 
   @override
-  String get chatJoinedChannels => 'Aangesloten kanalen';
-
-  @override
-  String get chatAvailableChannels => 'Beschikbare kanalen';
-
-  @override
-  String get chatAvailableChannelsDescription =>
-      'Kanalen die je kunt bekijken of waar je aan kunt deelnemen.';
-
-  @override
-  String get chatAllChannelsJoined =>
-      'Je neemt deel aan alle beschikbare kanalen.';
-
-  @override
-  String get chatViewChannel => 'Bekijken';
-
-  @override
   String get mediaPlay => 'Afspelen';
 
   @override
   String get mediaPause => 'Pauzeren';
+
+  @override
+  String get chatChannelStatusReadOnly => 'Alleen-lezen';
+
+  @override
+  String get chatChannelStatusClosed => 'Gesloten';
+
+  @override
+  String get chatChannelStatusArchived => 'Gearchiveerd';
 }

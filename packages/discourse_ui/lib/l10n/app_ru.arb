@@ -1514,7 +1514,6 @@
   "chatNewMessage": "Новое сообщение",
   "chatStarred": "Отмечено звездочкой",
   "chatBrowseChannels": "Просмотр каналов",
-  "chatBrowseAllChannels": "Просмотреть все каналы",
   "chatFilterAll": "Все",
   "chatFilterOpen": "Открытые",
   "chatFilterClosed": "Закрытые",
@@ -1577,11 +1576,9 @@
   "messageListIncoming": "{count, plural, one{Есть {count} новая или обновлённая тема} few{Есть {count} новых или обновлённых темы} many{Есть {count} новых или обновлённых тем} other{Есть {count} новой или обновлённой темы}}",
   "chatPlaceholderGroup": "Чат в группе",
   "notificationAccountMismatch": "Это уведомление нельзя открыть в текущем аккаунте. Откройте уведомления, чтобы увидеть обновления для этого аккаунта.",
-  "chatJoinedChannels": "Ваши каналы",
-  "chatAvailableChannels": "Доступные каналы",
-  "chatAvailableChannelsDescription": "Каналы, которые можно просматривать или к которым можно присоединиться.",
-  "chatAllChannelsJoined": "Вы присоединились ко всем доступным каналам.",
-  "chatViewChannel": "Просмотреть",
   "mediaPlay": "Воспроизвести",
-  "mediaPause": "Пауза"
+  "mediaPause": "Пауза",
+  "chatChannelStatusReadOnly": "Только для чтения",
+  "chatChannelStatusClosed": "Закрыт",
+  "chatChannelStatusArchived": "Архивирован"
 }

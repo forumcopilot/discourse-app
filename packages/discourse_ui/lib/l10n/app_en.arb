@@ -6244,11 +6244,7 @@
   },
   "chatBrowseChannels": "Browse channels",
   "@chatBrowseChannels": {
-    "description": "Button that opens the list of all public chat channels to join"
-  },
-  "chatBrowseAllChannels": "Browse all channels",
-  "@chatBrowseAllChannels": {
-    "description": "Row at the end of the reader's channels that opens all public channels"
+    "description": "Heading of the channels to join under the reader's chat channels, which opens the page of every public channel; also that page's title (Discourse chat.channels_list_popup.browse)"
   },
   "chatFilterAll": "All",
   "@chatFilterAll": {
@@ -6559,11 +6555,6 @@
     "description": "Composer hint in a group chat (Discourse chat.placeholder_group)"
   },
   "notificationAccountMismatch": "This notification cannot be opened with the current account. Open Notifications to see updates for this account.",
-  "chatJoinedChannels": "Joined channels",
-  "chatAvailableChannels": "Available channels",
-  "chatAvailableChannelsDescription": "Channels you can view or join.",
-  "chatAllChannelsJoined": "You have joined all available channels.",
-  "chatViewChannel": "View",
   "mediaPlay": "Play",
   "mediaPause": "Pause",
   "@mediaPlay": {
@@ -6571,5 +6562,17 @@
   },
   "@mediaPause": {
     "description": "Accessible label for an audio or video pause button"
+  },
+  "chatChannelStatusReadOnly": "Read Only",
+  "@chatChannelStatusReadOnly": {
+    "description": "Status of a chat channel nobody can write in for now, shown under its name in the channel lists (Discourse chat.channel_status.read_only)"
+  },
+  "chatChannelStatusClosed": "Closed",
+  "@chatChannelStatusClosed": {
+    "description": "Status of a closed chat channel, shown under its name in the channel lists (Discourse chat.channel_status.closed)"
+  },
+  "chatChannelStatusArchived": "Archived",
+  "@chatChannelStatusArchived": {
+    "description": "Status of an archived chat channel, shown under its name in the channel lists (Discourse chat.channel_status.archived)"
   }
 }

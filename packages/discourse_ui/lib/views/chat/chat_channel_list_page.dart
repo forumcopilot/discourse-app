@@ -748,7 +748,6 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
     final rows = <Widget>[
       header,
-      if (!showDms) sectionTitle(l10n.chatJoinedChannels),
       if (!showDms && half.isEmpty)
         Padding(
           padding: const EdgeInsets.all(DesignTokens.spacingL),

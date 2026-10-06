@@ -158,18 +158,10 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
               padding: const EdgeInsets.all(DesignTokens.spacingL),
               child: Row(children: [
                 Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Semantics(
-                            header: true,
-                            child: Text(l10n.chatAvailableChannels,
-                                style: text.titleSmall)),
-                        const SizedBox(height: DesignTokens.spacingXS),
-                        Text(l10n.chatAvailableChannelsDescription,
-                            style: text.bodySmall
-                                ?.copyWith(color: colors.onSurfaceVariant)),
-                      ]),
+                  child: Semantics(
+                      header: true,
+                      child: Text(l10n.chatBrowseChannels,
+                          style: text.titleSmall)),
                 ),
                 Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
               ]),
@@ -202,12 +194,10 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
         Center(
             child: TextButton(onPressed: _loadMore, child: Text(l10n.loadMore)))
       else if (error == null && available.isEmpty)
+        // The web's Browse channels says this when it has nothing to list.
         Padding(
             padding: const EdgeInsets.all(DesignTokens.spacingL),
-            child: Text(
-                widget.joinedIds.isEmpty
-                    ? l10n.chatNoChannelsFound
-                    : l10n.chatAllChannelsJoined,
+            child: Text(l10n.chatNoChannelsFound,
                 style:
                     text.bodyMedium?.copyWith(color: colors.onSurfaceVariant))),
     ]);

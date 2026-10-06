@@ -67,13 +67,15 @@ class ChatChannelBrowseTile extends StatelessWidget {
     } else {
       action = null;
     }
+    // Discourse's short status words (chat.channel_status.*); read-only
+    // used to show the composer's "you cannot send new messages" hint.
     final status = channel.isOpen
         ? null
         : channel.isArchived
-            ? l10n.chatFilterArchived
+            ? l10n.chatChannelStatusArchived
             : channel.isClosed
-                ? l10n.chatFilterClosed
-                : l10n.chatPlaceholderReadOnly;
+                ? l10n.chatChannelStatusClosed
+                : l10n.chatChannelStatusReadOnly;
     return LayoutBuilder(builder: (context, constraints) {
       // Large text on a phone: the button goes under the name, not beside.
       final scale = MediaQuery.textScalerOf(context).scale(14) / 14;

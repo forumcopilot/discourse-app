@@ -4773,9 +4773,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chatBrowseChannels => '채널 찾아보기';
 
   @override
-  String get chatBrowseAllChannels => '모든 채널 찾아보기';
-
-  @override
   String get chatFilterAll => '전체';
 
   @override
@@ -5026,23 +5023,17 @@ class AppLocalizationsKo extends AppLocalizations {
       '현재 계정으로는 이 알림을 열 수 없습니다. 알림을 열어 이 계정의 업데이트를 확인하세요.';
 
   @override
-  String get chatJoinedChannels => '참여 중인 채널';
-
-  @override
-  String get chatAvailableChannels => '이용 가능한 채널';
-
-  @override
-  String get chatAvailableChannelsDescription => '보거나 참여할 수 있는 채널입니다.';
-
-  @override
-  String get chatAllChannelsJoined => '이용 가능한 모든 채널에 참여했습니다.';
-
-  @override
-  String get chatViewChannel => '보기';
-
-  @override
   String get mediaPlay => '재생';
 
   @override
   String get mediaPause => '일시 정지';
+
+  @override
+  String get chatChannelStatusReadOnly => '읽기 전용';
+
+  @override
+  String get chatChannelStatusClosed => '닫힘';
+
+  @override
+  String get chatChannelStatusArchived => '보관됨';
 }

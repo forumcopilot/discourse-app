@@ -5062,9 +5062,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chatBrowseChannels => 'Просмотр каналов';
 
   @override
-  String get chatBrowseAllChannels => 'Просмотреть все каналы';
-
-  @override
   String get chatFilterAll => 'Все';
 
   @override
@@ -5342,25 +5339,17 @@ class AppLocalizationsRu extends AppLocalizations {
       'Это уведомление нельзя открыть в текущем аккаунте. Откройте уведомления, чтобы увидеть обновления для этого аккаунта.';
 
   @override
-  String get chatJoinedChannels => 'Ваши каналы';
-
-  @override
-  String get chatAvailableChannels => 'Доступные каналы';
-
-  @override
-  String get chatAvailableChannelsDescription =>
-      'Каналы, которые можно просматривать или к которым можно присоединиться.';
-
-  @override
-  String get chatAllChannelsJoined =>
-      'Вы присоединились ко всем доступным каналам.';
-
-  @override
-  String get chatViewChannel => 'Просмотреть';
-
-  @override
   String get mediaPlay => 'Воспроизвести';
 
   @override
   String get mediaPause => 'Пауза';
+
+  @override
+  String get chatChannelStatusReadOnly => 'Только для чтения';
+
+  @override
+  String get chatChannelStatusClosed => 'Закрыт';
+
+  @override
+  String get chatChannelStatusArchived => 'Архивирован';
 }

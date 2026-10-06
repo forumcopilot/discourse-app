@@ -8148,17 +8148,11 @@ abstract class AppLocalizations {
   /// **'Starred'**
   String get chatStarred;
 
-  /// Button that opens the list of all public chat channels to join
+  /// Heading of the channels to join under the reader's chat channels, which opens the page of every public channel; also that page's title (Discourse chat.channels_list_popup.browse)
   ///
   /// In en, this message translates to:
   /// **'Browse channels'**
   String get chatBrowseChannels;
-
-  /// Row at the end of the reader's channels that opens all public channels
-  ///
-  /// In en, this message translates to:
-  /// **'Browse all channels'**
-  String get chatBrowseAllChannels;
 
   /// Filter chip in Browse channels: every channel
   ///
@@ -8532,36 +8526,6 @@ abstract class AppLocalizations {
   /// **'This notification cannot be opened with the current account. Open Notifications to see updates for this account.'**
   String get notificationAccountMismatch;
 
-  /// No description provided for @chatJoinedChannels.
-  ///
-  /// In en, this message translates to:
-  /// **'Joined channels'**
-  String get chatJoinedChannels;
-
-  /// No description provided for @chatAvailableChannels.
-  ///
-  /// In en, this message translates to:
-  /// **'Available channels'**
-  String get chatAvailableChannels;
-
-  /// No description provided for @chatAvailableChannelsDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Channels you can view or join.'**
-  String get chatAvailableChannelsDescription;
-
-  /// No description provided for @chatAllChannelsJoined.
-  ///
-  /// In en, this message translates to:
-  /// **'You have joined all available channels.'**
-  String get chatAllChannelsJoined;
-
-  /// No description provided for @chatViewChannel.
-  ///
-  /// In en, this message translates to:
-  /// **'View'**
-  String get chatViewChannel;
-
   /// Accessible label for an audio or video play button
   ///
   /// In en, this message translates to:
@@ -8573,6 +8537,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pause'**
   String get mediaPause;
+
+  /// Status of a chat channel nobody can write in for now, shown under its name in the channel lists (Discourse chat.channel_status.read_only)
+  ///
+  /// In en, this message translates to:
+  /// **'Read Only'**
+  String get chatChannelStatusReadOnly;
+
+  /// Status of a closed chat channel, shown under its name in the channel lists (Discourse chat.channel_status.closed)
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get chatChannelStatusClosed;
+
+  /// Status of an archived chat channel, shown under its name in the channel lists (Discourse chat.channel_status.archived)
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get chatChannelStatusArchived;
 }
 
 class _AppLocalizationsDelegate

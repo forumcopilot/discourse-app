@@ -260,8 +260,11 @@ void main() {
             of: find.text('off-topic'), matching: find.byType(Opacity)),
         findsOneWidget);
     expect(find.byType(ChatChannelAvatar), findsNWidgets(3));
-    expect(find.text('Joined channels'), findsOneWidget);
-    expect(find.text('Available channels'), findsOneWidget);
+    // Discourse's words: no invented "Joined channels" / "Available
+    // channels" headings; the channels to join sit under "Browse channels".
+    expect(find.text('Joined channels'), findsNothing);
+    expect(find.text('Available channels'), findsNothing);
+    expect(find.text('Browse channels'), findsOneWidget);
     expect(ChatUnread.of(_ctx()).value,
         const ChatUnreadState(urgent: 1, any: true));
   });
@@ -327,7 +330,7 @@ void main() {
     };
     await pump(tester);
     expect(find.byType(ChatBrowseChannelsPage), findsNothing);
-    expect(find.text('Available channels'), findsOneWidget);
+    expect(find.text('Browse channels'), findsOneWidget);
     expect(find.text('Anything goes'), findsOneWidget);
     expect(find.text('30 members'), findsOneWidget);
     await tester.tap(find.text('Join'));
@@ -336,7 +339,7 @@ void main() {
     expect(find.text('Join'), findsNothing);
     expect(find.text('off-topic'), findsOneWidget);
     expect(tester.getTopLeft(find.text('off-topic')).dy,
-        lessThan(tester.getTopLeft(find.text('Available channels')).dy));
+        lessThan(tester.getTopLeft(find.text('Browse channels')).dy));
   });
 
   testWidgets('discovery excludes joined channels and private conversations',
@@ -419,7 +422,7 @@ void main() {
     await tester.pump();
     expect(find.text('Join denied'), findsOneWidget);
     expect(tester.getTopLeft(find.text('New channel')).dy,
-        greaterThan(tester.getTopLeft(find.text('Available channels')).dy));
+        greaterThan(tester.getTopLeft(find.text('Browse channels')).dy));
     expect(find.text('Join'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 5));
@@ -452,7 +455,7 @@ void main() {
     // A page of channels the reader has all joined reads the next at once,
     // rather than leaving only Load more.
     expect(chat.browseOffsets, [0, 25]);
-    expect(find.text('You have joined all available channels.'), findsNothing);
+    expect(find.text('No channels found'), findsNothing);
     expect(find.text('Next page channel'), findsOneWidget);
     expect(find.text('Load more'), findsNothing);
   });
@@ -642,6 +645,35 @@ void main() {
     expect(find.text('open 26'), findsOneWidget);
   });
 
+  test("a channel's status is translated in every language", () {
+    final en = lookupAppLocalizations(const Locale('en'));
+    for (final locale in AppLocalizations.supportedLocales) {
+      if (locale.languageCode == 'en') continue;
+      final l10n = lookupAppLocalizations(locale);
+      for (final (word, english) in [
+        (l10n.chatChannelStatusReadOnly, en.chatChannelStatusReadOnly),
+        (l10n.chatChannelStatusClosed, en.chatChannelStatusClosed),
+        (l10n.chatChannelStatusArchived, en.chatChannelStatusArchived),
+      ]) {
+        expect(word, isNot(english), reason: '$locale');
+      }
+    }
+  });
+
+  testWidgets("every channel joined: the web's empty Browse channels line",
+      (tester) async {
+    chat.list = {
+      'public_channels': [_channel(1, 'general')],
+      'direct_message_channels': [],
+    };
+    chat.browse = {
+      'channels': [_channel(1, 'general')]
+    };
+    await pump(tester);
+    expect(find.text('No channels found'), findsOneWidget);
+    expect(find.text('You have joined all available channels.'), findsNothing);
+  });
+
   testWidgets('a channel with no members shows no count, as on the web',
       (tester) async {
     chat.list = {'public_channels': [], 'direct_message_channels': []};
@@ -685,6 +717,9 @@ void main() {
               matching: find.text('Join')),
           findsNothing,
           reason: 'a read-only channel would vanish from both lists');
+      expect(find.text('Read Only'), findsOneWidget,
+          reason: "Discourse's status word, not the composer's hint");
+      expect(find.textContaining('cannot send new messages'), findsNothing);
       expect(
           find.descendant(
               of: find.byKey(const ValueKey('available-channel-10')),
@@ -701,8 +736,8 @@ void main() {
 
   group('Browse channels', () {
     Future<void> openBrowse(WidgetTester tester) async {
-      await tester.ensureVisible(find.byIcon(Icons.chevron_right));
-      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.ensureVisible(find.text('Browse channels'));
+      await tester.tap(find.text('Browse channels'));
       await tester.pumpAndSettle();
       expect(find.byType(ChatBrowseChannelsPage), findsOneWidget);
     }
