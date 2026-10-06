@@ -43,19 +43,57 @@ class ReactionGlyph extends StatelessWidget {
     this.preferImage = false,
   });
 
-  static String normalize(String reactionId) =>
-      reactionId.replaceAll(':', '').trim();
+  /// [reactionId] without the colons around it: `wave`, or `wave:t3` with
+  /// a skin tone, as Discourse writes the name in `:wave:t3:`.
+  static String normalize(String reactionId) {
+    final (:name, :tone) = parse(reactionId);
+    return tone == null ? name : '$name:t$tone';
+  }
+
+  /// The emoji name and its skin tone (1–6), read as Discourse reads one
+  /// (`Emoji.normalize_name`): `wave`, `:wave:`, `wave:t3` and `:wave:t3:`
+  /// are all wave, the last two with tone 3. Stripping every colon made
+  /// `wave:t3` the unknown name `wavet3`, drawn as the grey outline.
+  static ({String name, int? tone}) parse(String reactionId) {
+    final m = _idPattern.firstMatch(reactionId.trim());
+    if (m == null) return (name: '', tone: null);
+    return (
+      name: m.group(1)!.replaceAll(':', '').trim(),
+      tone: int.tryParse(m.group(2) ?? ''),
+    );
+  }
+
+  static final RegExp _idPattern = RegExp(r'^:?(.+?)(?::t([1-6]))?:?$');
 
   /// The unicode character for [reactionId], or null when Discourse's
   /// shortcode has no unicode equivalent (i.e. it is a custom emoji).
   ///
   /// Resolved against Discourse's own emoji table, so names like `+1`,
   /// `-1` and `hugs` — which a generic emoji library files under other
-  /// short names — come out as the glyph Discourse itself shows.
+  /// short names — come out as the glyph Discourse itself shows, with the
+  /// skin tone a `:tN` suffix asks for.
   static String? unicodeFor(String reactionId) {
-    final clean = normalize(reactionId);
-    if (clean.isEmpty) return null;
-    return discourseEmojiChar(clean);
+    final (:name, :tone) = parse(reactionId);
+    if (name.isEmpty) return null;
+    return discourseEmojiChar(name, tone: tone?.toString());
+  }
+
+  /// The tone whose artwork to draw: Discourse keeps a toned emoji's images
+  /// beside its plain one, as `<name>/<tone>.png` for tones 2–6; tone 1 is
+  /// the plain image, and an emoji that takes no tone has only that.
+  static int? _artworkTone(String name, int? tone) =>
+      tone != null && tone > 1 && discourseTonableEmoji.contains(name)
+          ? tone
+          : null;
+
+  /// [url] (an emoji's `<name>.png`) for [tone], as the web builds it:
+  /// `…/wave.png?v=15` → `…/wave/3.png?v=15`.
+  static String _withTone(String url, int? tone) {
+    if (tone == null) return url;
+    final uri = Uri.tryParse(url);
+    if (uri == null || !uri.path.endsWith('.png')) return url;
+    final base = uri.path.substring(0, uri.path.length - '.png'.length);
+    return uri.replace(path: '$base/$tone.png').toString();
   }
 
   static final Map<String, List<String>> _namesByUnicode = () {
@@ -66,14 +104,16 @@ class ReactionGlyph extends StatelessWidget {
     return names;
   }();
 
-  String? _imageUrl(String siteUrl, String name, String? unicode) {
+  String? _imageUrl(String siteUrl, String name, int? tone) {
     final exact = DiscourseCustomEmoji.urlFor(siteUrl, name);
-    if (exact != null || unicode == null) return exact;
+    if (exact != null) return _withTone(exact, _artworkTone(name, tone));
+    final unicode = discourseEmojiChar(name);
+    if (unicode == null) return null;
     // /emojis.json lists canonical names, while channel settings also accept
     // aliases such as art (artist_palette) and computer (laptop).
     for (final alias in _namesByUnicode[unicode] ?? const <String>[]) {
       final url = DiscourseCustomEmoji.urlFor(siteUrl, alias);
-      if (url != null) return url;
+      if (url != null) return _withTone(url, _artworkTone(alias, tone));
     }
     return null;
   }
@@ -85,7 +125,7 @@ class ReactionGlyph extends StatelessWidget {
       return Text(unicode, style: TextStyle(fontSize: size));
     }
     final site = siteContext;
-    final name = normalize(reactionId);
+    final (:name, :tone) = parse(reactionId);
     if (site == null || name.isEmpty) {
       return unicode == null
           ? _fallback(context)
@@ -94,7 +134,7 @@ class ReactionGlyph extends StatelessWidget {
     return ValueListenableBuilder<int>(
       valueListenable: DiscourseCustomEmoji.revision,
       builder: (context, _, __) {
-        final url = _imageUrl(site.site.url, name, unicode);
+        final url = _imageUrl(site.site.url, name, tone);
         if (url == null) {
           if (!DiscourseCustomEmoji.isLoaded(site.site.url)) {
             // ignore: discarded_futures
@@ -113,7 +153,7 @@ class ReactionGlyph extends StatelessWidget {
           height: size,
           cacheWidth: px,
           cacheHeight: px,
-          semanticLabel: ':$name:',
+          semanticLabel: ':${normalize(reactionId)}:',
           errorBuilder: (_, __, ___) => unicode == null
               ? _fallback(context)
               : Text(unicode, style: TextStyle(fontSize: size)),
