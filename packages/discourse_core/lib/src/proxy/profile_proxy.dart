@@ -136,9 +136,16 @@ class DiscourseProfileProxy extends BaseDiscourseProxy {
   /// Topics created by the signed-in member, with the server's indication
   /// of another page. Search is applied by Discourse before pagination,
   /// rather than filtering only the first downloaded page by title.
+  ///
+  /// Newest created first (`order=created`: TopicQuery's SORTABLE_MAPPING
+  /// sorts `topics.created_at`, descending unless `ascending=true`). The
+  /// list's default order is `bumped_at`, so a topic that got a reply
+  /// between two pages moved to the top: the next page repeated the row
+  /// it pushed down, and the bumped topic was never shown.
   Future<({List<DiscourseProfileTopic> topics, int? nextPage})> myTopicsPage(
       {String query = '', int page = 0}) async {
     final body = await apiGet('/topics/created-by/$_me.json', query: {
+      'order': 'created',
       if (page > 0) 'page': '$page',
       if (query.trim().isNotEmpty) 'search': query.trim(),
     });

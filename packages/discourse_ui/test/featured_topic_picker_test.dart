@@ -50,6 +50,18 @@ void main() {
     expect(choice?.topicId, 2);
   });
 
+  testWidgets('a topic that comes round again on a later page is listed once',
+      (tester) async {
+    // A topic started between Load more taps pushes the list down a row,
+    // so the next page begins with the last one already shown.
+    proxy.repeatOnPage1 = true;
+    await pump(tester);
+    await tester.tap(find.text('Load more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Recent topic'), findsOneWidget);
+    expect(find.text('Older topic'), findsOneWidget);
+  });
+
   testWidgets('search resets pagination, pages with the query, and clears',
       (tester) async {
     await pump(tester);
@@ -155,6 +167,7 @@ class _Profile extends DiscourseProfileProxy {
               resultText: '',
               user: FCUser(id: '2', username: 'alice'))));
   final calls = <(String, int)>[];
+  bool repeatOnPage1 = false;
   int? failPage;
   Completer<Map<String, dynamic>>? delayed;
   @override
@@ -168,6 +181,16 @@ class _Profile extends DiscourseProfileProxy {
       return _page('Search match ${page + 1}', 10 + page, more: page == 0);
     }
     if (page > 0 && delayed != null) return delayed!.future;
+    if (page == 1 && repeatOnPage1) {
+      return {
+        'topic_list': {
+          'topics': [
+            {'id': 1, 'title': 'Recent topic'},
+            {'id': 2, 'title': 'Older topic'},
+          ],
+        },
+      };
+    }
     return _page(page == 0 ? 'Recent topic' : 'Older topic', page + 1,
         more: page == 0);
   }

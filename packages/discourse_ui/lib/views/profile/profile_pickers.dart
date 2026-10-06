@@ -673,7 +673,15 @@ class _FeaturedTopicPickerState extends State<_FeaturedTopicPicker> {
       final result = await widget.proxy.myTopicsPage(query: _query, page: page);
       if (!mounted || generation != _generation) return;
       setState(() {
-        _topics = [if (more) ...?_topics, ...result.topics];
+        // Pages are numbered, not anchored: a topic the forum moved meanwhile
+        // (one started, or deleted, between Load more taps) can come round
+        // again. List it once.
+        final listed = {if (more) ...?_topics?.map((t) => t.id)};
+        _topics = [
+          if (more) ...?_topics,
+          for (final t in result.topics)
+            if (listed.add(t.id)) t,
+        ];
         _nextPage = result.nextPage;
         _loading = false;
       });

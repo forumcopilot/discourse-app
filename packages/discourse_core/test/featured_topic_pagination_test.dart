@@ -28,9 +28,22 @@ void main() {
     await proxy.myTopicsPage(page: 1);
     expect(proxy.paths, everyElement('/topics/created-by/alice.json'));
     expect(proxy.queries, [
-      {},
-      {'page': '1'}
+      {'order': 'created'},
+      {'order': 'created', 'page': '1'}
     ]);
+  });
+
+  test('lists by creation, so a reply between pages cannot move a topic',
+      () async {
+    // Discourse's default for this list is bumped_at: a topic that got a
+    // reply between Load more taps jumped to the top, the next page
+    // repeated a row and the bumped one was never shown.
+    final proxy = _Profile()..response = {'topic_list': {'topics': []}};
+    await proxy.myTopicsPage();
+    await proxy.myTopicsPage(page: 3);
+    expect(proxy.queries.map((q) => q['order']), ['created', 'created']);
+    expect(proxy.queries.any((q) => q.containsKey('ascending')), isFalse,
+        reason: 'newest first, as the list reads');
   });
 
   test('search reaches the server on every page and keeps content matches',
@@ -49,8 +62,8 @@ void main() {
         reason: 'server results must not be filtered again against the title');
     await proxy.myTopicsPage(query: 'needle', page: 1);
     expect(proxy.queries, [
-      {'search': 'needle'},
-      {'page': '1', 'search': 'needle'}
+      {'order': 'created', 'search': 'needle'},
+      {'order': 'created', 'page': '1', 'search': 'needle'}
     ]);
   });
 
