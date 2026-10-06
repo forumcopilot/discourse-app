@@ -4319,6 +4319,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pollVotersNotVisible => '此投票的投票者不可见。';
 
   @override
+  String get pollRankedChoiceHint => '按偏好顺序点按选项。未排序的选项计为弃权。';
+
+  @override
+  String get pollRankAbstain => '弃权';
+
+  @override
+  String pollRank(int rank) {
+    return '第 $rank 位';
+  }
+
+  @override
+  String get pollRankedChoiceWinner => '胜出';
+
+  @override
+  String get pollRankedChoiceTied => '平局';
+
+  @override
   String solutionSolvedByInPost(String name, int postNumber) {
     return '由 $name 在帖子 #$postNumber 中解决';
   }

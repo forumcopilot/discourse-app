@@ -4607,6 +4607,24 @@ class AppLocalizationsPt extends AppLocalizations {
       'Os votantes desta enquete não são visíveis.';
 
   @override
+  String get pollRankedChoiceHint =>
+      'Toque nas opções em ordem de preferência. Opções sem posição contam como abstenção.';
+
+  @override
+  String get pollRankAbstain => 'Abstenção';
+
+  @override
+  String pollRank(int rank) {
+    return 'Posição $rank';
+  }
+
+  @override
+  String get pollRankedChoiceWinner => 'Vencedor';
+
+  @override
+  String get pollRankedChoiceTied => 'Empate';
+
+  @override
   String solutionSolvedByInPost(String name, int postNumber) {
     return 'Resolvido por $name na postagem #$postNumber';
   }

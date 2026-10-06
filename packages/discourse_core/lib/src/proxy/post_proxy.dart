@@ -13,6 +13,7 @@ import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 import '../base_discourse_proxy.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../data/post/discourse_accepted_answer.dart';
+import '../data/post/discourse_poll_extras.dart';
 import '../data/post/discourse_reaction_users.dart';
 import '../data/post/discourse_valid_reactions.dart';
 import '../data/topic/discourse_topic_slugs.dart';
@@ -807,40 +808,91 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// digests are reusable across polls, posts, topics, and forums, so the SDK's
   /// topic + options alone cannot identify a target safely. Callers must pass
   /// [poll]; an older caller without that identity fails without sending a vote.
+  ///
+  /// A ranked-choice poll is voted with ranks, not a choice of options
+  /// ([voteRankedChoicePollAsync]); the server refuses a plain list for it,
+  /// so none is sent.
   @override
   Future<FCPoll?> votePollAsync(
     String topicId,
     List<String> responseIds, {
     FCPoll? poll,
   }) async {
+    final postId = _votablePostId(topicId, poll);
+    if (poll == null ||
+        postId == null ||
+        DiscoursePollExtras.of(poll)?.isRankedChoice == true ||
+        responseIds.isEmpty ||
+        responseIds.any((id) => !poll.responses.any((option) => option.id == id))) {
+      return null;
+    }
+    return _castVote(topicId, postId, poll.pollId, responseIds);
+  }
+
+  /// Discourse-only: vote in a ranked-choice poll.
+  ///
+  /// [ranks] maps option digests to the viewer's rank for them, 1 being the
+  /// first choice; an option left out, or ranked 0, is Abstain. The ballot
+  /// goes as the web sends it: every option of the poll with its rank
+  /// (`options[i][digest]`, `options[i][rank]`, ranks as strings), since
+  /// `DiscoursePoll::Poll.vote` refuses a ballot that leaves an option out
+  /// or ranks none. A ballot the server would refuse (no option ranked, a
+  /// rank used twice or past the number of options, an option not in the
+  /// poll) is not sent; null then, as on any failure.
+  Future<FCPoll?> voteRankedChoicePollAsync(
+    String topicId,
+    Map<String, int> ranks, {
+    required FCPoll poll,
+  }) async {
+    final postId = _votablePostId(topicId, poll);
+    final optionIds = poll.responses.map((r) => r.id).toList();
+    final used = ranks.values.where((rank) => rank != 0).toList();
+    if (postId == null ||
+        DiscoursePollExtras.of(poll)?.isRankedChoice != true ||
+        ranks.keys.any((id) => !optionIds.contains(id)) ||
+        used.isEmpty ||
+        used.toSet().length != used.length ||
+        used.any((rank) => rank < 0 || rank > optionIds.length)) {
+      return null;
+    }
+    return _castVote(topicId, postId, poll.pollId, {
+      for (final (i, id) in optionIds.indexed)
+        '$i': {'digest': id, 'rank': '${ranks[id] ?? 0}'},
+    });
+  }
+
+  /// The displayed poll's post id, when [poll] identifies a post and poll
+  /// in topic [topicId]; null otherwise (see [votePollAsync]).
+  static int? _votablePostId(String topicId, FCPoll? poll) {
     final postId = int.tryParse(poll?.postId ?? '');
     if (poll == null ||
         postId == null ||
         postId <= 0 ||
         poll.pollId.isEmpty ||
         topicId.isEmpty ||
-        poll.topicId != topicId ||
-        responseIds.isEmpty ||
-        responseIds.any((id) => !poll.responses.any((option) => option.id == id))) {
+        poll.topicId != topicId) {
       return null;
     }
-    final pollName = poll.pollId;
+    return postId;
+  }
+
+  /// PUT `/polls/vote`; the poll as the server has it after the vote, with
+  /// the viewer's ballot (`vote`), or null on any failure.
+  Future<FCPoll?> _castVote(
+      String topicId, int postId, String pollName, Object options) async {
     try {
       final response = await apiPut('/polls/vote', body: {
         'post_id': postId,
         'poll_name': pollName,
-        'options': responseIds,
+        'options': options,
       });
       final pollJson = (response['poll'] as Map?)?.cast<String, dynamic>();
       if (pollJson == null) return null;
-      final votedAfter = ((response['vote'] as List?) ?? const [])
-          .whereType<String>()
-          .toList();
       return _pollFromJson(
         pollJson,
         topicId: topicId,
         postId: postId,
-        viewerVotes: votedAfter,
+        viewerVotes: (response['vote'] as List?) ?? const [],
       );
     } catch (_) {
       return null;
@@ -948,11 +1000,15 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// The hosting post's id lands on [FCPoll.postId] (and the poll's
   /// name on [FCPoll.pollId]) so vote/voters calls can be made without
   /// refetching the topic.
+  ///
+  /// [viewerVotes] is the viewer's ballot as `polls_votes[name]` has it:
+  /// option digests, or for a ranked-choice poll `{digest, rank}` entries
+  /// (kept on [DiscoursePollExtras], with the type and outcome).
   static FCPoll? _pollFromJson(
     Map<String, dynamic> pollJson, {
     required String topicId,
     required int postId,
-    List<String>? viewerVotes,
+    List<Object?>? viewerVotes,
   }) {
     final name = (pollJson['name'] ?? 'poll').toString();
     final type = (pollJson['type'] ?? 'regular').toString();
@@ -967,7 +1023,17 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } else {
       max = 1;
     }
-    final voted = (viewerVotes ?? const <String>[]).toSet();
+    final isRankedChoice = type == DiscoursePollExtras.rankedChoiceType;
+    final viewerRanks = isRankedChoice
+        ? DiscoursePollExtras.ranksFromBallot(viewerVotes ?? const [])
+        : const <String, int>{};
+    // A ranked option is one the viewer voted for; Abstain is not.
+    final voted = isRankedChoice
+        ? {
+            for (final e in viewerRanks.entries)
+              if (e.value > 0) e.key
+          }
+        : (viewerVotes ?? const []).whereType<String>().toSet();
     final options = ((pollJson['options'] as List?) ?? const [])
         .whereType<Map>()
         .map((o) => o.cast<String, dynamic>())
@@ -986,7 +1052,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       );
     }).toList();
 
-    final hasVoted = voted.isNotEmpty;
+    final hasVoted = isRankedChoice ? viewerRanks.isNotEmpty : voted.isNotEmpty;
     final canViewResults = results == 'always' ||
         (results == 'on_vote' && hasVoted) ||
         (results == 'on_close' && isClosed);
@@ -1014,6 +1080,17 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       canVote: canVote,
       hasVoted: hasVoted,
       canViewResults: canViewResults,
+    );
+    DiscoursePollExtras.attach(
+      poll,
+      DiscoursePollExtras(
+        type: type,
+        viewerRanks: viewerRanks,
+        outcome: isRankedChoice
+            ? DiscourseRankedChoiceOutcome.fromJson(
+                pollJson['ranked_choice_outcome'])
+            : null,
+      ),
     );
     return poll;
   }
@@ -1056,9 +1133,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         json,
         topicId: topicId,
         postId: postId,
-        viewerVotes: ((votesByPoll?[name] as List?) ?? const [])
-            .whereType<String>()
-            .toList(),
+        viewerVotes: (votesByPoll?[name] as List?) ?? const [],
       );
       if (poll != null) out.add(poll);
     }
@@ -1075,9 +1150,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     if (postId == null) return null;
     final votesByPoll = (p['polls_votes'] as Map?)?.cast<String, dynamic>();
     final pollName = (first['name'] ?? 'poll').toString();
-    final viewerVotes = ((votesByPoll?[pollName] as List?) ?? const [])
-        .whereType<String>()
-        .toList();
+    final viewerVotes = (votesByPoll?[pollName] as List?) ?? const [];
     return _pollFromJson(
       first,
       topicId: topicId,

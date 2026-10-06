@@ -4624,6 +4624,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bei dieser Umfrage sind die Abstimmenden nicht sichtbar.';
 
   @override
+  String get pollRankedChoiceHint =>
+      'Tippe die Optionen in der Reihenfolge deiner Präferenz an. Optionen ohne Rang zählen als Enthaltung.';
+
+  @override
+  String get pollRankAbstain => 'Enthaltung';
+
+  @override
+  String pollRank(int rank) {
+    return 'Rang $rank';
+  }
+
+  @override
+  String get pollRankedChoiceWinner => 'Gewinner';
+
+  @override
+  String get pollRankedChoiceTied => 'Gleichstand';
+
+  @override
   String solutionSolvedByInPost(String name, int postNumber) {
     return 'Gelöst von $name in Beitrag #$postNumber';
   }

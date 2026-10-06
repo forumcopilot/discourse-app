@@ -4590,6 +4590,24 @@ class AppLocalizationsNl extends AppLocalizations {
       'De stemmers van deze peiling zijn niet zichtbaar.';
 
   @override
+  String get pollRankedChoiceHint =>
+      'Tik de opties aan in volgorde van voorkeur. Opties zonder rang tellen als onthouding.';
+
+  @override
+  String get pollRankAbstain => 'Onthouding';
+
+  @override
+  String pollRank(int rank) {
+    return 'Rang $rank';
+  }
+
+  @override
+  String get pollRankedChoiceWinner => 'Winnaar';
+
+  @override
+  String get pollRankedChoiceTied => 'Gelijkspel';
+
+  @override
   String solutionSolvedByInPost(String name, int postNumber) {
     return 'Opgelost door $name in bericht #$postNumber';
   }

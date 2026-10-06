@@ -4551,6 +4551,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pollVotersNotVisible => 'Voters are not visible for this poll.';
 
   @override
+  String get pollRankedChoiceHint =>
+      'Tap the options in order of preference. Unranked options count as Abstain.';
+
+  @override
+  String get pollRankAbstain => 'Abstain';
+
+  @override
+  String pollRank(int rank) {
+    return 'Rank $rank';
+  }
+
+  @override
+  String get pollRankedChoiceWinner => 'Winner';
+
+  @override
+  String get pollRankedChoiceTied => 'Tied';
+
+  @override
   String solutionSolvedByInPost(String name, int postNumber) {
     return 'Solved by $name in post #$postNumber';
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscoursePostProxy, DiscoursePollVoter;
+    show DiscoursePostProxy, DiscoursePollExtras, DiscoursePollVoter;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
@@ -15,6 +15,13 @@ import 'user_avatar.dart';
 ///
 /// On Discourse the poll's title and each option's text are cooked HTML
 /// (emoji images, links, bold, code), drawn by [CookedInlineText].
+///
+/// A ranked-choice poll ([DiscoursePollExtras.isRankedChoice]) is voted by
+/// tapping the options in order of preference: each tap gives the next rank,
+/// a second tap takes it back, and an option left unranked is Abstain, as
+/// the web's per-option rank menu has it. Its result is the runoff's winner
+/// (or the tied options), marked on the options; the per-option counts of a
+/// ranked-choice poll are all the voter count, so it has no bars.
 class ThreadPollCard extends StatefulWidget {
   final FCPoll poll;
   final String topicId;
@@ -36,6 +43,10 @@ class ThreadPollCard extends StatefulWidget {
 class _ThreadPollCardState extends State<ThreadPollCard> {
   /// Selected response IDs for submission. For single-choice maxVotes==1, at most one; for multi, up to maxVotes.
   final Set<String> _selectedIds = {};
+
+  /// A ranked-choice ballot being filled in: the options in order of
+  /// preference, first choice first. An option not here is Abstain.
+  final List<String> _rankOrder = [];
   bool _isSubmitting = false;
   bool _isRemovingVote = false;
 
@@ -53,11 +64,20 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
   bool _servesThisForum(DiscoursePostProxy proxy) =>
       proxy.siteContext.site.pluginUrl == widget.siteContext.site.pluginUrl;
 
+  DiscoursePollExtras? get _extras => DiscoursePollExtras.of(widget.poll);
+
+  bool get _isRankedChoice => _extras?.isRankedChoice == true;
+
   int get _maxSelections => widget.poll.maxVotes == 0 ? widget.poll.responses.length : widget.poll.maxVotes;
 
   void _toggleOption(String responseId) {
     if (!widget.poll.canVote || widget.poll.hasVoted || _isSubmitting) return;
     setState(() {
+      if (_isRankedChoice) {
+        // The next rank, or back to Abstain; the ranks after it move up.
+        if (!_rankOrder.remove(responseId)) _rankOrder.add(responseId);
+        return;
+      }
       if (_selectedIds.contains(responseId)) {
         _selectedIds.remove(responseId);
       } else {
@@ -72,8 +92,14 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
   }
 
   Future<void> _submitVote() async {
-    if (_selectedIds.isEmpty || !widget.poll.canVote || widget.poll.hasVoted || _isSubmitting) return;
-    if (widget.poll.maxVotes > 0 && _selectedIds.length > widget.poll.maxVotes) return;
+    final ranked = _isRankedChoice;
+    if ((ranked ? _rankOrder.isEmpty : _selectedIds.isEmpty) ||
+        !widget.poll.canVote ||
+        widget.poll.hasVoted ||
+        _isSubmitting) {
+      return;
+    }
+    if (!ranked && widget.poll.maxVotes > 0 && _selectedIds.length > widget.poll.maxVotes) return;
 
     setState(() => _isSubmitting = true);
     try {
@@ -83,8 +109,13 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
       FCPoll? updated;
       if (postProxy is DiscoursePostProxy) {
         if (_servesThisForum(postProxy)) {
-          updated = await postProxy.votePollAsync(
-            widget.topicId, _selectedIds.toList(), poll: widget.poll);
+          updated = ranked
+              ? await postProxy.voteRankedChoicePollAsync(
+                  widget.topicId,
+                  {for (final (i, id) in _rankOrder.indexed) id: i + 1},
+                  poll: widget.poll)
+              : await postProxy.votePollAsync(
+                  widget.topicId, _selectedIds.toList(), poll: widget.poll);
         }
       } else {
         updated = await postProxy.votePollAsync(widget.topicId, _selectedIds.toList());
@@ -202,11 +233,20 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final l10n = AppLocalizations.of(context)!;
-    final showResults = widget.poll.canViewResults &&
+    final extras = _extras;
+    final ranked = extras?.isRankedChoice == true;
+    // Bars and voters per option. A ranked-choice poll has neither: every
+    // voter has a vote on every option (Abstain included), so each option's
+    // count is the voter count and each option's voters are all of them.
+    final showResults = !ranked &&
+        widget.poll.canViewResults &&
         widget.poll.voterCount != null &&
         widget.poll.voterCount! > 0;
     final canVote = widget.poll.canVote && !widget.poll.hasVoted;
     final voterCount = widget.poll.voterCount;
+    // The server sends the outcome whatever the poll's results setting.
+    final outcome =
+        ranked && widget.poll.canViewResults ? extras!.outcome : null;
     // Discourse-native poll extras: retracting a vote and listing voters
     // both hit the poll plugin's endpoints via DiscoursePostProxy.
     // Both affordances need the hosting post id (FCPoll.postId); a poll
@@ -239,12 +279,37 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
             ),
             SizedBox(height: DesignTokens.spacingM),
           ],
+          if (ranked && canVote) ...[
+            Text(
+              l10n.pollRankedChoiceHint,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            SizedBox(height: DesignTokens.spacingS),
+          ],
           ...widget.poll.responses.map((r) => _buildOptionRow(
                 context,
                 r,
                 showResults: showResults,
                 canVote: canVote,
                 voterCount: voterCount,
+                // The ballot being filled in, else the viewer's own.
+                rank: !ranked
+                    ? null
+                    : canVote
+                        ? _rankOrder.indexOf(r.id) + 1
+                        : widget.poll.hasVoted
+                            ? extras!.viewerRanks[r.id] ?? 0
+                            : null,
+                outcome: outcome == null
+                    ? null
+                    : outcome.winnerId == r.id
+                        ? l10n.pollRankedChoiceWinner
+                        : outcome.tiedIds.contains(r.id)
+                            ? l10n.pollRankedChoiceTied
+                            : null,
+                isWinner: outcome?.winnerId == r.id,
               )),
           SizedBox(height: DesignTokens.spacingM),
           if (canVote) ...[
@@ -252,7 +317,10 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: (_selectedIds.isNotEmpty && !_isSubmitting) ? _submitVote : null,
+                onPressed: ((ranked ? _rankOrder.isNotEmpty : _selectedIds.isNotEmpty) &&
+                        !_isSubmitting)
+                    ? _submitVote
+                    : null,
                 child: _isSubmitting
                     ? SizedBox(
                         height: 20,
@@ -308,11 +376,16 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     required bool showResults,
     required bool canVote,
     int? voterCount,
+    int? rank,
+    String? outcome,
+    bool isWinner = false,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final isSelected = _selectedIds.contains(r.id) || r.viewerVotedFor;
+    final isSelected = rank != null
+        ? rank > 0
+        : _selectedIds.contains(r.id) || r.viewerVotedFor;
     double fraction = 0.0;
     if (showResults && voterCount != null && voterCount > 0 && r.voteCount != null) {
       fraction = (r.voteCount! / voterCount).clamp(0.0, 1.0);
@@ -366,7 +439,12 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                 ],
                 Row(
                   children: [
-                    if (canVote && !widget.poll.hasVoted)
+                    if (rank != null)
+                      Padding(
+                        padding: EdgeInsets.only(right: DesignTokens.spacingS),
+                        child: _rankBadge(rank, colorScheme, textTheme),
+                      )
+                    else if (canVote && !widget.poll.hasVoted)
                       Padding(
                         padding: EdgeInsets.only(right: DesignTokens.spacingS),
                         child: Icon(
@@ -398,11 +476,70 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
+                    if (outcome != null) ...[
+                      SizedBox(width: DesignTokens.spacingS),
+                      if (isWinner)
+                        Padding(
+                          padding: EdgeInsets.only(right: DesignTokens.spacingXS),
+                          child: Icon(
+                            Icons.emoji_events_outlined,
+                            size: DesignTokens.iconSizeSMedium,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      Text(
+                        outcome,
+                        style: textTheme.labelMedium?.copyWith(
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  /// A ranked-choice option's rank: the number in a filled circle, or an
+  /// empty circle for Abstain.
+  Widget _rankBadge(int rank, ColorScheme colorScheme, TextTheme textTheme) {
+    final l10n = AppLocalizations.of(context)!;
+    final size = DesignTokens.iconSizeM;
+    return Semantics(
+      label: rank > 0 ? l10n.pollRank(rank) : l10n.pollRankAbstain,
+      child: ExcludeSemantics(
+        child: Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: rank > 0 ? colorScheme.primary : null,
+            border: rank > 0
+                ? null
+                : Border.all(
+                    color: colorScheme.onSurfaceVariant,
+                    width: DesignTokens.borderWidthMedium,
+                  ),
+          ),
+          child: rank > 0
+              ? Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: FittedBox(
+                    child: Text(
+                      '$rank',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: DesignTokens.fontWeightBold,
+                      ),
+                    ),
+                  ),
+                )
+              : null,
         ),
       ),
     );

@@ -4382,6 +4382,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String get pollVotersNotVisible => 'この投票の投票者は表示されません。';
 
   @override
+  String get pollRankedChoiceHint =>
+      '希望する順に選択肢をタップしてください。順位を付けなかった選択肢は棄権として扱われます。';
+
+  @override
+  String get pollRankAbstain => '棄権';
+
+  @override
+  String pollRank(int rank) {
+    return '$rank位';
+  }
+
+  @override
+  String get pollRankedChoiceWinner => '勝者';
+
+  @override
+  String get pollRankedChoiceTied => '引き分け';
+
+  @override
   String solutionSolvedByInPost(String name, int postNumber) {
     return '$name さんが投稿 #$postNumber で解決';
   }
