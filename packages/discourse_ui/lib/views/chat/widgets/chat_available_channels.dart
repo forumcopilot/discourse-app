@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
@@ -6,19 +8,24 @@ import '../../../services/site_proxy_service.dart';
 import '../../../theme/design_tokens.dart';
 import '../../../utils/snackbar_helper.dart';
 import 'chat_channel_avatar.dart';
+import 'chat_channel_pages.dart';
 
-/// Discovery stays independent of joined chats and their unread tracking.
+/// Channels to join, under the joined ones. Its pages ([pages]) belong to
+/// the chat list, so they outlive this section; it stays independent of
+/// joined chats and their unread tracking.
 class ChatAvailableChannels extends StatefulWidget {
   const ChatAvailableChannels(
       {super.key,
       required this.siteContext,
+      required this.pages,
       required this.joinedIds,
-      required this.revision,
       required this.onOpen,
       required this.onJoined});
   final SiteContext siteContext;
+  final ChatChannelPages pages;
+
+  /// The channels in the reader's list: not offered here.
   final Set<int> joinedIds;
-  final int revision;
   final Future<void> Function(FCChatChannel) onOpen;
   final void Function(FCChatChannel) onJoined;
   @override
@@ -26,66 +33,77 @@ class ChatAvailableChannels extends StatefulWidget {
 }
 
 class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
-  static const _pageSize = 25;
-  final Map<int, FCChatChannel> _channels = {};
+  /// Pages read in a row on their own when each brought nothing to show
+  /// (every channel on it already joined), before waiting for Load more.
+  static const _maxAutoPages = 3;
+
   final Set<int> _joining = {};
-  bool _loading = true;
-  bool _hasMore = false;
-  int _offset = 0;
-  int _generation = 0;
-  String? _error;
+  int _autoPages = 0;
+  int _pagesSeen = 0;
+
   @override
   void initState() {
     super.initState();
-    _load();
+    _pagesSeen = widget.pages.pagesRead;
+    widget.pages.addListener(_onPages);
+    widget.pages.ensureLoaded();
   }
 
   @override
   void didUpdateWidget(ChatAvailableChannels oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.revision != widget.revision) _load();
-  }
-
-  Future<void> _load({bool more = false}) async {
-    final proxy = SiteProxyService.getChatProxy();
-    if (proxy is! DiscourseChatProxy) return;
-    final generation = ++_generation;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final result = await proxy.browseChannelsAsync(
-          offset: more ? _offset : 0, limit: _pageSize);
-      if (!mounted || generation != _generation) return;
-      setState(() {
-        _loading = false;
-        if (!result.result) {
-          _error = result.resultText?.isNotEmpty == true
-              ? result.resultText
-              : AppLocalizations.of(context)!.chatNotAvailable;
-          return;
-        }
-        if (!more) {
-          _channels.clear();
-          _offset = 0;
-        }
-        _offset += result.channels.length;
-        for (final channel in result.channels) {
-          // Never offer private conversations as discoverable channels.
-          if (channel.chatableType != 'DirectMessage') {
-            _channels[channel.id] = channel;
-          }
-        }
-        _hasMore = result.channels.length >= _pageSize;
-      });
-    } catch (e) {
-      if (!mounted || generation != _generation) return;
-      setState(() {
-        _loading = false;
-        _error = '$e';
+    if (oldWidget.pages != widget.pages) {
+      oldWidget.pages.removeListener(_onPages);
+      _pagesSeen = widget.pages.pagesRead;
+      _autoPages = 0;
+      widget.pages.addListener(_onPages);
+      widget.pages.ensureLoaded();
+      return;
+    }
+    // A channel left the reader's list (left elsewhere, or no longer open):
+    // read the shown pages again, so it is offered (or not) as it is now.
+    // Nothing else needs a request: a joined channel is simply hidden.
+    if (oldWidget.joinedIds.difference(widget.joinedIds).isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(widget.pages.refresh());
       });
     }
+  }
+
+  @override
+  void dispose() {
+    widget.pages.removeListener(_onPages);
+    super.dispose();
+  }
+
+  bool _offered(FCChatChannel c) =>
+      !widget.joinedIds.contains(c.id) && !c.isFollowing;
+
+  List<FCChatChannel> get _available =>
+      widget.pages.channels.where(_offered).toList();
+
+  /// A page of channels the reader has all joined would leave only "Load
+  /// more" to tap: read the next one at once, a few pages at most.
+  void _onPages() {
+    final pages = widget.pages;
+    if (!mounted || pages.pagesRead == _pagesSeen) return;
+    _pagesSeen = pages.pagesRead;
+    if (pages.lastPage.any(_offered)) {
+      _autoPages = 0;
+      return;
+    }
+    if (pages.error != null || !pages.hasMore || _autoPages >= _maxAutoPages) {
+      return;
+    }
+    _autoPages++;
+    scheduleMicrotask(() {
+      if (mounted) unawaited(pages.loadMore());
+    });
+  }
+
+  void _loadMore() {
+    _autoPages = 0;
+    unawaited(widget.pages.loadMore());
   }
 
   Future<void> _join(FCChatChannel channel) async {
@@ -109,14 +127,18 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ListenableBuilder(listenable: widget.pages, builder: _build);
+
+  Widget _build(BuildContext context, Widget? _) {
     final l10n = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final available = _channels.values
-        .where((c) => !widget.joinedIds.contains(c.id) && !c.isFollowing)
-        .toList()
-      ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    final pages = widget.pages;
+    // In the server's order: sorting each page by name moved the rows
+    // already shown whenever another page arrived.
+    final available = _available;
+    final error = pages.error;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       const SizedBox(height: DesignTokens.spacingL),
       const Divider(height: 1),
@@ -135,25 +157,24 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
                     text.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
           ])),
       for (final channel in available) _tile(channel),
-      if (_error != null)
+      if (error != null)
         Padding(
             padding: const EdgeInsets.all(DesignTokens.spacingL),
             child: Column(children: [
-              Text(_error!),
+              Text(error.isNotEmpty ? error : l10n.chatNotAvailable),
               TextButton(
-                  onPressed:
-                      _loading ? null : () => _load(more: _channels.isNotEmpty),
+                  onPressed: pages.loading ? null : pages.retry,
                   child: Text(l10n.retry))
             ])),
-      if (_loading)
+      if (pages.loading)
         const Padding(
             padding: EdgeInsets.all(DesignTokens.spacingL),
             child: Center(child: CircularProgressIndicator()))
-      else if (_error == null && _hasMore)
+      else if (error == null && pages.hasMore)
         Center(
             child: TextButton(
-                onPressed: () => _load(more: true), child: Text(l10n.loadMore)))
-      else if (_error == null && available.isEmpty)
+                onPressed: _loadMore, child: Text(l10n.loadMore)))
+      else if (error == null && available.isEmpty)
         Padding(
             padding: const EdgeInsets.all(DesignTokens.spacingL),
             child: Text(
@@ -171,6 +192,7 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
         DiscourseChatChannelDetails.of(widget.siteContext.site.url, channel.id);
     final busy = _joining.contains(channel.id);
     final canJoin = channel.canJoin && !channel.isClosed && !channel.isArchived;
+    final members = details?.membershipsCount ?? 0;
     final action = busy
         ? const SizedBox(
             width: 24,
@@ -201,7 +223,8 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
               if (channel.description?.isNotEmpty == true)
                 Text(channel.description!,
                     maxLines: 2, overflow: TextOverflow.ellipsis),
-              Text(l10n.chatMembersCount(details?.membershipsCount ?? 0)),
+              // As the web's card: no count for a channel nobody is in.
+              if (members > 0) Text(l10n.chatMembersCount(members)),
               if (!channel.isOpen)
                 Text(channel.isArchived
                     ? l10n.chatFilterArchived

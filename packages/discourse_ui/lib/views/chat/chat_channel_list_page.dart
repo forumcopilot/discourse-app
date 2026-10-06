@@ -27,6 +27,7 @@ import 'chat_people_sheet.dart';
 import 'chat_search_page.dart';
 import 'widgets/chat_channel_avatar.dart';
 import 'widgets/chat_available_channels.dart';
+import 'widgets/chat_channel_pages.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/not_signed_in_view.dart';
 import '../widgets/resettable_widget.dart';
@@ -82,14 +83,19 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   List<FCChatChannel>? _channels;
   bool _loading = false;
   int _loadGeneration = 0;
-  int _discoveryRevision = 0;
   String? _error;
+
+  /// Channels to join under the joined ones, for [_discoveryOwner] (forum
+  /// and account). Kept here, not in the section, so the pages the reader
+  /// loaded survive switching halves, opening a channel and refreshing.
+  ChatChannelPages? _discovery;
+  String? _discoveryOwner;
 
   /// Discourse keeps channels and direct messages apart (Channels / DMs),
   /// with the reader's threads beside them where threads are on; this list
   /// mixed them, sorted unread-first.
-  /// Null until the reader picks: then the list opens on DMs when they
-  /// have direct messages but have joined no channel.
+  /// Null until the reader picks: the list opens on Channels, or on DMs
+  /// when the forum has no public channels.
   _ChatHalf? _half;
 
   /// The reader's threads (My Threads), loaded when that half is picked.
@@ -150,6 +156,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   @override
   void dispose() {
     _loadGeneration++;
+    _discovery?.dispose();
     _stopWatching?.call();
     widget.siteContext.isLoggedInNotifier.removeListener(_authStateListener);
     super.dispose();
@@ -285,7 +292,6 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         // ("Ask an admin to invite you" was wrong too — Discourse users
         // browse and join channels themselves.)
         _channels = result.channels;
-        _discoveryRevision++;
       });
       _publishUnread();
       _watch();
@@ -298,6 +304,27 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         _error = '$e';
       });
     }
+  }
+
+  /// Pull to refresh (or the refresh button): the reader's list and the
+  /// channels to join, which otherwise are read only when shown first. Back
+  /// from a channel only the list is read again.
+  Future<void> _refresh() async {
+    await Future.wait<void>([
+      _load(),
+      if (_discovery case final pages?) pages.refresh(),
+    ]);
+  }
+
+  /// The channels to join for this forum and account, the same pages while
+  /// those stay the same.
+  ChatChannelPages _discoveryFor(String owner) {
+    if (_discovery == null || _discoveryOwner != owner) {
+      _discovery?.dispose();
+      _discovery = ChatChannelPages();
+      _discoveryOwner = owner;
+    }
+    return _discovery!;
   }
 
   Future<void> _loadThreads() async {
@@ -389,7 +416,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     }
 
     final body = RefreshIndicator(
-      onRefresh: _load,
+      onRefresh: _refresh,
       child: _buildBody(),
     );
     // Only people allowed to start direct messages get the button (Discourse:
@@ -438,7 +465,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: AppLocalizations.of(context)!.refresh,
-            onPressed: _loading ? null : _load,
+            onPressed: _loading ? null : _refresh,
           ),
         ],
       ),
@@ -528,6 +555,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     final hasChannels = widget.siteContext.chatPublicChannelsEnabled;
     final hasDms = canDm || all.any((c) => c.chatableType == 'DirectMessage');
     final site = widget.siteContext.site.url;
+    final owner = '$site:${widget.siteContext.currentUsername}';
     final discourse = SiteProxyService.getChatProxy() is DiscourseChatProxy;
     final threadsOn =
         discourse && DiscourseChatSettings.forSite(site).threadsEnabled;
@@ -738,13 +766,14 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       for (final ch in rest) tile(ch),
       if (!showDms && discourse)
         ChatAvailableChannels(
-          key: ValueKey(
-              '${widget.siteContext.site.url}:${widget.siteContext.currentUsername}'),
+          key: ValueKey(owner),
           siteContext: widget.siteContext,
+          pages: _discoveryFor(owner),
           joinedIds: half.map((c) => c.id).toSet(),
-          revision: _discoveryRevision,
           onOpen: _open,
           onJoined: (channel) {
+            // In the list at once; the reload brings its tracking and
+            // follows it live (watching now would be undone by the reload).
             setState(() {
               channel.isFollowing = true;
               _channels = [
@@ -753,7 +782,6 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
               ];
             });
             _publishUnread();
-            _watch();
             unawaited(_load());
           },
         ),
