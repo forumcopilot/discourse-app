@@ -3770,6 +3770,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get failedToDiscardDraft => '초안을 삭제하지 못했습니다';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return '임시 저장을 삭제하지 못했습니다. 임시 저장에 그대로 있습니다. $error';
+  }
+
+  @override
   String get messagesLoadFailed => '메시지를 불러오지 못했습니다';
 
   @override
@@ -4606,6 +4611,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get couldNotEnableDoNotDisturb => '방해 금지를 켤 수 없습니다';
+
+  @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      '로그인 상태가 변경되어 방해 금지를 켜지 않았습니다.';
 
   @override
   String get couldNotTurnOffDoNotDisturb => '방해 금지를 끌 수 없습니다';

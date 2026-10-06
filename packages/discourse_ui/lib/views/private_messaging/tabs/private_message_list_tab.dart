@@ -113,7 +113,7 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
     super.dispose();
   }
 
-  Future<void> _loadGroups() async {
+  Future<void> _loadGroups({bool openInitialGroup = true}) async {
     if (!widget.siteContext.isLoggedIn) return;
     final proxy = SiteProxyFactory.getPrivateConversationProxy();
     if (proxy is! DiscoursePrivateConversationProxy) return;
@@ -121,6 +121,7 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
     if (mounted && groups.isNotEmpty) setState(() => _groups = groups);
     if (!mounted) return;
     unawaited(_startTracking(proxy));
+    if (!openInitialGroup) return;
     final wanted = widget.initialGroup?.toLowerCase();
     if (wanted == null) return;
     final group = _groups.where((g) => g.name.toLowerCase() == wanted).firstOrNull;
@@ -161,8 +162,12 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
   @override
   void resetTab() {
     _keyFor(_current).currentState?.resetAndLoadConversations();
-    final proxy = SiteProxyFactory.getPrivateConversationProxy();
-    if (proxy is DiscoursePrivateConversationProxy) unawaited(proxy.loadMessageTrackingAsync());
+    // A new subscription, not just new counts: after signing in again on
+    // this context the old one belongs to the previous session and drops
+    // every message, and a tab built while signed out never had one.
+    _stopWatching?.call();
+    _stopWatching = null;
+    unawaited(_loadGroups(openInitialGroup: false));
   }
 
   void _show(DiscourseMessageList list) {

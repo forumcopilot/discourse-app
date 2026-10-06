@@ -4831,6 +4831,15 @@
   "@failedToDiscardDraft": {
     "description": "Drafts page: snackbar when discarding a draft fails"
   },
+  "draftNotDiscardedAway": "Draft not discarded. It's still in Drafts. {error}",
+  "@draftNotDiscardedAway": {
+    "description": "Drafts page: a discard sent after the Undo ran out failed when the reader had already left the page; the draft was not deleted. {error} is the reason.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "messagesLoadFailed": "Failed to load messages",
   "@messagesLoadFailed": {
     "description": "Message list (Inbox, Sent, Archive…): shown when the forum could not return the list and gave no reason"
@@ -6011,6 +6020,10 @@
   "couldNotEnableDoNotDisturb": "Couldn't enable do not disturb",
   "@couldNotEnableDoNotDisturb": {
     "description": "Snackbar when turning on Do not disturb failed"
+  },
+  "doNotDisturbNotEnabledSessionChanged": "Do not disturb wasn't turned on: your sign-in changed.",
+  "@doNotDisturbNotEnabledSessionChanged": {
+    "description": "Snackbar: a Do not disturb duration was picked after the profile tile closed, but the reader had signed in to another account meanwhile, so nothing was sent."
   },
   "couldNotTurnOffDoNotDisturb": "Couldn't turn off do not disturb",
   "@couldNotTurnOffDoNotDisturb": {

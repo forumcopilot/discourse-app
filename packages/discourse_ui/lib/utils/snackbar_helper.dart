@@ -29,17 +29,41 @@ class SnackbarHelper {
     String message, {
     SnackBarAction? action,
     Duration? duration,
-  }) =>
-      _show(
-        context,
-        message,
-        backgroundColor: Theme.of(context).colorScheme.errorContainer,
-        foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
-        icon: Icons.error_outline,
-        showCloseIcon: true,
-        action: action,
-        duration: duration,
-      );
+  }) {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    showErrorOn(messenger, Theme.of(context), message,
+        action: action, duration: duration);
+  }
+
+  /// [showError] for a failure that can arrive after the screen that
+  /// started the work has closed (a delete sent when an Undo timed out):
+  /// [messenger] and [theme] are taken from that screen while it is still
+  /// up. The app's ScaffoldMessenger outlives the page, so the reader still
+  /// learns the work did not happen. Shows nothing once the messenger is
+  /// gone too.
+  static void showErrorOn(
+    ScaffoldMessengerState messenger,
+    ThemeData theme,
+    String message, {
+    SnackBarAction? action,
+    Duration? duration,
+    bool replace = true,
+  }) {
+    if (!messenger.mounted) return;
+    _show(
+      messenger,
+      theme,
+      message,
+      backgroundColor: theme.colorScheme.errorContainer,
+      foregroundColor: theme.colorScheme.onErrorContainer,
+      icon: Icons.error_outline,
+      showCloseIcon: true,
+      action: action,
+      duration: duration,
+      replace: replace,
+    );
+  }
 
   /// Surface a neutral informational message. Uses
   /// `colorScheme.surfaceContainerHighest` to sit unobtrusively above the
@@ -54,7 +78,7 @@ class SnackbarHelper {
     Duration? duration,
     bool? persist,
   }) =>
-      _show(
+      _showIn(
         context,
         message,
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -74,7 +98,7 @@ class SnackbarHelper {
     SnackBarAction? action,
     Duration? duration,
   }) =>
-      _show(
+      _showIn(
         context,
         message,
         backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
@@ -91,8 +115,32 @@ class SnackbarHelper {
         milliseconds: (1500 + 65 * message.length).clamp(4000, 10000),
       );
 
-  static void _show(
+  static void _showIn(
     BuildContext context,
+    String message, {
+    required Color backgroundColor,
+    required Color foregroundColor,
+    SnackBarAction? action,
+    Duration? duration,
+    bool? persist,
+  }) {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    _show(
+      messenger,
+      Theme.of(context),
+      message,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      action: action,
+      duration: duration,
+      persist: persist,
+    );
+  }
+
+  static void _show(
+    ScaffoldMessengerState messenger,
+    ThemeData theme,
     String message, {
     required Color backgroundColor,
     required Color foregroundColor,
@@ -101,19 +149,15 @@ class SnackbarHelper {
     SnackBarAction? action,
     Duration? duration,
     bool? persist,
+    bool replace = true,
   }) {
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    if (messenger == null) return;
     final text = Text(
       message,
-      style: Theme.of(context)
-          .textTheme
-          .bodyMedium
-          ?.copyWith(color: foregroundColor),
+      style: theme.textTheme.bodyMedium?.copyWith(color: foregroundColor),
     );
     // ScaffoldMessenger queues: a second failed submit used to wait,
     // unseen, behind the first message.
-    messenger.clearSnackBars();
+    if (replace) messenger.clearSnackBars();
     messenger.showSnackBar(
       SnackBar(
         content: icon == null

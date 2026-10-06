@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../network/discourse_client.dart';
 import '../storage/discourse_secure_storage.dart';
+import '../data/message/discourse_message_tracking.dart';
 import '../data/site/discourse_site_capabilities.dart';
 
 /// Discourse-specific authentication state attached to a [SiteContext].
@@ -60,6 +61,8 @@ extension DiscourseSiteContextExtension on SiteContext {
   void _invalidateCapabilities() {
     _data()['configurationSession'] = Object();
     DiscourseSiteCapabilities.invalidate(site.pluginUrl);
+    // The message counts were the previous sign-in's.
+    DiscourseMessageTracking.resetSite(site.url);
   }
 
   /// Tells the HTTP read cache who is now signed in to this forum. It keeps

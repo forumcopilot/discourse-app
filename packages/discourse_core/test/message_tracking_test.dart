@@ -1,12 +1,21 @@
+import 'dart:async';
+
 import 'package:discourse_core/discourse_core.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// The New and Unread counts on the messages page, per inbox, as the web's
 /// pm-topic-tracking-state counts them; and a group's filtered lists.
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   const site = 'https://pm.example';
-  setUp(DiscourseMessageTracking.clear);
+  setUp(() {
+    DiscourseMessageTracking.clear();
+    SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
+  });
 
   Map<String, dynamic> row(int id,
           {int? lastRead, int highest = 3, int? level, List<int> groups = const [], bool seen = false}) =>
@@ -76,6 +85,43 @@ void main() {
     expect(DiscourseMessageTracking.forSite(site).count(unread: false), 1);
   });
 
+  for (final change in ['signing out', 'signing in as someone else']) {
+    test('$change forgets the counts until the next report', () async {
+      final p = _Recording(site);
+      await p.siteContext
+          .setUserApiCredentials(userApiKey: 'alice', userApiClientId: 'c');
+      expect(await p.loadMessageTrackingAsync(), isTrue);
+      final tracking = DiscourseMessageTracking.forSite(site);
+      expect(tracking.count(unread: false), 1);
+      final heard = tracking.revision.value;
+      if (change == 'signing out') {
+        await p.siteContext.clearUserApiCredentials();
+      } else {
+        await p.siteContext
+            .setUserApiCredentials(userApiKey: 'bob', userApiClientId: 'c');
+      }
+      expect(tracking.isLoaded, isFalse);
+      expect(tracking.count(unread: false), 0);
+      expect(tracking.revision.value, greaterThan(heard),
+          reason: 'a list showing "New (1)" redraws without it');
+    });
+  }
+
+  test("a report that arrives after the sign-in changed is not the next account's",
+      () async {
+    final p = _Recording(site);
+    await p.siteContext
+        .setUserApiCredentials(userApiKey: 'alice', userApiClientId: 'c');
+    p.gate = Completer<void>();
+    final load = p.loadMessageTrackingAsync();
+    await p.siteContext
+        .setUserApiCredentials(userApiKey: 'bob', userApiClientId: 'c');
+    p.gate!.complete();
+    expect(await load, isFalse);
+    expect(DiscourseMessageTracking.forSite(site).isLoaded, isFalse);
+    expect(DiscourseMessageTracking.forSite(site).count(unread: false), 0);
+  });
+
   test("a group's New, Unread and Archive are its own lists", () async {
     final p = _Recording(site);
     await p.getMessageListAsync(DiscourseMessageList.group('team', filter: 'new'), 0, 19);
@@ -109,10 +155,12 @@ class _Recording extends DiscoursePrivateConversationProxy {
         )..setLoginData(FCLoginResult(result: true, resultText: '', user: FCUser(id: '2', username: 'alice'))));
 
   final List<String> paths = [];
+  Completer<void>? gate;
 
   @override
   Future<Map<String, dynamic>> apiGet(String path, {Map<String, dynamic>? query}) async {
     paths.add(path);
+    await gate?.future;
     if (path.endsWith('private-message-topic-tracking-state.json')) {
       return {
         '_value': [

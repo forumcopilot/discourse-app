@@ -3960,6 +3960,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get failedToDiscardDraft => 'Não foi possível descartar o rascunho';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Rascunho não descartado. Continua em Rascunhos. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Não foi possível carregar as mensagens';
 
   @override
@@ -4843,6 +4848,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get couldNotEnableDoNotDisturb =>
       'Não foi possível ativar o Não perturbe';
+
+  @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'O Não perturbe não foi ativado: sua sessão mudou.';
 
   @override
   String get couldNotTurnOffDoNotDisturb =>

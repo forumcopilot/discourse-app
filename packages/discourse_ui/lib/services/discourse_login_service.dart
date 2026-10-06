@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:discourse_core/discourse_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteContextExtension;
@@ -487,13 +488,32 @@ class DiscourseLoginService {
     return result;
   }
 
+  /// How long sign-in waits for the forum's configuration. Worth a moment
+  /// (the forum opens with the new account's views and permissions), not a
+  /// slow forum: only `/about.json` has a budget of its own, while
+  /// `/site.json`, `/site/settings.json` and the chat probe wait out Dio's
+  /// 15 s to connect and 30 s between bytes, plus any 429 cooldown, with
+  /// the sign-in on a spinner all along. The same 10 s a forum gets to
+  /// open; past it sign-in completes and the reads land in the background.
+  @visibleForTesting
+  static Duration configurationRefreshTimeout = const Duration(seconds: 10);
+
   /// Reload the forum's configuration for the key now in place. A
   /// configuration outage must not discard an otherwise successful
-  /// authentication, so this never throws.
+  /// authentication, so this never throws, and a slow one must not hold it
+  /// up: past [configurationRefreshTimeout] it carries on without waiting,
+  /// and the capabilities are stored when they arrive.
   Future<void> _refreshConfiguration() async {
+    final refresh = DiscourseConfigProxy(siteContext, client: _client)
+        .getConfig(siteContext.site.pluginUrl, forceRefresh: true);
     try {
-      await DiscourseConfigProxy(siteContext, client: _client)
-          .getConfig(siteContext.site.pluginUrl, forceRefresh: true);
+      await refresh.timeout(configurationRefreshTimeout);
+    } on TimeoutException {
+      AppLogger.warning('Configuration still loading after '
+          '$configurationRefreshTimeout; finishing sign-in without it');
+      unawaited(refresh.then<void>((_) {}, onError: (Object e) {
+        AppLogger.warning('Could not refresh configuration after sign-in: $e');
+      }));
     } catch (e) {
       AppLogger.warning('Could not refresh configuration after sign-in: $e');
     }

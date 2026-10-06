@@ -3950,6 +3950,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get failedToDiscardDraft => 'Concept verwijderen mislukt';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Concept niet verwijderd. Het staat nog bij Concepten. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Berichten laden mislukt';
 
   @override
@@ -4825,6 +4830,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get couldNotEnableDoNotDisturb => 'Kon Niet storen niet inschakelen';
+
+  @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Niet storen is niet ingeschakeld: je aanmelding is gewijzigd.';
 
   @override
   String get couldNotTurnOffDoNotDisturb => 'Kon Niet storen niet uitschakelen';

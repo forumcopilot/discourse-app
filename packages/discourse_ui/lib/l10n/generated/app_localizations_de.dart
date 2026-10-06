@@ -3970,6 +3970,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get failedToDiscardDraft => 'Entwurf konnte nicht verworfen werden';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Entwurf nicht verworfen. Er ist weiterhin unter Entwürfe. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Nachrichten konnten nicht geladen werden';
 
   @override
@@ -4863,6 +4868,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get couldNotEnableDoNotDisturb =>
       '„Nicht stören“ konnte nicht aktiviert werden';
+
+  @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      '„Nicht stören“ wurde nicht aktiviert: Deine Anmeldung hat sich geändert.';
 
   @override
   String get couldNotTurnOffDoNotDisturb =>

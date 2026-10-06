@@ -3966,6 +3966,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get failedToDiscardDraft => 'Impossibile scartare la bozza';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Bozza non scartata. È ancora in Bozze. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Impossibile caricare i messaggi';
 
   @override
@@ -4851,6 +4856,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get couldNotEnableDoNotDisturb =>
       'Impossibile attivare Non disturbare';
+
+  @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Non disturbare non è stato attivato: la tua sessione è cambiata.';
 
   @override
   String get couldNotTurnOffDoNotDisturb =>

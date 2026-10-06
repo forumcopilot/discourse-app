@@ -3959,6 +3959,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get failedToDiscardDraft => 'No se pudo descartar el borrador';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'No se descartó el borrador. Sigue en Borradores. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'No se pudieron cargar los mensajes';
 
   @override
@@ -4840,6 +4845,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get couldNotEnableDoNotDisturb => 'No se pudo activar No molestar';
+
+  @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'No molestar no se activó: tu sesión ha cambiado.';
 
   @override
   String get couldNotTurnOffDoNotDisturb => 'No se pudo desactivar No molestar';

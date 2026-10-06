@@ -276,9 +276,13 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   Future<bool> loadMessageTrackingAsync() async {
     final username = siteContext.currentUsername;
     if (!siteContext.isLoggedIn || username == null || username.isEmpty) return false;
+    final session = siteContext.configurationSession;
     try {
       final r = await apiGet(
           '/u/${Uri.encodeComponent(username)}/private-message-topic-tracking-state.json');
+      // Signed out, or in as someone else, meanwhile: these were the
+      // previous account's messages, not the next one's.
+      if (!identical(session, siteContext.configurationSession)) return false;
       // A bare JSON array, which apiGet wraps under `_value`.
       final rows = r['_value'];
       if (rows is! List) return false;
@@ -302,7 +306,10 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     final bus = DiscourseMessageBus.of(siteContext);
     if (me == null || bus.isUnavailable) return null;
     final tracking = DiscourseMessageTracking.forSite(siteContext.site.url);
+    final session = siteContext.configurationSession;
     void handle(Map<String, dynamic> data) {
+      // A message for the previous sign-in, delivered before this stopped.
+      if (!identical(session, siteContext.configurationSession)) return;
       final type = tracking.apply(data, myUserId: me);
       if (type != null) onIncoming(data, type);
     }

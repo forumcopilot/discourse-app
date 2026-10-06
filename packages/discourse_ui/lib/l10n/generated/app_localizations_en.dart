@@ -3919,6 +3919,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToDiscardDraft => 'Failed to discard draft';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Draft not discarded. It\'s still in Drafts. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Failed to load messages';
 
   @override
@@ -4782,6 +4787,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get couldNotEnableDoNotDisturb => 'Couldn\'t enable do not disturb';
+
+  @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Do not disturb wasn\'t turned on: your sign-in changed.';
 
   @override
   String get couldNotTurnOffDoNotDisturb => 'Couldn\'t turn off do not disturb';

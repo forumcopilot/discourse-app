@@ -3970,6 +3970,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get failedToDiscardDraft => 'Impossible de supprimer le brouillon';
 
   @override
+  String draftNotDiscardedAway(String error) {
+    return 'Le brouillon n\'a pas été supprimé. Il est toujours dans Brouillons. $error';
+  }
+
+  @override
   String get messagesLoadFailed => 'Impossible de charger les messages';
 
   @override
@@ -4856,6 +4861,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get couldNotEnableDoNotDisturb =>
       'Impossible d’activer Ne pas déranger';
+
+  @override
+  String get doNotDisturbNotEnabledSessionChanged =>
+      'Ne pas déranger n’a pas été activé : votre session a changé.';
 
   @override
   String get couldNotTurnOffDoNotDisturb =>

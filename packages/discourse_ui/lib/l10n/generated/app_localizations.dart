@@ -6406,6 +6406,12 @@ abstract class AppLocalizations {
   /// **'Failed to discard draft'**
   String get failedToDiscardDraft;
 
+  /// Drafts page: a discard sent after the Undo ran out failed when the reader had already left the page; the draft was not deleted. {error} is the reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft not discarded. It\'s still in Drafts. {error}'**
+  String draftNotDiscardedAway(String error);
+
   /// Message list (Inbox, Sent, Archive…): shown when the forum could not return the list and gave no reason
   ///
   /// In en, this message translates to:
@@ -7847,6 +7853,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t enable do not disturb'**
   String get couldNotEnableDoNotDisturb;
+
+  /// Snackbar: a Do not disturb duration was picked after the profile tile closed, but the reader had signed in to another account meanwhile, so nothing was sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not disturb wasn\'t turned on: your sign-in changed.'**
+  String get doNotDisturbNotEnabledSessionChanged;
 
   /// Snackbar when turning off Do not disturb failed
   ///

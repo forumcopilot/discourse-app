@@ -26,6 +26,8 @@ library;
 import 'package:discourse_core/discourse_core.dart' show DiscourseLink;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
+import 'notification_forum.dart';
+
 /// What kind of destination a payload names.
 enum NotificationRouteKind {
   /// A specific post, by id: the topic can be opened centred on it. A post
@@ -121,15 +123,14 @@ class DiscourseNotificationRoute {
   final bool isPush;
   final String? recipientUserId;
 
+  /// Whether this push may open in [context]: its forum (scheme aside, as
+  /// the backend echoes either; [NotificationForum.identity]) and its
+  /// signed-in recipient. Links always may.
   bool permits(SiteContext context) {
     if (!isPush) return true;
-    final target = Uri.tryParse(siteUrl ?? '');
-    final current = Uri.tryParse(context.site.pluginUrl);
-    if (target == null || current == null ||
-        target.scheme != current.scheme || target.host != current.host ||
-        target.port != current.port ||
-        target.path.replaceAll(RegExp(r'/+$'), '') !=
-            current.path.replaceAll(RegExp(r'/+$'), '')) {
+    final target = NotificationForum.identity(siteUrl);
+    if (target == null ||
+        target != NotificationForum.identity(context.site.pluginUrl)) {
       return false;
     }
     return context.isLoggedIn && recipientUserId != null &&

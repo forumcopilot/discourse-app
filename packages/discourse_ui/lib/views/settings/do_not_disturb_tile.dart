@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../services/discourse_login_service.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/snackbar_helper.dart';
 import '../widgets/sheet_title.dart';
 
 /// Do-not-disturb control, backed by Discourse's native
@@ -159,6 +160,15 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
 
   Future<void> _showDurationPicker() async {
     if (!mounted || !_checkSession()) return;
+    // The profile list can dispose this tile while the sheet is up (a
+    // text-size or viewport change). The choice is still the reader's, so
+    // what it needs then is taken now.
+    final proxy = _proxy;
+    final siteContext = widget.siteContext;
+    final session = _accountSession;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final duration = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
@@ -186,10 +196,59 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
         );
       },
     );
-    if (!mounted || !_checkSession()) return;
-    if (duration != null) {
-      await _enter(duration);
+    if (duration == null) return;
+    if (mounted) {
+      if (_checkSession()) await _enter(duration);
+      return;
     }
+    await _enterWithoutTile(
+      duration,
+      proxy: proxy,
+      siteContext: siteContext,
+      session: session,
+      messenger: messenger,
+      theme: theme,
+      l10n: l10n,
+    );
+  }
+
+  /// A duration picked after the tile was disposed: sent all the same for
+  /// the account that opened the picker, and [DoNotDisturbTile.notifyChanged]
+  /// lets the tile the profile list builds again read the new state. If the
+  /// reader signed in to another account meanwhile, nothing is sent, and
+  /// they are told so rather than left to think it is on.
+  static Future<void> _enterWithoutTile(
+    String duration, {
+    required DiscourseUserProxy proxy,
+    required SiteContext siteContext,
+    required Object session,
+    required ScaffoldMessengerState? messenger,
+    required ThemeData theme,
+    required AppLocalizations l10n,
+  }) async {
+    bool current() => identical(session, siteContext.configurationSession);
+    void tell(String message) {
+      if (messenger != null) {
+        SnackbarHelper.showErrorOn(messenger, theme, message);
+      }
+    }
+
+    if (!current()) {
+      tell(l10n.doNotDisturbNotEnabledSessionChanged);
+      return;
+    }
+    final result = await proxy.enterDoNotDisturbAsync(duration);
+    // An answer for an earlier sign-in is not the current account's state.
+    if (!current()) return;
+    if (!result.result) {
+      tell(result.resultText.isNotEmpty
+          ? result.resultText
+          : l10n.couldNotEnableDoNotDisturb);
+      return;
+    }
+    DoNotDisturbTile.notifyChanged();
+    unawaited(
+        DiscourseLoginService(siteContext).syncDoNotDisturb(result.endsAt));
   }
 
   String _untilLabel(BuildContext context, DateTime endsAt) {
