@@ -1,3 +1,4 @@
+import 'package:discourse_notifications/discourse_notifications.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -94,7 +95,21 @@ class NotificationInstallation {
   /// callback already has it); with [force] it reports even before the first
   /// grant, which is how the grant page files the phone just before
   /// registering the key under it.
-  static Future<bool> report({String? token, bool force = false}) async {
+  static Future<bool> report({String? token, bool force = false}) {
+    // One at a time: with two in flight the backend kept whichever arrived
+    // last and this phone remembered whichever finished last, so a legacy
+    // report could stick while later ones were skipped as unchanged.
+    final previous = _reporting;
+    final next = previous
+        .then((_) => _report(token: token, force: force))
+        .catchError((Object _) => false);
+    _reporting = next;
+    return next;
+  }
+
+  static Future<bool> _reporting = Future.value(true);
+
+  static Future<bool> _report({String? token, bool force = false}) async {
     if (!AppForumConfig.isNotificationsGrantEnabled) return false;
     await NotificationGrantCleanup.instance.retryPending();
     if (!force && !await isRegistered()) return false;
@@ -104,6 +119,7 @@ class NotificationInstallation {
       final permitted = await NotificationPermission.status() ==
           NotificationPermissionState.granted;
       final body = reportBody(
+        guardedAndroidDelivery: DiscourseNotifications.ready,
         deviceToken: effectiveToken,
         devicePlatform: NotificationKeyService.devicePlatform,
         notificationsPermitted: permitted,
@@ -129,6 +145,7 @@ class NotificationInstallation {
   /// token the backend already has.
   @visibleForTesting
   static Map<String, dynamic> reportBody({
+    bool guardedAndroidDelivery = false,
     String? deviceToken,
     required String devicePlatform,
     required bool notificationsPermitted,
@@ -139,6 +156,8 @@ class NotificationInstallation {
       if (deviceToken != null && deviceToken.isNotEmpty)
         'device_token': deviceToken,
       'device_platform': devicePlatform,
+      if (devicePlatform == 'android' && guardedAndroidDelivery)
+        'notification_delivery': DiscourseNotifications.deliveryMode,
       'notifications_permitted': notificationsPermitted,
       if (appVersion != null && appVersion.isNotEmpty) 'app_version': appVersion,
       if (locale != null && locale.isNotEmpty) 'locale': locale,

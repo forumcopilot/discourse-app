@@ -665,7 +665,7 @@ class _SectionState extends State<_Section> {
   }
 }
 
-/// One destination, Material 3's navigation-drawer item: 48dp, a pill
+/// One destination, Material 3's navigation-drawer item: at least 48dp, a pill
 /// behind the current one.
 class _Item extends StatelessWidget {
   const _Item({
@@ -700,7 +700,7 @@ class _Item extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 48),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(children: [
                 SizedBox(
                   width: 24,
@@ -710,7 +710,7 @@ class _Item extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: text.labelLarge?.copyWith(
                         color: selected

@@ -315,6 +315,7 @@
     "description": "Home tab title"
   },
   "notifications": "Meldingen",
+  "notificationsTab": "Meldingen",
   "@notifications": {
     "description": "Notifications tab title"
   },
@@ -1732,5 +1733,7 @@
   "chatAvailableChannels": "Beschikbare kanalen",
   "chatAvailableChannelsDescription": "Kanalen die je kunt bekijken of waar je aan kunt deelnemen.",
   "chatAllChannelsJoined": "Je neemt deel aan alle beschikbare kanalen.",
-  "chatViewChannel": "Bekijken"
+  "chatViewChannel": "Bekijken",
+  "mediaPlay": "Afspelen",
+  "mediaPause": "Pauzeren"
 }

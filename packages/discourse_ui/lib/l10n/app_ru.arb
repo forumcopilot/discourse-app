@@ -266,6 +266,7 @@
   "deleteTopic": "Удалить тему",
   "home": "Главная",
   "notifications": "Уведомления",
+  "notificationsTab": "Оповещения",
   "forums": "Категории",
   "content": "Содержание",
   "pleaseEnterTitle": "Пожалуйста, введите заголовок",
@@ -1575,5 +1576,7 @@
   "chatAvailableChannels": "Доступные каналы",
   "chatAvailableChannelsDescription": "Каналы, которые можно просматривать или к которым можно присоединиться.",
   "chatAllChannelsJoined": "Вы присоединились ко всем доступным каналам.",
-  "chatViewChannel": "Просмотреть"
+  "chatViewChannel": "Просмотреть",
+  "mediaPlay": "Воспроизвести",
+  "mediaPause": "Пауза"
 }

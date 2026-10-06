@@ -582,17 +582,42 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         children: [
           Expanded(
             child: segments.length > 1
-                ? SegmentedButton<_ChatHalf>(
-                    segments: segments,
-                    selected: {selected},
-                    showSelectedIcon: false,
-                    onSelectionChanged: (sel) {
-                      setState(() => _half = sel.first);
-                      if (sel.first == _ChatHalf.threads && _threads == null) {
+                ? LayoutBuilder(builder: (context, constraints) {
+                    void select(_ChatHalf half) {
+                      setState(() => _half = half);
+                      if (half == _ChatHalf.threads && _threads == null) {
                         unawaited(_loadThreads());
                       }
-                    },
-                  )
+                    }
+
+                    // Keep every destination readable with larger text or
+                    // too little room for one row of navigation controls.
+                    final scale =
+                        MediaQuery.textScalerOf(context).scale(14) / 14;
+                    if (scale > 1.3 ||
+                        constraints.maxWidth < segments.length * 100 * scale) {
+                      return Wrap(
+                        spacing: DesignTokens.spacingS,
+                        runSpacing: DesignTokens.spacingXS,
+                        children: [
+                          for (final segment in segments)
+                            ChoiceChip(
+                              label: segment.label!,
+                              avatar: segment.icon,
+                              selected: selected == segment.value,
+                              showCheckmark: false,
+                              onSelected: (_) => select(segment.value),
+                            ),
+                        ],
+                      );
+                    }
+                    return SegmentedButton<_ChatHalf>(
+                      segments: segments,
+                      selected: {selected},
+                      showSelectedIcon: false,
+                      onSelectionChanged: (values) => select(values.first),
+                    );
+                  })
                 : const SizedBox.shrink(),
           ),
           if (searchOn)

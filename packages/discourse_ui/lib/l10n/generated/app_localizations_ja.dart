@@ -531,6 +531,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifications => '通知';
 
   @override
+  String get notificationsTab => '通知';
+
+  @override
   String get forums => 'カテゴリ';
 
   @override
@@ -5018,4 +5021,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatViewChannel => '表示';
+
+  @override
+  String get mediaPlay => '再生';
+
+  @override
+  String get mediaPause => '一時停止';
 }

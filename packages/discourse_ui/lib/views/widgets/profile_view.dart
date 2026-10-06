@@ -990,16 +990,14 @@ class _SummaryTab extends StatelessWidget {
     ];
   }
 
-  /// Trust level, groups, views, followers and custom fields: what the old
-  /// info card had that is not already in the header.
+  /// Trust level, groups, views and followers. Public profile questions
+  /// already appear in the header via extras.fields; raw custom_fields
+  /// contain plugin storage such as last_chat_channel_id, not display fields.
   Widget _details(BuildContext context, AppLocalizations l10n) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final level = userInfo.trustLevel;
     final groups = userInfo.userGroups;
-    final fields = userInfo.customFields
-        .where((f) => f.name.isNotEmpty && f.value.trim().isNotEmpty)
-        .toList();
     Widget row(IconData icon, String label, String? value, {VoidCallback? onTap}) =>
         ListTile(
           dense: true,
@@ -1033,7 +1031,6 @@ class _SummaryTab extends StatelessWidget {
             row(Icons.person_outline, l10n.following,
                 formatNumber(context, userInfo.followingCount)),
           ],
-          for (final f in fields) row(Icons.info_outline, f.name, f.value),
           if (groups.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL,

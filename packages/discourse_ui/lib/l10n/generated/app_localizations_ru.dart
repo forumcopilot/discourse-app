@@ -552,6 +552,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get notifications => 'Уведомления';
 
   @override
+  String get notificationsTab => 'Оповещения';
+
+  @override
   String get forums => 'Категории';
 
   @override
@@ -5336,4 +5339,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatViewChannel => 'Просмотреть';
+
+  @override
+  String get mediaPlay => 'Воспроизвести';
+
+  @override
+  String get mediaPause => 'Пауза';
 }

@@ -1058,6 +1058,12 @@ abstract class AppLocalizations {
   /// **'Notifications'**
   String get notifications;
 
+  /// Short bottom navigation label for Notifications. Keep concise so it fits on narrow phones with larger text.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get notificationsTab;
+
   /// Categories tab title (Discourse-native term; the ARB key keeps the legacy 'forums' name for compatibility)
   ///
   /// In en, this message translates to:
@@ -8525,6 +8531,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View'**
   String get chatViewChannel;
+
+  /// Accessible label for an audio or video play button
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get mediaPlay;
+
+  /// Accessible label for an audio or video pause button
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get mediaPause;
 }
 
 class _AppLocalizationsDelegate

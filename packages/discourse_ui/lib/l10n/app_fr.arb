@@ -266,6 +266,7 @@
   "deleteTopic": "Supprimer le sujet",
   "home": "Accueil",
   "notifications": "Notifications",
+  "notificationsTab": "Alertes",
   "forums": "Catégories",
   "content": "Contenu",
   "pleaseEnterTitle": "Veuillez entrer un titre",
@@ -1575,5 +1576,7 @@
   "chatAvailableChannels": "Canaux disponibles",
   "chatAvailableChannelsDescription": "Canaux que vous pouvez consulter ou rejoindre.",
   "chatAllChannelsJoined": "Vous avez rejoint tous les canaux disponibles.",
-  "chatViewChannel": "Voir"
+  "chatViewChannel": "Voir",
+  "mediaPlay": "Lire",
+  "mediaPause": "Mettre en pause"
 }

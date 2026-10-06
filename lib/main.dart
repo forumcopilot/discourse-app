@@ -1,3 +1,4 @@
+import 'package:discourse_ui/services/account_notifications.dart';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -292,6 +293,7 @@ void _createPushNotificationController() {
 
 @pragma('vm:entry-point')
 Future<void> _backgroundHandler(RemoteMessage message) async {
+  if (await AccountNotifications.handle(message.data)) return;
   AppLogger.info('Received background message: ${message.messageId}');
   AppLogger.debug('Message data: ${message.data}');
   if (message.notification != null) {

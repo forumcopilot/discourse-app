@@ -550,6 +550,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notifications => 'Notificações';
 
   @override
+  String get notificationsTab => 'Avisos';
+
+  @override
   String get forums => 'Categorias';
 
   @override
@@ -5285,4 +5288,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get chatViewChannel => 'Ver';
+
+  @override
+  String get mediaPlay => 'Reproduzir';
+
+  @override
+  String get mediaPause => 'Pausar';
 }
