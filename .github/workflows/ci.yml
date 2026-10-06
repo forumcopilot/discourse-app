@@ -102,6 +102,10 @@ jobs:
       - name: Build
         run: flutter build apk --debug
 
+      - name: Test Android notification identity
+        run: ./gradlew :discourse_notifications:testDebugUnitTest
+        working-directory: android
+
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk

@@ -528,6 +528,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifications => '알림';
 
   @override
+  String get notificationsTab => '알림';
+
+  @override
   String get forums => '카테고리';
 
   @override
@@ -5018,4 +5021,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatViewChannel => '보기';
+
+  @override
+  String get mediaPlay => '재생';
+
+  @override
+  String get mediaPause => '일시 정지';
 }

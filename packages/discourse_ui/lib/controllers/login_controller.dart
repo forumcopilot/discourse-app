@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:discourse_ui/services/discourse_login_service.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
-import 'package:discourse_ui/config/app_forum_config.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_api_exception.dart';
 import 'package:get/get.dart';
@@ -1047,7 +1046,6 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
   /// forum. Network failure is retried; storage failure must be surfaced
   /// before forgetting the account and its cleanup request.
   Future<void> _revokeNotificationsKey(SiteContext siteContext) async {
-    if (!AppForumConfig.isNotificationsGrantEnabled) return;
     try {
       final loginService = DiscourseLoginService(siteContext);
       await loginService.retireNotificationsGrant();

@@ -100,6 +100,7 @@ void main() {
   });
 
   group('Notification settings page', () {
+    late _Account account;
     Future<SiteContext> setUp({required bool granted}) async {
       final ctx = context();
       final prefix = ctx.discourseStoragePrefix;
@@ -108,9 +109,39 @@ void main() {
         if (granted) '${prefix}_notifications_key_install_bound': true,
       });
       AppForumConfig.setNotificationsApiBaseUrl('https://push.example/api');
-      SiteProxyFactory.register('scope-test', _Factory());
+      account = _Account();
+      SiteProxyFactory.register('scope-test', _Factory(account));
       SiteProxyService.initialize(ctx);
       return ctx;
+    }
+
+    for (final scale in [1.0, 2.0]) {
+      testWidgets(
+          'email picker remains selectable in landscape at ${scale}x text',
+          (tester) async {
+        final ctx = await setUp(granted: false);
+        await pump(tester, NotificationSettingsPage(siteContext: ctx));
+        await tester.tap(find.text('Email when away'));
+        await tester.pumpAndSettle();
+
+        // Rotate and enlarge text while the sheet is already open, as on device.
+        tester.view.physicalSize = const Size(640, 360);
+        tester.view.devicePixelRatio = 1;
+        tester.platformDispatcher.textScaleFactorTestValue = scale;
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+
+        final lastOption = find.descendant(
+            of: find.byType(BottomSheet), matching: find.text('Never'));
+        await tester.ensureVisible(lastOption);
+        await tester.pumpAndSettle();
+        await tester.tap(lastOption);
+        await tester.pumpAndSettle();
+        expect(find.byType(BottomSheet), findsNothing);
+        expect(account.saved.single.emailLevel, 2);
+        expect(tester.takeException(), isNull);
+      });
     }
 
     testWidgets('push on: this device, then the account everywhere',
@@ -142,8 +173,7 @@ void main() {
           findsOneWidget);
       expect(find.text('Email when away'), findsOneWidget);
       expect(find.text('Notify when liked'), findsOneWidget);
-      expect(
-          tester.getTopLeft(find.text('Stop push on this device')).dy,
+      expect(tester.getTopLeft(find.text('Stop push on this device')).dy,
           lessThan(tester.getTopLeft(find.text('Your Test Forum account')).dy),
           reason: 'device settings first, account settings after');
 
@@ -185,7 +215,8 @@ void main() {
     });
   });
 
-  testWidgets('the Profile tab row re-reads Do Not Disturb when it changes '
+  testWidgets(
+      'the Profile tab row re-reads Do Not Disturb when it changes '
       'elsewhere', (tester) async {
     final ctx = context();
     final users = _Users(ctx);
@@ -224,6 +255,15 @@ class _Users extends DiscourseUserProxy {
 }
 
 class _Account implements IFCAccountProxy {
+  final saved = <FCNotificationPrefs>[];
+
+  @override
+  Future<FCNotificationPrefsResult> updateNotificationPrefsAsync(
+      FCNotificationPrefs prefs) async {
+    saved.add(prefs);
+    return FCNotificationPrefsResult(result: true, prefs: prefs);
+  }
+
   @override
   Future<FCNotificationPrefsResult> getNotificationPrefsAsync() async =>
       FCNotificationPrefsResult(result: true, prefs: FCNotificationPrefs());
@@ -233,8 +273,10 @@ class _Account implements IFCAccountProxy {
 }
 
 class _Factory implements SiteProxyFactory {
+  final _Account account;
+  _Factory(this.account);
   @override
-  IFCAccountProxy createAccountProxy(SiteContext context) => _Account();
+  IFCAccountProxy createAccountProxy(SiteContext context) => account;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

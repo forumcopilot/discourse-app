@@ -174,6 +174,7 @@ class _VideoPreviewState extends State<_VideoPreview> {
       button: true,
       label: [provider.name, if (title != null) title].join(': '),
       excludeSemantics: true,
+      onTap: () => widget.onOpen(link.url),
       child: Align(
         alignment: AlignmentDirectional.centerStart,
         child: ConstrainedBox(
@@ -311,10 +312,15 @@ class PostVideoCard extends StatelessWidget {
     // No poster: a black frame; the play button says what it is.
     Widget blank() => const ColoredBox(color: Colors.black);
 
+    void openVideo() => Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => FullScreenVideoViewer(videoUrl: src, title: name, auth: auth),
+    ));
+
     return Semantics(
       button: true,
       label: name,
       excludeSemantics: true,
+      onTap: openVideo,
       child: Align(
         alignment: AlignmentDirectional.centerStart,
         child: ConstrainedBox(
@@ -326,10 +332,7 @@ class PostVideoCard extends StatelessWidget {
               child: Material(
                 color: Colors.black,
                 child: InkWell(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) =>
-                        FullScreenVideoViewer(videoUrl: src, title: name, auth: auth),
-                  )),
+                  onTap: openVideo,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -459,12 +462,16 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
             )
           else if (_failed)
             IconButton(
+              tooltip: AppLocalizations.of(context)?.viewOnWeb ?? 'View on Web',
               // It would not play here; the browser may manage.
               onPressed: () => UrlUtils.openUrl(widget.src),
               icon: Icon(Icons.open_in_new, color: colorScheme.error),
             )
           else
             IconButton(
+              tooltip: (value?.isPlaying ?? false)
+                  ? (AppLocalizations.of(context)?.mediaPause ?? 'Pause')
+                  : (AppLocalizations.of(context)?.mediaPlay ?? 'Play'),
               onPressed: _toggle,
               icon: Icon(
                 (value?.isPlaying ?? false)

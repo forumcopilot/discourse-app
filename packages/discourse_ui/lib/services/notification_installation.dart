@@ -1,3 +1,4 @@
+import 'package:discourse_notifications/discourse_notifications.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -104,6 +105,7 @@ class NotificationInstallation {
       final permitted = await NotificationPermission.status() ==
           NotificationPermissionState.granted;
       final body = reportBody(
+        guardedAndroidDelivery: DiscourseNotifications.ready,
         deviceToken: effectiveToken,
         devicePlatform: NotificationKeyService.devicePlatform,
         notificationsPermitted: permitted,
@@ -129,6 +131,7 @@ class NotificationInstallation {
   /// token the backend already has.
   @visibleForTesting
   static Map<String, dynamic> reportBody({
+    bool guardedAndroidDelivery = false,
     String? deviceToken,
     required String devicePlatform,
     required bool notificationsPermitted,
@@ -139,6 +142,8 @@ class NotificationInstallation {
       if (deviceToken != null && deviceToken.isNotEmpty)
         'device_token': deviceToken,
       'device_platform': devicePlatform,
+      if (devicePlatform == 'android' && guardedAndroidDelivery)
+        'notification_delivery': DiscourseNotifications.deliveryMode,
       'notifications_permitted': notificationsPermitted,
       if (appVersion != null && appVersion.isNotEmpty) 'app_version': appVersion,
       if (locale != null && locale.isNotEmpty) 'locale': locale,

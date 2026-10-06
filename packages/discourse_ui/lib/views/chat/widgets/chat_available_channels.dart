@@ -171,38 +171,53 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
         DiscourseChatChannelDetails.of(widget.siteContext.site.url, channel.id);
     final busy = _joining.contains(channel.id);
     final canJoin = channel.canJoin && !channel.isClosed && !channel.isArchived;
-    return ListTile(
-      key: ValueKey('available-channel-${channel.id}'),
-      onTap: () => widget.onOpen(channel),
-      leading: ChatChannelAvatar(
-          channel: channel, details: details, siteContext: widget.siteContext),
-      title: Text(channel.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-      subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (channel.description?.isNotEmpty == true)
-              Text(channel.description!,
-                  maxLines: 2, overflow: TextOverflow.ellipsis),
-            Text(l10n.chatMembersCount(details?.membershipsCount ?? 0)),
-            if (!channel.isOpen)
-              Text(channel.isArchived
-                  ? l10n.chatFilterArchived
-                  : channel.isClosed
-                      ? l10n.chatFilterClosed
-                      : l10n.chatPlaceholderReadOnly),
-          ]),
-      trailing: busy
-          ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2))
-          : canJoin
-              ? FilledButton.tonal(
-                  onPressed: () => _join(channel), child: Text(l10n.chatJoin))
-              : TextButton(
-                  onPressed: () => widget.onOpen(channel),
-                  child: Text(l10n.chatViewChannel)),
-    );
+    final action = busy
+        ? const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2))
+        : canJoin
+            ? FilledButton.tonal(
+                onPressed: () => _join(channel), child: Text(l10n.chatJoin))
+            : TextButton(
+                onPressed: () => widget.onOpen(channel),
+                child: Text(l10n.chatViewChannel));
+    return LayoutBuilder(builder: (context, constraints) {
+      final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
+      final stacked = constraints.maxWidth / scale < 320;
+      return ListTile(
+        key: ValueKey('available-channel-${channel.id}'),
+        onTap: () => widget.onOpen(channel),
+        leading: ChatChannelAvatar(
+            channel: channel,
+            details: details,
+            siteContext: widget.siteContext),
+        title:
+            Text(channel.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+        subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (channel.description?.isNotEmpty == true)
+                Text(channel.description!,
+                    maxLines: 2, overflow: TextOverflow.ellipsis),
+              Text(l10n.chatMembersCount(details?.membershipsCount ?? 0)),
+              if (!channel.isOpen)
+                Text(channel.isArchived
+                    ? l10n.chatFilterArchived
+                    : channel.isClosed
+                        ? l10n.chatFilterClosed
+                        : l10n.chatPlaceholderReadOnly),
+              if (stacked)
+                Padding(
+                  padding: const EdgeInsets.only(top: DesignTokens.spacingS),
+                  child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: action),
+                ),
+            ]),
+        trailing: stacked ? null : action,
+      );
+    });
   }
 }

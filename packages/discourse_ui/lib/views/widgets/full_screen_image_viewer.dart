@@ -189,6 +189,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         leading: IconButton(
+          tooltip: AppLocalizations.of(context)!.close,
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -197,6 +198,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             : null,
         actions: [
           IconButton(
+            tooltip: AppLocalizations.of(context)!.download,
             icon: Icon(_isSaving ? Icons.downloading : Icons.download),
             onPressed: _isSaving ? null : _saveImage,
           ),

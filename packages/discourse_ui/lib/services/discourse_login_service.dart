@@ -1,3 +1,4 @@
+import 'account_notifications.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
@@ -172,6 +173,9 @@ class DiscourseLoginService {
     if (suffix != null && installBound && current()) {
       await _retireLegacyGrantOnce(prefs);
     }
+    if (current()) {
+      await AccountNotifications.activate(siteContext, siteContext.configurationSession, newGrant: true);
+    }
     return current();
   }
 
@@ -261,6 +265,7 @@ class DiscourseLoginService {
   /// Persist cleanup before forgetting local state. New grants then get a
   /// different client ID; retries can safely outlive logout and app restarts.
   Future<void> retireNotificationsGrant() async {
+    await AccountNotifications.retire(siteContext);
     if (!AppForumConfig.isNotificationsGrantEnabled) return;
     final prefs = await SharedPreferences.getInstance();
     // A started grant may have reached the relay even if its response was lost.
@@ -432,6 +437,7 @@ class DiscourseLoginService {
   /// login state. Returns the [FCLoginResult] that was stored.
   Future<FCLoginResult> finishLogin(String payload) async {
     await _authManager.completeHandshake(payload);
+    final session = siteContext.configurationSession;
 
     final response = await _client.get(siteContext, '/session/current.json');
     if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -444,6 +450,9 @@ class DiscourseLoginService {
       );
     }
 
+    if (!identical(session, siteContext.configurationSession)) {
+      throw StateError('Account changed during sign-in');
+    }
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final cu = (data['current_user'] as Map<String, dynamic>?) ?? const {};
 
@@ -458,7 +467,11 @@ class DiscourseLoginService {
     // them before notifying the UI that login completed.
     await _refreshConfiguration();
 
+    if (!identical(session, siteContext.configurationSession)) {
+      throw StateError('Account changed during sign-in');
+    }
     siteContext.setLoginData(result);
+    await AccountNotifications.activate(siteContext, siteContext.configurationSession, newGrant: true);
     siteContext.resetOnLogin();
     await siteContext.saveToDevice();
     // Cache the identity so future launches can restore it offline.
@@ -492,12 +505,15 @@ class DiscourseLoginService {
   /// revoked server-side) drops credentials.
   Future<bool> restorePersistedSession() async {
     await siteContext.loadUserApiCredentials();
-    if (!siteContext.hasUserApiKey) return false;
+    if (!siteContext.hasUserApiKey || AccountNotifications.isRetired(siteContext)) return false;
+    final session = siteContext.configurationSession;
 
     String failureReason;
     Duration? retryHint;
     try {
       final response = await _client.get(siteContext, '/session/current.json');
+      if (!identical(session, siteContext.configurationSession) ||
+          AccountNotifications.isRetired(siteContext)) return false;
       if (response.statusCode == 401 || response.statusCode == 403) {
         // Key revoked server-side. Drop locally (this also deletes the
         // cached login snapshot).
@@ -517,6 +533,7 @@ class DiscourseLoginService {
         }
         _applyChatFlags(cu);
         siteContext.setLoginData(result);
+        await AccountNotifications.activate(siteContext, siteContext.configurationSession);
         // Refresh the cached identity for future offline launches.
         await siteContext.saveLoginSnapshot(result.toJson());
         // The notifications backend cannot read Do Not Disturb with its
@@ -532,13 +549,15 @@ class DiscourseLoginService {
     } catch (e) {
       failureReason = e.toString();
     }
-    return _restoreFromSnapshot(failureReason, retryHint);
+    if (!identical(session, siteContext.configurationSession) ||
+        AccountNotifications.isRetired(siteContext)) return false;
+    return _restoreFromSnapshot(failureReason, retryHint, session);
   }
 
   /// Fall back to the cached login snapshot when the server could not be
   /// reached. Returns `true` (and schedules a background revalidation) when
   /// a usable snapshot exists; `false` otherwise (pre-fix behavior).
-  Future<bool> _restoreFromSnapshot(String reason, Duration? retryHint) async {
+  Future<bool> _restoreFromSnapshot(String reason, Duration? retryHint, Object session) async {
     String? snapshotJson;
     try {
       snapshotJson = await siteContext.readLoginSnapshot();
@@ -562,9 +581,11 @@ class DiscourseLoginService {
           'starting signed out');
       return false;
     }
-    if (cached.user == null) return false;
+    if (cached.user == null || !identical(session, siteContext.configurationSession) ||
+        AccountNotifications.isRetired(siteContext)) return false;
 
     siteContext.setLoginData(cached);
+    await AccountNotifications.activate(siteContext, siteContext.configurationSession);
     AppLogger.info(
         'DiscourseLoginService: Restored session from cache (server '
         'unreachable: $reason); will revalidate in background');
@@ -596,13 +617,17 @@ class DiscourseLoginService {
   static const Duration _maxRevalidationDelay = Duration(minutes: 2);
 
   Future<void> _revalidationLoop(Duration initialDelay) async {
+    final session = siteContext.configurationSession;
     var delay = _capDelay(initialDelay);
     for (var attempt = 1; attempt <= _maxRevalidationAttempts; attempt++) {
       await Future.delayed(delay);
-      if (!siteContext.hasUserApiKey) return; // logged out meanwhile
+      if (!siteContext.hasUserApiKey || AccountNotifications.isRetired(siteContext) ||
+          !identical(session, siteContext.configurationSession)) return;
       try {
         final response =
             await _client.get(siteContext, '/session/current.json');
+        if (!identical(session, siteContext.configurationSession) ||
+            AccountNotifications.isRetired(siteContext)) return;
         if (response.statusCode == 401 || response.statusCode == 403) {
           AppLogger.info(
               'DiscourseLoginService: Background revalidation found the User '

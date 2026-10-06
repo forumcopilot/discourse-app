@@ -266,6 +266,7 @@
   "deleteTopic": "删除话题",
   "home": "首页",
   "notifications": "通知",
+  "notificationsTab": "通知",
   "forums": "类别",
   "content": "内容",
   "pleaseEnterTitle": "请输入标题",
@@ -1575,5 +1576,7 @@
   "chatAvailableChannels": "可用频道",
   "chatAvailableChannelsDescription": "您可以查看或加入的频道。",
   "chatAllChannelsJoined": "您已加入所有可用频道。",
-  "chatViewChannel": "查看"
+  "chatViewChannel": "查看",
+  "mediaPlay": "播放",
+  "mediaPause": "暂停"
 }

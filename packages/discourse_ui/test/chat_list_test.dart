@@ -9,6 +9,7 @@ import 'package:discourse_ui/views/chat/chat_channel_list_page.dart';
 import 'package:discourse_ui/views/chat/widgets/chat_channel_avatar.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 
@@ -91,6 +92,7 @@ void main() {
 
   setUp(() {
     DiscourseChatChannelDetails.clear();
+    DiscourseChatSettings.clear();
     DiscourseCustomEmoji.clear();
     DiscourseCustomEmoji.fetchOverride = (_) async => <String, dynamic>{};
     ChatUnread.clear();
@@ -101,9 +103,15 @@ void main() {
 
   tearDown(() => DiscourseCustomEmoji.fetchOverride = null);
 
-  Future<void> pump(WidgetTester tester) async {
+  Future<void> pump(WidgetTester tester,
+      {double textScale = 1, bool dark = false}) async {
     await tester.pumpWidget(MaterialApp(
-      theme: AppTheme.lightTheme,
+      theme: dark ? AppTheme.darkTheme : AppTheme.lightTheme,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: TextScaler.linear(textScale)),
+        child: child!,
+      ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: ChatChannelListPage(siteContext: _ctx()),
@@ -114,6 +122,62 @@ void main() {
   Future<void> showDms(WidgetTester tester) async {
     await tester.tap(find.text('DMs'));
     await tester.pumpAndSettle();
+  }
+
+  for (final dark in [false, true]) {
+    for (final size in [const Size(393, 851), const Size(851, 393)]) {
+      testWidgets(
+          'chat navigation and discovery at large text ($size, dark=$dark)',
+          (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        DiscourseChatSettings.set(
+            _site, const DiscourseChatSettings(threadsEnabled: true));
+        chat.browse = {
+          'channels': [
+            {
+              'id': 9,
+              'title': 'Community planning',
+              'description': 'Ideas for our next community event',
+              'chatable_type': 'Category',
+              'memberships_count': 30,
+              'meta': {'can_join_chat_channel': true},
+            },
+          ],
+        };
+        await pump(tester, textScale: 2, dark: dark);
+        expect(tester.takeException(), isNull);
+        for (final label in ['Channels', 'DMs', 'My Threads']) {
+          final paragraph =
+              tester.renderObject<RenderParagraph>(find.text(label));
+          expect(paragraph.didExceedMaxLines, isFalse,
+              reason: 'navigation labels must remain readable: $label');
+        }
+        await tester.ensureVisible(find.text('DMs'));
+        await tester.tap(find.text('DMs'));
+        await tester.pumpAndSettle();
+        expect(find.text('You have not joined any direct messages yet!'), findsOneWidget);
+        await tester.ensureVisible(find.text('Channels'));
+        await tester.tap(find.text('Channels'));
+        await tester.pumpAndSettle();
+        final tile = find.byKey(const ValueKey('available-channel-9'));
+        await tester.ensureVisible(tile);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        final title = tester
+            .renderObject<RenderParagraph>(find.text('Community planning'));
+        expect(title.didExceedMaxLines, isFalse,
+            reason:
+                'a short channel name must remain readable with large text');
+        await tester.ensureVisible(find.text('Join'));
+        await tester.tap(find.text('Join'));
+        await tester.pumpAndSettle();
+        expect(
+            chat.calls, contains('POST /chat/api/channels/9/memberships/me'));
+      });
+    }
   }
 
   testWidgets("a DM shows the person's avatar, the last message and its time",

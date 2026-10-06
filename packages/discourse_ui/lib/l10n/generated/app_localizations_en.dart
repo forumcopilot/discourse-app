@@ -546,6 +546,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
+  String get notificationsTab => 'Alerts';
+
+  @override
   String get forums => 'Categories';
 
   @override
@@ -5221,4 +5224,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatViewChannel => 'View';
+
+  @override
+  String get mediaPlay => 'Play';
+
+  @override
+  String get mediaPause => 'Pause';
 }
