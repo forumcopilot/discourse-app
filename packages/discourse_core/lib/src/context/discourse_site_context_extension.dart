@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../storage/discourse_secure_storage.dart';
+import '../data/message/discourse_message_tracking.dart';
 import '../data/site/discourse_site_capabilities.dart';
 
 /// Discourse-specific authentication state attached to a [SiteContext].
@@ -57,6 +58,8 @@ extension DiscourseSiteContextExtension on SiteContext {
   void _invalidateCapabilities() {
     _data()['configurationSession'] = Object();
     DiscourseSiteCapabilities.invalidate(site.pluginUrl);
+    // The message counts were the previous sign-in's.
+    DiscourseMessageTracking.resetSite(site.url);
   }
 
   /// The User API Key returned by Discourse after a successful handshake.

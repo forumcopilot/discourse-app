@@ -8,7 +8,10 @@ import 'package:flutter/foundation.dart' show ValueNotifier;
 /// `…/group/{id}`. The counts on the messages page's New and Unread come
 /// from here, per inbox (the reader's own or a group's), as on the web.
 ///
-/// Per forum; [revision] ticks on every change.
+/// Per forum and sign-in: the reader's credentials changing (signing out, or
+/// in as someone else) forgets the rows ([resetSite]), so the next account's
+/// counts never start from the previous one's. [revision] ticks on every
+/// change.
 class DiscourseMessageTracking {
   DiscourseMessageTracking._();
 
@@ -25,8 +28,21 @@ class DiscourseMessageTracking {
   static DiscourseMessageTracking forSite(String siteUrl) =>
       _bySite.putIfAbsent(_key(siteUrl), DiscourseMessageTracking._);
 
-  /// Only for tests and sign-out.
+  /// Only for tests.
   static void clear() => _bySite.clear();
+
+  /// Forgets what the forum at [siteUrl] reported: it was another sign-in's.
+  /// Counts are unknown ([isLoaded] false) until the next report loads, and
+  /// whoever watches [revision] hears it, so no "Unread (3)" outlives the
+  /// account it counted. Called whenever the forum's credentials change.
+  static void resetSite(String siteUrl) => _bySite[_key(siteUrl)]?._reset();
+
+  void _reset() {
+    if (_states.isEmpty && !_loaded) return;
+    _states.clear();
+    _loaded = false;
+    revision.value++;
+  }
 
   final Map<int, Map<String, dynamic>> _states = {};
   final ValueNotifier<int> revision = ValueNotifier<int>(0);
