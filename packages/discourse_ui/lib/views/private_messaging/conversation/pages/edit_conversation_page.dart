@@ -15,11 +15,19 @@ class EditConversationPage extends StatefulWidget {
   /// else only edits the title.
   final bool canClose;
 
+  /// Called when a save has changed something on the forum, even if the
+  /// rest of it failed: the title saves and closing is refused, say. The
+  /// editor then stays open with the error, and may be left without
+  /// saving again, so this, not the route's result, tells the page behind
+  /// it to show the new title.
+  final VoidCallback? onSaved;
+
   const EditConversationPage({
     super.key,
     required this.siteContext,
     required this.conversationId,
     this.canClose = false,
+    this.onSaved,
   });
 
   @override
@@ -82,17 +90,37 @@ class _EditConversationPageState extends State<EditConversationPage> {
         _isSubmitting = true;
       });
 
-      final result = await SiteProxyFactory.getPrivateConversationProxy().saveRawConversationAsync(
+      final proxy = SiteProxyFactory.getPrivateConversationProxy();
+      final title = _titleController.text.trim();
+      // Every save used to send the open state, so for anyone who cannot
+      // close messages the title saved and then PUT /t/{id}/status failed
+      // with a permission error. Only a change made by someone allowed to
+      // make it is sent now.
+      final open = widget.canClose && _conversationOpen != _initialOpen
+          ? _conversationOpen
+          : null;
+      // The title and the open state are separate requests on Discourse
+      // (PUT /t/{id}, PUT /t/{id}/status), so they are sent one at a time:
+      // when closing is refused after the title saved, the editor stays
+      // open with the error, and the page behind it still learns the
+      // title changed.
+      var result = await proxy.saveRawConversationAsync(
         widget.conversationId,
-        conversationTitle: _titleController.text.trim(),
-        // Every save used to send the open state, so for anyone who cannot
-        // close messages the title saved and then PUT /t/{id}/status failed
-        // with a permission error. Only a change made by someone allowed to
-        // make it is sent now.
-        conversationOpen: widget.canClose && _conversationOpen != _initialOpen
-            ? _conversationOpen
-            : null,
+        conversationTitle: title,
       );
+      if (result.result) {
+        if (mounted) {
+          setState(() => _hasChanges = _titleController.text.trim() != title);
+        }
+        widget.onSaved?.call();
+        if (open != null) {
+          result = await proxy.saveRawConversationAsync(
+            widget.conversationId,
+            conversationOpen: open,
+          );
+          if (result.result) _initialOpen = open;
+        }
+      }
 
       if (!result.result) {
         final errorMessage = result.resultText?.trim();
