@@ -7,7 +7,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../../services/site_proxy_service.dart';
 import '../../../theme/design_tokens.dart';
 import '../../../utils/snackbar_helper.dart';
-import 'chat_channel_avatar.dart';
+import 'chat_channel_browse_tile.dart';
 import 'chat_channel_pages.dart';
 
 /// Channels to join, under the joined ones. Its pages ([pages]) belong to
@@ -20,7 +20,8 @@ class ChatAvailableChannels extends StatefulWidget {
       required this.pages,
       required this.joinedIds,
       required this.onOpen,
-      required this.onJoined});
+      required this.onJoined,
+      required this.onBrowse});
   final SiteContext siteContext;
   final ChatChannelPages pages;
 
@@ -28,6 +29,9 @@ class ChatAvailableChannels extends StatefulWidget {
   final Set<int> joinedIds;
   final Future<void> Function(FCChatChannel) onOpen;
   final void Function(FCChatChannel) onJoined;
+
+  /// Opens Browse channels: every channel, by name and status.
+  final VoidCallback onBrowse;
   @override
   State<ChatAvailableChannels> createState() => _ChatAvailableChannelsState();
 }
@@ -142,21 +146,45 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       const SizedBox(height: DesignTokens.spacingL),
       const Divider(height: 1),
-      Container(
-          color: colors.surfaceContainerLow,
-          padding: const EdgeInsets.all(DesignTokens.spacingL),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Semantics(
-                header: true,
-                child:
-                    Text(l10n.chatAvailableChannels, style: text.titleSmall)),
-            const SizedBox(height: DesignTokens.spacingXS),
-            Text(l10n.chatAvailableChannelsDescription,
-                style:
-                    text.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
-          ])),
-      for (final channel in available) _tile(channel),
+      // The way to every channel, searchable and by status, as the web's
+      // "Browse channels"; below it the open ones to join from here.
+      Material(
+        color: colors.surfaceContainerLow,
+        child: Semantics(
+          button: true,
+          child: InkWell(
+            onTap: widget.onBrowse,
+            child: Padding(
+              padding: const EdgeInsets.all(DesignTokens.spacingL),
+              child: Row(children: [
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Semantics(
+                            header: true,
+                            child: Text(l10n.chatAvailableChannels,
+                                style: text.titleSmall)),
+                        const SizedBox(height: DesignTokens.spacingXS),
+                        Text(l10n.chatAvailableChannelsDescription,
+                            style: text.bodySmall
+                                ?.copyWith(color: colors.onSurfaceVariant)),
+                      ]),
+                ),
+                Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+              ]),
+            ),
+          ),
+        ),
+      ),
+      for (final channel in available)
+        ChatChannelBrowseTile(
+          channel: channel,
+          siteContext: widget.siteContext,
+          busy: _joining.contains(channel.id),
+          onOpen: () => widget.onOpen(channel),
+          onJoin: () => _join(channel),
+        ),
       if (error != null)
         Padding(
             padding: const EdgeInsets.all(DesignTokens.spacingL),
@@ -172,8 +200,7 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
             child: Center(child: CircularProgressIndicator()))
       else if (error == null && pages.hasMore)
         Center(
-            child: TextButton(
-                onPressed: _loadMore, child: Text(l10n.loadMore)))
+            child: TextButton(onPressed: _loadMore, child: Text(l10n.loadMore)))
       else if (error == null && available.isEmpty)
         Padding(
             padding: const EdgeInsets.all(DesignTokens.spacingL),
@@ -184,63 +211,5 @@ class _ChatAvailableChannelsState extends State<ChatAvailableChannels> {
                 style:
                     text.bodyMedium?.copyWith(color: colors.onSurfaceVariant))),
     ]);
-  }
-
-  Widget _tile(FCChatChannel channel) {
-    final l10n = AppLocalizations.of(context)!;
-    final details =
-        DiscourseChatChannelDetails.of(widget.siteContext.site.url, channel.id);
-    final busy = _joining.contains(channel.id);
-    final canJoin = channel.canJoin && !channel.isClosed && !channel.isArchived;
-    final members = details?.membershipsCount ?? 0;
-    final action = busy
-        ? const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(strokeWidth: 2))
-        : canJoin
-            ? FilledButton.tonal(
-                onPressed: () => _join(channel), child: Text(l10n.chatJoin))
-            : TextButton(
-                onPressed: () => widget.onOpen(channel),
-                child: Text(l10n.chatViewChannel));
-    return LayoutBuilder(builder: (context, constraints) {
-      final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
-      final stacked = constraints.maxWidth / scale < 320;
-      return ListTile(
-        key: ValueKey('available-channel-${channel.id}'),
-        onTap: () => widget.onOpen(channel),
-        leading: ChatChannelAvatar(
-            channel: channel,
-            details: details,
-            siteContext: widget.siteContext),
-        title:
-            Text(channel.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-        subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (channel.description?.isNotEmpty == true)
-                Text(channel.description!,
-                    maxLines: 2, overflow: TextOverflow.ellipsis),
-              // As the web's card: no count for a channel nobody is in.
-              if (members > 0) Text(l10n.chatMembersCount(members)),
-              if (!channel.isOpen)
-                Text(channel.isArchived
-                    ? l10n.chatFilterArchived
-                    : channel.isClosed
-                        ? l10n.chatFilterClosed
-                        : l10n.chatPlaceholderReadOnly),
-              if (stacked)
-                Padding(
-                  padding: const EdgeInsets.only(top: DesignTokens.spacingS),
-                  child: Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: action),
-                ),
-            ]),
-        trailing: stacked ? null : action,
-      );
-    });
   }
 }

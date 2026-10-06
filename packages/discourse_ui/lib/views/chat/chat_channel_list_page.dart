@@ -321,7 +321,8 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   ChatChannelPages _discoveryFor(String owner) {
     if (_discovery == null || _discoveryOwner != owner) {
       _discovery?.dispose();
-      _discovery = ChatChannelPages();
+      // Open channels, as the web's Browse channels opens on.
+      _discovery = ChatChannelPages(status: 'open');
       _discoveryOwner = owner;
     }
     return _discovery!;
@@ -474,6 +475,8 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     );
   }
 
+  /// Browse channels: every channel by name and status, where one the
+  /// reader follows that is closed or archived now can be opened and left.
   Future<void> _browse() async {
     await Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => ChatBrowseChannelsPage(siteContext: widget.siteContext),
@@ -680,24 +683,20 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       return _buildThreads(header);
     }
 
+    // No direct messages: the way to start one. (An empty Channels half
+    // lists the channels to join under its own empty line.)
     if (half.isEmpty && showDms) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           header,
           const SizedBox(height: DesignTokens.spacingXL),
-          EmptyStateView(
-            icon: showDms ? Icons.person_outline : Icons.tag,
-            message: showDms ? l10n.chatNoDms : l10n.chatNoChannels,
-          ),
-          // Never a dead end: an empty Channels half offers the channels
-          // there are to join, an empty DMs half the way to start one.
-          if (!showDms || canDm)
+          EmptyStateView(icon: Icons.person_outline, message: l10n.chatNoDms),
+          if (canDm)
             Center(
               child: FilledButton.tonal(
-                onPressed: showDms ? _startNewDm : _browse,
-                child:
-                    Text(showDms ? l10n.chatNoDmsCta : l10n.chatBrowseChannels),
+                onPressed: _startNewDm,
+                child: Text(l10n.chatNoDmsCta),
               ),
             ),
         ],
@@ -771,6 +770,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
           pages: _discoveryFor(owner),
           joinedIds: half.map((c) => c.id).toSet(),
           onOpen: _open,
+          onBrowse: _browse,
           onJoined: (channel) {
             // In the list at once; the reload brings its tracking and
             // follows it live (watching now would be undone by the reload).
@@ -785,8 +785,6 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
             unawaited(_load());
           },
         ),
-      if (!showDms && !discourse)
-        ListTile(title: Text(l10n.chatBrowseAllChannels), onTap: _browse),
       // Room for the floating button over the last row.
       const SizedBox(height: 88),
     ];

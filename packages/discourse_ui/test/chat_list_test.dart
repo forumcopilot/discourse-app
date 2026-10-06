@@ -369,7 +369,9 @@ void main() {
     expect(find.text('Members-only planning'), findsOneWidget);
     expect(find.text('private conversation'), findsNothing);
     expect(find.text('Join'), findsOneWidget);
-    expect(find.text('View'), findsOneWidget);
+    // As the web's card: no button where there is nothing to do; a tap
+    // opens the channel.
+    expect(find.text('View'), findsNothing);
     expect(find.text('Archived'), findsOneWidget);
   });
 
@@ -658,6 +660,149 @@ void main() {
     expect(find.text('0 members'), findsNothing);
   });
 
+  group('joining, as the web allows it', () {
+    testWidgets('only an open channel is offered to join', (tester) async {
+      chat.list = {'public_channels': [], 'direct_message_channels': []};
+      chat.browse = {
+        'channels': [
+          {
+            'id': 9,
+            'title': 'announcements',
+            'status': 'read_only',
+            'meta': {'can_join_chat_channel': true},
+          },
+          {
+            'id': 10,
+            'title': 'lounge',
+            'meta': {'can_join_chat_channel': true},
+          },
+        ],
+      };
+      await pump(tester);
+      expect(
+          find.descendant(
+              of: find.byKey(const ValueKey('available-channel-9')),
+              matching: find.text('Join')),
+          findsNothing,
+          reason: 'a read-only channel would vanish from both lists');
+      expect(
+          find.descendant(
+              of: find.byKey(const ValueKey('available-channel-10')),
+              matching: find.text('Join')),
+          findsOneWidget);
+    });
+
+    testWidgets('discovery asks for open channels', (tester) async {
+      chat.list = {'public_channels': [], 'direct_message_channels': []};
+      await pump(tester);
+      expect(chat.browseQueries.single, containsPair('status', 'open'));
+    });
+  });
+
+  group('Browse channels', () {
+    Future<void> openBrowse(WidgetTester tester) async {
+      await tester.ensureVisible(find.byIcon(Icons.chevron_right));
+      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.pumpAndSettle();
+      expect(find.byType(ChatBrowseChannelsPage), findsOneWidget);
+    }
+
+    setUp(() {
+      chat.list = {
+        'public_channels': [_channel(1, 'general')],
+        'direct_message_channels': [],
+      };
+    });
+
+    testWidgets("opens from the chat list, on the web's Open tab",
+        (tester) async {
+      chat.browseAll = [
+        {..._channel(1, 'general')},
+        {
+          'id': 2,
+          'title': 'planning',
+          'meta': {'can_join_chat_channel': true}
+        },
+        {
+          'id': 3,
+          'title': 'old news',
+          'status': 'closed',
+          'meta': {'can_join_chat_channel': true}
+        },
+      ];
+      await pump(tester);
+      await openBrowse(tester);
+      final chips = tester
+          .widgetList<ChoiceChip>(find.byType(ChoiceChip))
+          .map((c) => ((c.label as Text).data, c.selected))
+          .toList();
+      expect(chips, [('All', false), ('Open', true), ('Closed', false)],
+          reason: 'Archived only where the forum archives channels');
+      expect(chat.browseQueries.last, containsPair('status', 'open'));
+      expect(find.text('old news'), findsNothing);
+      expect(find.widgetWithText(OutlinedButton, 'Leave'), findsOneWidget,
+          reason: 'general is followed');
+      expect(find.widgetWithText(FilledButton, 'Join'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'plan');
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpAndSettle();
+      expect(chat.browseQueries.last, containsPair('filter', 'plan'));
+      expect(find.text('planning'), findsOneWidget);
+      expect(find.text('general'), findsNothing);
+    });
+
+    testWidgets('an Archived tab where the forum archives channels',
+        (tester) async {
+      DiscourseChatSettings.set(
+          _site, const DiscourseChatSettings(archivingAllowed: true));
+      chat.browseAll = [];
+      await pump(tester);
+      await openBrowse(tester);
+      expect(find.widgetWithText(ChoiceChip, 'Archived'), findsOneWidget);
+    });
+
+    testWidgets('a followed channel closed since can be found and left',
+        (tester) async {
+      chat.browseAll = [
+        {
+          'id': 4,
+          'title': 'old project',
+          'status': 'closed',
+          'current_user_membership': {'following': true},
+          'meta': {'can_join_chat_channel': true},
+        },
+      ];
+      await pump(tester);
+      await openBrowse(tester);
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Closed'));
+      await tester.pumpAndSettle();
+      expect(chat.browseQueries.last, containsPair('status', 'closed'));
+      expect(find.text('old project'), findsOneWidget);
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Leave'));
+      await tester.pumpAndSettle();
+      expect(chat.calls, contains('DELETE /chat/api/channels/4/memberships/me'));
+    });
+
+    testWidgets('reads the next page at the end of the list', (tester) async {
+      chat.browseAll = [
+        for (var id = 10; id < 40; id++)
+          {
+            'id': id,
+            'title': 'channel $id',
+            'meta': {'can_join_chat_channel': true}
+          }
+      ];
+      await pump(tester);
+      await openBrowse(tester);
+      await tester.dragUntilVisible(find.text('channel 39'),
+          find.byType(ListView).last, const Offset(0, -300));
+      await tester.pumpAndSettle();
+      expect(chat.browseQueries.last, containsPair('offset', 25));
+      expect(find.text('channel 39'), findsOneWidget);
+    });
+  });
+
   testWidgets('logging out discards an in-flight channel response',
       (tester) async {
     final reader = _ctx();
@@ -842,7 +987,18 @@ class _Chat extends DiscourseChatProxy {
       final all = browseAll;
       if (all != null) {
         final limit = query?['limit'] as int? ?? 25;
-        return {'channels': all.skip(offset).take(limit).toList()};
+        final status = query?['status'];
+        final filter = (query?['filter'] as String? ?? '').toLowerCase();
+        return {
+          'channels': all
+              .where((c) => status == null || (c['status'] ?? 'open') == status)
+              .where((c) =>
+                  filter.isEmpty ||
+                  (c['title'] as String).toLowerCase().contains(filter))
+              .skip(offset)
+              .take(limit)
+              .toList()
+        };
       }
       return browsePages[offset] ?? browse;
     }

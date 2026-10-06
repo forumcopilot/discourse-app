@@ -202,6 +202,14 @@ void main() {
       expect(events.whereType<DiscourseChatListNewMessage>().single.fromReader, isTrue);
     });
   });
+
+  test('Browse channels has an Archived tab only where channels are archived', () {
+    addTearDown(DiscourseChatSettings.clear);
+    DiscourseChatSettings.storeFromClientSettings(site, {});
+    expect(DiscourseChatSettings.forSite(site).archivingAllowed, isFalse);
+    DiscourseChatSettings.storeFromClientSettings(site, {'chat_allow_archiving_channels': true});
+    expect(DiscourseChatSettings.forSite(site).archivingAllowed, isTrue);
+  });
 }
 
 class _Recording extends DiscourseChatProxy {

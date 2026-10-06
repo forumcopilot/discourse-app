@@ -74,8 +74,16 @@ class ChatChannelPages extends ChangeNotifier {
     _fetch(_Fetch.reload, quiet: true);
   }
 
-  /// Starts again from the first page (another search or status).
-  Future<void> reload() => _fetch(_Fetch.reload);
+  /// Starts again from the first page (another search or status). What was
+  /// shown goes at once: it answered another question.
+  Future<void> reload() {
+    _rows.clear();
+    _consumed = 0;
+    _hasMore = false;
+    _loaded = false;
+    _lastPage = const [];
+    return _fetch(_Fetch.reload);
+  }
 
   /// Reads the next page.
   Future<void> loadMore() async {
