@@ -1582,5 +1582,6 @@
   "mediaPause": "一時停止",
   "chatChannelStatusReadOnly": "読み取り専用",
   "chatChannelStatusClosed": "閉鎖",
-  "chatChannelStatusArchived": "アーカイブ済み"
+  "chatChannelStatusArchived": "アーカイブ済み",
+  "failedToLoadAudio": "音声を読み込めませんでした"
 }

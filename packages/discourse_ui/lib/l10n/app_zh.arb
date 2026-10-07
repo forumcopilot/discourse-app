@@ -1582,5 +1582,6 @@
   "mediaPause": "暂停",
   "chatChannelStatusReadOnly": "只读",
   "chatChannelStatusClosed": "已关闭",
-  "chatChannelStatusArchived": "已归档"
+  "chatChannelStatusArchived": "已归档",
+  "failedToLoadAudio": "无法加载音频"
 }

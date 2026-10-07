@@ -408,28 +408,41 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
   }
 
   Future<void> _toggle() async {
+    if (_loading) return;
     final existing = _controller;
-    if (existing != null) {
-      existing.value.isPlaying ? await existing.pause() : await existing.play();
+    if (existing != null && !_failed && !existing.value.hasError) {
+      try {
+        existing.value.isPlaying ? await existing.pause() : await existing.play();
+      } catch (_) {
+        if (mounted) setState(() => _failed = true);
+      }
       return;
     }
-    if (Uri.tryParse(widget.src) == null) return;
-    setState(() => _loading = true);
-    // Where to play it from, and whether it needs the key (see
-    // ForumMedia.resolvePlayable).
-    final media = await ForumMedia.resolvePlayable(widget.auth, widget.src);
-    if (!mounted) return;
-    final controller =
-        VideoPlayerController.networkUrl(media.url, httpHeaders: media.headers);
-    setState(() => _controller = controller);
+    setState(() {
+      _loading = true;
+      _failed = false;
+      _controller = null;
+    });
     try {
-      await controller.initialize();
+      existing?.removeListener(_changed);
+      existing?.dispose();
+      final media = await ForumMedia.resolvePlayable(widget.auth, widget.src);
+      if (!mounted) return;
+      final controller = VideoPlayerController.networkUrl(
+          media.url, httpHeaders: media.headers);
+      _controller = controller;
       controller.addListener(_changed);
+      await controller.initialize();
+      if (!mounted) return;
       await controller.play();
     } catch (_) {
-      _failed = true;
+      if (mounted) _failed = true;
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+        updateKeepAlive();
+      }
     }
-    if (mounted) setState(() => _loading = false);
   }
 
   static String _time(Duration d) {
@@ -447,6 +460,35 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
     final value = controller?.value;
     final ready = controller != null && value!.isInitialized && !_failed;
 
+    if (_failed && !_loading) {
+      final l10n = AppLocalizations.of(context);
+      return EmbeddedCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Semantics(
+              liveRegion: true,
+              child: Text(l10n?.failedToLoadAudio ?? 'Failed to load audio'),
+            ),
+            Wrap(
+              spacing: 8,
+              children: [
+                TextButton.icon(
+                  onPressed: _toggle,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n?.retryButton ?? 'Retry'),
+                ),
+                TextButton(
+                  onPressed: () => UrlUtils.openUrl(widget.src),
+                  child: Text(l10n?.viewOnWeb ?? 'View on Web'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
     // The card recipe; the play button's own 48dp target is its padding.
     return EmbeddedCard(
       padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingXS),
@@ -460,13 +502,6 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-            )
-          else if (_failed)
-            IconButton(
-              tooltip: AppLocalizations.of(context)?.viewOnWeb ?? 'View on Web',
-              // It would not play here; the browser may manage.
-              onPressed: () => UrlUtils.openUrl(widget.src),
-              icon: Icon(Icons.open_in_new, color: colorScheme.error),
             )
           else
             IconButton(

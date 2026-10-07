@@ -5045,4 +5045,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatChannelStatusArchived => '보관됨';
+
+  @override
+  String get failedToLoadAudio => '오디오를 불러오지 못했습니다';
 }

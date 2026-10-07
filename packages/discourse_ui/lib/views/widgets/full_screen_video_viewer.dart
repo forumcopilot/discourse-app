@@ -24,7 +24,7 @@ class FullScreenVideoViewer extends StatefulWidget {
 
 class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
   VideoPlayerController? _controller;
-  late final Future<void> _initializeFuture;
+  late Future<void> _initializeFuture;
 
   @override
   void initState() {
@@ -47,6 +47,17 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
     if (!mounted) return;
     await controller.play();
     if (mounted) setState(() {});
+  }
+
+  void _retry() {
+    final previous = _controller;
+    previous?.removeListener(_playbackChanged);
+    _controller = null;
+    // Native teardown can finish independently of the next playback attempt.
+    previous?.dispose();
+    setState(() {
+      _initializeFuture = _open();
+    });
   }
 
   /// What the page shows of the playback. The controller notifies about
@@ -121,14 +132,26 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
                 controller == null ||
                 controller.value.hasError) {
               return Center(
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
-                  // Not the player's own description: on Android that is
-                  // the raw ExoPlayer exception.
-                  child: Text(
-                    l10n.failedToLoadVideo,
-                    style: const TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Semantics(
+                        liveRegion: true,
+                        child: Text(
+                          l10n.failedToLoadVideo,
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      FilledButton.icon(
+                        onPressed: _retry,
+                        icon: const Icon(Icons.refresh),
+                        label: Text(l10n.retryButton),
+                      ),
+                    ],
                   ),
                 ),
               );

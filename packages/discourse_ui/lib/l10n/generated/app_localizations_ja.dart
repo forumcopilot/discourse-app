@@ -5045,4 +5045,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatChannelStatusArchived => 'アーカイブ済み';
+
+  @override
+  String get failedToLoadAudio => '音声を読み込めませんでした';
 }

@@ -6587,5 +6587,9 @@
   "chatChannelStatusArchived": "Archived",
   "@chatChannelStatusArchived": {
     "description": "Status of an archived chat channel, shown under its name in the channel lists (Discourse chat.channel_status.archived)"
+  },
+  "failedToLoadAudio": "Failed to load audio",
+  "@failedToLoadAudio": {
+    "description": "Inline audio player error with retry and browser actions"
   }
 }
