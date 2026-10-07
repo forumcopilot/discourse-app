@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show SemanticsAction;
 
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/views/widgets/full_screen_video_viewer.dart';
@@ -83,8 +84,16 @@ void main() {
     }
   });
 
-  Future<void> open(WidgetTester tester, bool audio) async {
+  Future<void> open(WidgetTester tester, bool audio,
+      {double textScale = 1, Locale locale = const Locale('en')}) async {
     await tester.pumpWidget(MaterialApp(
+      locale: locale,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaler: TextScaler.linear(textScale),
+        ),
+        child: child!,
+      ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: audio
@@ -94,12 +103,54 @@ void main() {
     ));
     await tester.pumpAndSettle();
     if (audio) {
-      await tester.tap(find.byTooltip('Play'));
+      final l10n =
+          AppLocalizations.of(tester.element(find.byType(PostAudioPlayer)))!;
+      await tester.tap(find.byTooltip(l10n.mediaPlay));
       await tester.pumpAndSettle();
     }
   }
 
   for (final audio in [true, false]) {
+    for (final size in [const Size(320, 568), const Size(568, 320)]) {
+      testWidgets(
+          '${audio ? 'audio' : 'video'} recovery is accessible at $size with large text',
+          (tester) async {
+        await tester.binding.setSurfaceSize(size);
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+        final semantics = tester.ensureSemantics();
+        try {
+          player.failNext = true;
+          // German exercises longer translated labels on a compact display.
+          await open(tester, audio, textScale: 2, locale: const Locale('de'));
+          final l10n =
+              AppLocalizations.of(tester.element(find.byType(Scaffold)))!;
+          final error = tester.getSemantics(find.text(
+            audio ? l10n.failedToLoadAudio : l10n.failedToLoadVideo,
+          ));
+          expect(error.getSemanticsData().flagsCollection.isLiveRegion, isTrue);
+          final retry = find.text(l10n.retryButton);
+          await tester.ensureVisible(retry);
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+          await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+          await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+          final node = tester.getSemantics(retry);
+          expect(node.getSemanticsData().flagsCollection.isButton, isTrue);
+          expect(
+              node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
+          // Activate through the screen-reader action instead of a pointer tap.
+          tester.semantics.tap(find.semantics.byLabel(l10n.retryButton));
+          await tester.pumpAndSettle();
+          expect(find.byTooltip(l10n.mediaPause), findsOneWidget);
+          expect(find.text(l10n.retryButton), findsNothing);
+          expect(tester.takeException(), isNull);
+          await tester.pumpWidget(const SizedBox());
+          await tester.pumpAndSettle();
+        } finally {
+          semantics.dispose();
+        }
+      });
+    }
     for (final initial in [true, false]) {
       testWidgets(
           '${audio ? 'audio' : 'video'} retries ${initial ? 'initial' : 'late'} failure',
@@ -116,7 +167,8 @@ void main() {
         await tester.pumpAndSettle();
         expect(player.streams.length, 2);
         // Let asynchronous platform disposal finish outside the frame clock.
-        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+        await tester.runAsync(
+            () => Future<void>.delayed(const Duration(milliseconds: 10)));
         await tester.pump();
         expect(player.disposed, contains(1));
         expect(find.byTooltip('Pause'), findsOneWidget);
@@ -124,7 +176,8 @@ void main() {
         await tester.pumpWidget(const SizedBox());
         await tester.pumpAndSettle();
         // Let asynchronous platform disposal finish outside the frame clock.
-        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+        await tester.runAsync(
+            () => Future<void>.delayed(const Duration(milliseconds: 10)));
         await tester.pump();
         expect(player.disposed, contains(2));
       });
