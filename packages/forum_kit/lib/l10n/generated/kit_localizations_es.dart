@@ -9,6 +9,16 @@ class KitLocalizationsEs extends KitLocalizations {
   KitLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      '¿Cerrar de todos modos? Un borrador guardado antes se queda en Borradores.';
+
+  @override
+  String get keepEditing => 'Seguir editando';
+
+  @override
+  String get closeAnyway => 'Cerrar de todos modos';
+
+  @override
   String get okButton => 'Aceptar';
 
   @override
@@ -153,6 +163,9 @@ class KitLocalizationsEs extends KitLocalizations {
   String get copy => 'Copiar';
 
   @override
+  String get discard => 'Descartar';
+
+  @override
   String get firstPostsOnly => 'Solo primeras publicaciones';
 
   @override
@@ -199,6 +212,18 @@ class KitLocalizationsEs extends KitLocalizations {
 
   @override
   String get tags => 'Etiquetas';
+
+  @override
+  String get discardPostQuestion => '¿Quieres descartar tu publicación?';
+
+  @override
+  String get discardChangesQuestion => '¿Quieres descartar tus cambios?';
+
+  @override
+  String get discardChanges => 'Descartar cambios';
+
+  @override
+  String get saveDraft => 'Guardar borrador';
 
   @override
   String topicMapViews(int count) {
@@ -374,4 +399,8 @@ class KitLocalizationsEs extends KitLocalizations {
 
   @override
   String get postUnlikeAction => 'Deshacer me gusta';
+
+  @override
+  String get somethingWentWrongTryAgain =>
+      'Algo salió mal. Inténtalo de nuevo.';
 }

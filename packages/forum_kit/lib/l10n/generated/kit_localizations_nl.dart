@@ -9,6 +9,16 @@ class KitLocalizationsNl extends KitLocalizations {
   KitLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Toch sluiten? Een eerder opgeslagen concept blijft bij Concepten.';
+
+  @override
+  String get keepEditing => 'Verder bewerken';
+
+  @override
+  String get closeAnyway => 'Toch sluiten';
+
+  @override
   String get okButton => 'OK';
 
   @override
@@ -153,6 +163,9 @@ class KitLocalizationsNl extends KitLocalizations {
   String get copy => 'Kopiëren';
 
   @override
+  String get discard => 'Verwerpen';
+
+  @override
   String get firstPostsOnly => 'Alleen eerste berichten';
 
   @override
@@ -199,6 +212,18 @@ class KitLocalizationsNl extends KitLocalizations {
 
   @override
   String get tags => 'Tags';
+
+  @override
+  String get discardPostQuestion => 'Wil je je bericht weggooien?';
+
+  @override
+  String get discardChangesQuestion => 'Wil je je wijzigingen negeren?';
+
+  @override
+  String get discardChanges => 'Wijzigingen negeren';
+
+  @override
+  String get saveDraft => 'Concept opslaan';
 
   @override
   String topicMapViews(int count) {
@@ -375,4 +400,8 @@ class KitLocalizationsNl extends KitLocalizations {
 
   @override
   String get postUnlikeAction => 'Like ongedaan maken';
+
+  @override
+  String get somethingWentWrongTryAgain =>
+      'Er ging iets mis. Probeer het opnieuw.';
 }

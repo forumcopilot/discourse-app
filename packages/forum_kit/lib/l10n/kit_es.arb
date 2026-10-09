@@ -1,5 +1,8 @@
 {
   "@@locale": "es",
+  "discardFailedCloseQuestion": "¿Cerrar de todos modos? Un borrador guardado antes se queda en Borradores.",
+  "keepEditing": "Seguir editando",
+  "closeAnyway": "Cerrar de todos modos",
   "okButton": "Aceptar",
   "copied": "Copiado",
   "cancel": "Cancelar",
@@ -61,6 +64,7 @@
   "apply": "Aplicar",
   "bookmarks": "Marcadores",
   "copy": "Copiar",
+  "discard": "Descartar",
   "firstPostsOnly": "Solo primeras publicaciones",
   "relevance": "Relevancia",
   "reset": "Restablecer",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "Imagen no disponible",
   "searchFilters": "Filtros de búsqueda",
   "tags": "Etiquetas",
+  "discardPostQuestion": "¿Quieres descartar tu publicación?",
+  "discardChangesQuestion": "¿Quieres descartar tus cambios?",
+  "discardChanges": "Descartar cambios",
+  "saveDraft": "Guardar borrador",
   "topicMapViews": "{count, plural, =1{visita} other{visitas}}",
   "topicMapLikes": "{count, plural, other{me gusta}}",
   "topicMapLinks": "{count, plural, =1{enlace} other{enlaces}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "Tema más reciente",
   "searchFieldHint": "Buscar…",
   "postLikeAction": "Me gusta la publicación",
-  "postUnlikeAction": "Deshacer me gusta"
+  "postUnlikeAction": "Deshacer me gusta",
+  "somethingWentWrongTryAgain": "Algo salió mal. Inténtalo de nuevo."
 }

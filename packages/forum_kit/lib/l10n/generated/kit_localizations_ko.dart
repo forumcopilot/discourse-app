@@ -9,6 +9,16 @@ class KitLocalizationsKo extends KitLocalizations {
   KitLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      '그래도 닫을까요? 이전에 저장한 글은 임시 저장에 남아 있습니다.';
+
+  @override
+  String get keepEditing => '계속 작성';
+
+  @override
+  String get closeAnyway => '그래도 닫기';
+
+  @override
   String get okButton => '확인';
 
   @override
@@ -150,6 +160,9 @@ class KitLocalizationsKo extends KitLocalizations {
   String get copy => '복사';
 
   @override
+  String get discard => '버리기';
+
+  @override
   String get firstPostsOnly => '첫 게시물만';
 
   @override
@@ -195,6 +208,18 @@ class KitLocalizationsKo extends KitLocalizations {
 
   @override
   String get tags => '태그';
+
+  @override
+  String get discardPostQuestion => '게시물을 버리시겠습니까?';
+
+  @override
+  String get discardChangesQuestion => '변경 사항을 버리시겠습니까?';
+
+  @override
+  String get discardChanges => '변경 사항 버리기';
+
+  @override
+  String get saveDraft => '임시 저장';
 
   @override
   String topicMapViews(int count) {
@@ -362,4 +387,7 @@ class KitLocalizationsKo extends KitLocalizations {
 
   @override
   String get postUnlikeAction => '좋아요 취소';
+
+  @override
+  String get somethingWentWrongTryAgain => '문제가 발생했습니다. 다시 시도하세요.';
 }

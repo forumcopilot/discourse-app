@@ -1,5 +1,8 @@
 {
   "@@locale": "pt",
+  "discardFailedCloseQuestion": "Fechar mesmo assim? Um rascunho salvo antes continua em Rascunhos.",
+  "keepEditing": "Continuar editando",
+  "closeAnyway": "Fechar mesmo assim",
   "okButton": "OK",
   "copied": "Copiado",
   "cancel": "Cancelar",
@@ -61,6 +64,7 @@
   "apply": "Aplicar",
   "bookmarks": "Favoritos",
   "copy": "Copiar",
+  "discard": "Descartar",
   "firstPostsOnly": "Apenas primeiras postagens",
   "relevance": "Relevância",
   "reset": "Redefinir",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "Imagem indisponível",
   "searchFilters": "Filtros de pesquisa",
   "tags": "Tags",
+  "discardPostQuestion": "Você deseja excluir sua postagem?",
+  "discardChangesQuestion": "Você deseja descartar suas alterações?",
+  "discardChanges": "Descartar alterações",
+  "saveDraft": "Salvar rascunho",
   "topicMapViews": "{count, plural, =1{visualização} other{visualizações}}",
   "topicMapLikes": "{count, plural, =1{curtida} other{curtidas}}",
   "topicMapLinks": "{count, plural, =1{link} other{links}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "Último tópico",
   "searchFieldHint": "Pesquisar…",
   "postLikeAction": "Curtir a postagem",
-  "postUnlikeAction": "Desfazer curtida"
+  "postUnlikeAction": "Desfazer curtida",
+  "somethingWentWrongTryAgain": "Algo deu errado. Tente novamente."
 }

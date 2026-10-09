@@ -1,5 +1,8 @@
 {
   "@@locale": "nl",
+  "discardFailedCloseQuestion": "Toch sluiten? Een eerder opgeslagen concept blijft bij Concepten.",
+  "keepEditing": "Verder bewerken",
+  "closeAnyway": "Toch sluiten",
   "okButton": "OK",
   "copied": "Gekopieerd",
   "cancel": "Annuleren",
@@ -89,6 +92,7 @@
   "apply": "Toepassen",
   "bookmarks": "Bladwijzers",
   "copy": "Kopiëren",
+  "discard": "Verwerpen",
   "firstPostsOnly": "Alleen eerste berichten",
   "relevance": "Relevantie",
   "reset": "Herstellen",
@@ -102,6 +106,10 @@
   "imageNotAvailable": "Afbeelding niet beschikbaar",
   "searchFilters": "Zoekfilters",
   "tags": "Tags",
+  "discardPostQuestion": "Wil je je bericht weggooien?",
+  "discardChangesQuestion": "Wil je je wijzigingen negeren?",
+  "discardChanges": "Wijzigingen negeren",
+  "saveDraft": "Concept opslaan",
   "topicMapViews": "{count, plural, =1{weergave} other{weergaven}}",
   "topicMapLikes": "{count, plural, =1{like} other{likes}}",
   "topicMapLinks": "{count, plural, =1{link} other{links}}",
@@ -147,5 +155,6 @@
   "searchSortLatestTopic": "Nieuwste topic",
   "searchFieldHint": "Zoeken…",
   "postLikeAction": "Bericht liken",
-  "postUnlikeAction": "Like ongedaan maken"
+  "postUnlikeAction": "Like ongedaan maken",
+  "somethingWentWrongTryAgain": "Er ging iets mis. Probeer het opnieuw."
 }

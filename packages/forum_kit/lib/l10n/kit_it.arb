@@ -1,5 +1,8 @@
 {
   "@@locale": "it",
+  "discardFailedCloseQuestion": "Chiudere comunque? Una bozza salvata in precedenza resta in Bozze.",
+  "keepEditing": "Continua a scrivere",
+  "closeAnyway": "Chiudi comunque",
   "okButton": "OK",
   "copied": "Copiato",
   "cancel": "Annulla",
@@ -61,6 +64,7 @@
   "apply": "Applica",
   "bookmarks": "Segnalibri",
   "copy": "Copia",
+  "discard": "Scarta",
   "firstPostsOnly": "Solo primi post",
   "relevance": "Rilevanza",
   "reset": "Reimposta",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "Immagine non disponibile",
   "searchFilters": "Filtri di ricerca",
   "tags": "Tag",
+  "discardPostQuestion": "Vuoi eliminare il tuo messaggio?",
+  "discardChangesQuestion": "Vuoi annullare le modifiche?",
+  "discardChanges": "Annulla modifiche",
+  "saveDraft": "Salva bozza",
   "topicMapViews": "{count, plural, =1{visualizzazione} other{visualizzazioni}}",
   "topicMapLikes": "{count, plural, other{mi piace}}",
   "topicMapLinks": "{count, plural, other{link}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "Ultimo argomento",
   "searchFieldHint": "Cerca…",
   "postLikeAction": "Metti \"Mi piace\" al messaggio",
-  "postUnlikeAction": "Rimuovi il \"Mi piace\""
+  "postUnlikeAction": "Rimuovi il \"Mi piace\"",
+  "somethingWentWrongTryAgain": "Qualcosa è andato storto. Riprova."
 }

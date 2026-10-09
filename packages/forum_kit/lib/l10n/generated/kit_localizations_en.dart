@@ -9,6 +9,16 @@ class KitLocalizationsEn extends KitLocalizations {
   KitLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Close anyway? A draft saved earlier stays in Drafts.';
+
+  @override
+  String get keepEditing => 'Keep editing';
+
+  @override
+  String get closeAnyway => 'Close anyway';
+
+  @override
   String get okButton => 'OK';
 
   @override
@@ -153,6 +163,9 @@ class KitLocalizationsEn extends KitLocalizations {
   String get copy => 'Copy';
 
   @override
+  String get discard => 'Discard';
+
+  @override
   String get firstPostsOnly => 'First posts only';
 
   @override
@@ -199,6 +212,18 @@ class KitLocalizationsEn extends KitLocalizations {
 
   @override
   String get tags => 'Tags';
+
+  @override
+  String get discardPostQuestion => 'Do you want to discard your post?';
+
+  @override
+  String get discardChangesQuestion => 'Do you want to discard your changes?';
+
+  @override
+  String get discardChanges => 'Discard changes';
+
+  @override
+  String get saveDraft => 'Save draft';
 
   @override
   String topicMapViews(int count) {
@@ -373,4 +398,8 @@ class KitLocalizationsEn extends KitLocalizations {
 
   @override
   String get postUnlikeAction => 'Unlike post';
+
+  @override
+  String get somethingWentWrongTryAgain =>
+      'Something went wrong. Please try again.';
 }

@@ -1,5 +1,8 @@
 {
   "@@locale": "de",
+  "discardFailedCloseQuestion": "Trotzdem schließen? Ein bereits gespeicherter Entwurf bleibt unter Entwürfe.",
+  "keepEditing": "Weiter bearbeiten",
+  "closeAnyway": "Trotzdem schließen",
   "okButton": "OK",
   "copied": "Kopiert",
   "cancel": "Abbrechen",
@@ -61,6 +64,7 @@
   "apply": "Anwenden",
   "bookmarks": "Lesezeichen",
   "copy": "Kopieren",
+  "discard": "Verwerfen",
   "firstPostsOnly": "Nur erste Beiträge",
   "relevance": "Relevanz",
   "reset": "Zurücksetzen",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "Bild nicht verfügbar",
   "searchFilters": "Suchfilter",
   "tags": "Schlagwörter",
+  "discardPostQuestion": "Willst du deinen Beitrag verwerfen?",
+  "discardChangesQuestion": "Möchtest du deine Änderungen verwerfen?",
+  "discardChanges": "Änderungen verwerfen",
+  "saveDraft": "Entwurf speichern",
   "topicMapViews": "{count, plural, =1{Aufruf} other{Aufrufe}}",
   "topicMapLikes": "{count, plural, =1{Like} other{Likes}}",
   "topicMapLinks": "{count, plural, =1{Link} other{Links}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "Neuestes Thema",
   "searchFieldHint": "Suchen …",
   "postLikeAction": "Beitrag mit „Gefällt mir“ markieren",
-  "postUnlikeAction": "„Gefällt mir“ entfernen"
+  "postUnlikeAction": "„Gefällt mir“ entfernen",
+  "somethingWentWrongTryAgain": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
 }

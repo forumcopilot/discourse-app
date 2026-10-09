@@ -1,5 +1,8 @@
 {
   "@@locale": "ko",
+  "discardFailedCloseQuestion": "그래도 닫을까요? 이전에 저장한 글은 임시 저장에 남아 있습니다.",
+  "keepEditing": "계속 작성",
+  "closeAnyway": "그래도 닫기",
   "okButton": "확인",
   "copied": "복사됨",
   "cancel": "취소",
@@ -61,6 +64,7 @@
   "apply": "적용",
   "bookmarks": "북마크",
   "copy": "복사",
+  "discard": "버리기",
   "firstPostsOnly": "첫 게시물만",
   "relevance": "관련성",
   "reset": "초기화",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "이미지를 사용할 수 없습니다",
   "searchFilters": "검색 필터",
   "tags": "태그",
+  "discardPostQuestion": "게시물을 버리시겠습니까?",
+  "discardChangesQuestion": "변경 사항을 버리시겠습니까?",
+  "discardChanges": "변경 사항 버리기",
+  "saveDraft": "임시 저장",
   "topicMapViews": "{count, plural, other{조회}}",
   "topicMapLikes": "{count, plural, other{좋아요}}",
   "topicMapLinks": "{count, plural, other{링크}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "최신 글",
   "searchFieldHint": "검색…",
   "postLikeAction": "게시물에 좋아요 표시",
-  "postUnlikeAction": "좋아요 취소"
+  "postUnlikeAction": "좋아요 취소",
+  "somethingWentWrongTryAgain": "문제가 발생했습니다. 다시 시도하세요."
 }

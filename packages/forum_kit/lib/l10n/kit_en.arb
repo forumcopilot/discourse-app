@@ -1,5 +1,17 @@
 {
   "@@locale": "en",
+  "discardFailedCloseQuestion": "Close anyway? A draft saved earlier stays in Drafts.",
+  "@discardFailedCloseQuestion": {
+    "description": "After Discard failed (offline, or the sign-in changed): offer to close the composer without discarding; an earlier saved draft is kept."
+  },
+  "keepEditing": "Keep editing",
+  "@keepEditing": {
+    "description": "Button: stay in the composer."
+  },
+  "closeAnyway": "Close anyway",
+  "@closeAnyway": {
+    "description": "Button: close the composer although its draft could not be discarded."
+  },
   "okButton": "OK",
   "copied": "Copied",
   "cancel": "Cancel",
@@ -122,6 +134,10 @@
   "@copy": {
     "description": "UI text: Copy"
   },
+  "discard": "Discard",
+  "@discard": {
+    "description": "UI text: Discard"
+  },
   "firstPostsOnly": "First posts only",
   "@firstPostsOnly": {
     "description": "UI text: First posts only"
@@ -178,6 +194,22 @@
   "tags": "Tags",
   "@tags": {
     "description": "Drawer: Tags"
+  },
+  "discardPostQuestion": "Do you want to discard your post?",
+  "@discardPostQuestion": {
+    "description": "Asked when a composer with unsaved writing is closed (Discourse post.cancel_composer.confirm)."
+  },
+  "discardChangesQuestion": "Do you want to discard your changes?",
+  "@discardChangesQuestion": {
+    "description": "Asked when an edit with unsaved changes is closed (Discourse post.cancel_composer.confirm_edit)."
+  },
+  "discardChanges": "Discard changes",
+  "@discardChanges": {
+    "description": "Button that throws away unsaved edits (Discourse post.cancel_composer.discard_edit)."
+  },
+  "saveDraft": "Save draft",
+  "@saveDraft": {
+    "description": "Button that closes a composer and keeps what was written as a draft."
   },
   "topicMapViews": "{count, plural, =1{view} other{views}}",
   "@topicMapViews": {
@@ -382,5 +414,9 @@
   "postUnlikeAction": "Unlike post",
   "@postUnlikeAction": {
     "description": "Screen-reader label of a post's like (heart) button when the reader has liked it"
+  },
+  "somethingWentWrongTryAgain": "Something went wrong. Please try again.",
+  "@somethingWentWrongTryAgain": {
+    "description": "Generic error message when an error has no readable text of its own"
   }
 }

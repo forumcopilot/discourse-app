@@ -9,6 +9,16 @@ class KitLocalizationsFr extends KitLocalizations {
   KitLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Fermer quand même ? Un brouillon déjà enregistré reste dans Brouillons.';
+
+  @override
+  String get keepEditing => 'Continuer à écrire';
+
+  @override
+  String get closeAnyway => 'Fermer quand même';
+
+  @override
   String get okButton => 'OK';
 
   @override
@@ -153,6 +163,9 @@ class KitLocalizationsFr extends KitLocalizations {
   String get copy => 'Copier';
 
   @override
+  String get discard => 'Abandonner';
+
+  @override
   String get firstPostsOnly => 'Premiers messages uniquement';
 
   @override
@@ -199,6 +212,19 @@ class KitLocalizationsFr extends KitLocalizations {
 
   @override
   String get tags => 'Étiquettes';
+
+  @override
+  String get discardPostQuestion => 'Voulez-vous abandonner votre message ?';
+
+  @override
+  String get discardChangesQuestion =>
+      'Voulez-vous annuler vos modifications ?';
+
+  @override
+  String get discardChanges => 'Annuler les modifications';
+
+  @override
+  String get saveDraft => 'Enregistrer le brouillon';
 
   @override
   String topicMapViews(int count) {
@@ -374,4 +400,8 @@ class KitLocalizationsFr extends KitLocalizations {
 
   @override
   String get postUnlikeAction => 'Annuler le « J\'aime »';
+
+  @override
+  String get somethingWentWrongTryAgain =>
+      'Une erreur s’est produite. Veuillez réessayer.';
 }

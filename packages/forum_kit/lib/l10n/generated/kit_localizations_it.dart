@@ -9,6 +9,16 @@ class KitLocalizationsIt extends KitLocalizations {
   KitLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Chiudere comunque? Una bozza salvata in precedenza resta in Bozze.';
+
+  @override
+  String get keepEditing => 'Continua a scrivere';
+
+  @override
+  String get closeAnyway => 'Chiudi comunque';
+
+  @override
   String get okButton => 'OK';
 
   @override
@@ -153,6 +163,9 @@ class KitLocalizationsIt extends KitLocalizations {
   String get copy => 'Copia';
 
   @override
+  String get discard => 'Scarta';
+
+  @override
   String get firstPostsOnly => 'Solo primi post';
 
   @override
@@ -199,6 +212,18 @@ class KitLocalizationsIt extends KitLocalizations {
 
   @override
   String get tags => 'Tag';
+
+  @override
+  String get discardPostQuestion => 'Vuoi eliminare il tuo messaggio?';
+
+  @override
+  String get discardChangesQuestion => 'Vuoi annullare le modifiche?';
+
+  @override
+  String get discardChanges => 'Annulla modifiche';
+
+  @override
+  String get saveDraft => 'Salva bozza';
 
   @override
   String topicMapViews(int count) {
@@ -373,4 +398,7 @@ class KitLocalizationsIt extends KitLocalizations {
 
   @override
   String get postUnlikeAction => 'Rimuovi il \"Mi piace\"';
+
+  @override
+  String get somethingWentWrongTryAgain => 'Qualcosa è andato storto. Riprova.';
 }

@@ -116,6 +116,24 @@ abstract class KitLocalizations {
     Locale('zh')
   ];
 
+  /// After Discard failed (offline, or the sign-in changed): offer to close the composer without discarding; an earlier saved draft is kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Close anyway? A draft saved earlier stays in Drafts.'**
+  String get discardFailedCloseQuestion;
+
+  /// Button: stay in the composer.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get keepEditing;
+
+  /// Button: close the composer although its draft could not be discarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Close anyway'**
+  String get closeAnyway;
+
   /// No description provided for @okButton.
   ///
   /// In en, this message translates to:
@@ -344,6 +362,12 @@ abstract class KitLocalizations {
   /// **'Copy'**
   String get copy;
 
+  /// UI text: Discard
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discard;
+
   /// UI text: First posts only
   ///
   /// In en, this message translates to:
@@ -421,6 +445,30 @@ abstract class KitLocalizations {
   /// In en, this message translates to:
   /// **'Tags'**
   String get tags;
+
+  /// Asked when a composer with unsaved writing is closed (Discourse post.cancel_composer.confirm).
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to discard your post?'**
+  String get discardPostQuestion;
+
+  /// Asked when an edit with unsaved changes is closed (Discourse post.cancel_composer.confirm_edit).
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to discard your changes?'**
+  String get discardChangesQuestion;
+
+  /// Button that throws away unsaved edits (Discourse post.cancel_composer.discard_edit).
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes'**
+  String get discardChanges;
+
+  /// Button that closes a composer and keeps what was written as a draft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get saveDraft;
 
   /// Label under the view count in the summary under a topic's first post; the number is shown above it, not in the string
   ///
@@ -697,6 +745,12 @@ abstract class KitLocalizations {
   /// In en, this message translates to:
   /// **'Unlike post'**
   String get postUnlikeAction;
+
+  /// Generic error message when an error has no readable text of its own
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get somethingWentWrongTryAgain;
 }
 
 class _KitLocalizationsDelegate

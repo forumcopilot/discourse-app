@@ -9,6 +9,16 @@ class KitLocalizationsRu extends KitLocalizations {
   KitLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Всё равно закрыть? Сохранённый ранее черновик останется в разделе «Черновики».';
+
+  @override
+  String get keepEditing => 'Продолжить';
+
+  @override
+  String get closeAnyway => 'Всё равно закрыть';
+
+  @override
   String get okButton => 'ОК';
 
   @override
@@ -156,6 +166,9 @@ class KitLocalizationsRu extends KitLocalizations {
   String get copy => 'Копировать';
 
   @override
+  String get discard => 'Отменить';
+
+  @override
   String get firstPostsOnly => 'Только первые сообщения';
 
   @override
@@ -204,6 +217,18 @@ class KitLocalizationsRu extends KitLocalizations {
 
   @override
   String get tags => 'Теги';
+
+  @override
+  String get discardPostQuestion => 'Отказаться от сообщения?';
+
+  @override
+  String get discardChangesQuestion => 'Отменить изменения?';
+
+  @override
+  String get discardChanges => 'Отменить изменения';
+
+  @override
+  String get saveDraft => 'Сохранить черновик';
 
   @override
   String topicMapViews(int count) {
@@ -388,4 +413,8 @@ class KitLocalizationsRu extends KitLocalizations {
 
   @override
   String get postUnlikeAction => 'Убрать лайк';
+
+  @override
+  String get somethingWentWrongTryAgain =>
+      'Что-то пошло не так. Повторите попытку.';
 }

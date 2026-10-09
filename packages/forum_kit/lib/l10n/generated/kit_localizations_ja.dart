@@ -9,6 +9,15 @@ class KitLocalizationsJa extends KitLocalizations {
   KitLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion => 'このまま閉じますか？以前に保存した下書きは「下書き」に残ります。';
+
+  @override
+  String get keepEditing => '編集を続ける';
+
+  @override
+  String get closeAnyway => 'このまま閉じる';
+
+  @override
   String get okButton => 'OK';
 
   @override
@@ -150,6 +159,9 @@ class KitLocalizationsJa extends KitLocalizations {
   String get copy => 'コピー';
 
   @override
+  String get discard => '破棄';
+
+  @override
   String get firstPostsOnly => '最初の投稿のみ';
 
   @override
@@ -195,6 +207,18 @@ class KitLocalizationsJa extends KitLocalizations {
 
   @override
   String get tags => 'タグ';
+
+  @override
+  String get discardPostQuestion => '投稿を破棄しますか？';
+
+  @override
+  String get discardChangesQuestion => '変更を破棄しますか？';
+
+  @override
+  String get discardChanges => '変更を破棄';
+
+  @override
+  String get saveDraft => '下書きを保存';
 
   @override
   String topicMapViews(int count) {
@@ -362,4 +386,7 @@ class KitLocalizationsJa extends KitLocalizations {
 
   @override
   String get postUnlikeAction => '「いいね！」を取り消す';
+
+  @override
+  String get somethingWentWrongTryAgain => '問題が発生しました。もう一度お試しください。';
 }

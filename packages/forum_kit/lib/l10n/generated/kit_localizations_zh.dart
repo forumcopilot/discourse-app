@@ -9,6 +9,15 @@ class KitLocalizationsZh extends KitLocalizations {
   KitLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion => '仍要关闭吗？之前保存的草稿会保留在“草稿”中。';
+
+  @override
+  String get keepEditing => '继续编辑';
+
+  @override
+  String get closeAnyway => '仍然关闭';
+
+  @override
   String get okButton => '确定';
 
   @override
@@ -150,6 +159,9 @@ class KitLocalizationsZh extends KitLocalizations {
   String get copy => '复制';
 
   @override
+  String get discard => '放弃';
+
+  @override
   String get firstPostsOnly => '仅首帖';
 
   @override
@@ -194,6 +206,18 @@ class KitLocalizationsZh extends KitLocalizations {
 
   @override
   String get tags => '标签';
+
+  @override
+  String get discardPostQuestion => '是否要放弃您的帖子？';
+
+  @override
+  String get discardChangesQuestion => '您确定要放弃所做的更改吗？';
+
+  @override
+  String get discardChanges => '舍弃更改';
+
+  @override
+  String get saveDraft => '保存草稿';
 
   @override
   String topicMapViews(int count) {
@@ -360,4 +384,7 @@ class KitLocalizationsZh extends KitLocalizations {
 
   @override
   String get postUnlikeAction => '取消点赞';
+
+  @override
+  String get somethingWentWrongTryAgain => '出了点问题。请重试。';
 }

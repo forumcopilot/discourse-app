@@ -9,6 +9,16 @@ class KitLocalizationsPt extends KitLocalizations {
   KitLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Fechar mesmo assim? Um rascunho salvo antes continua em Rascunhos.';
+
+  @override
+  String get keepEditing => 'Continuar editando';
+
+  @override
+  String get closeAnyway => 'Fechar mesmo assim';
+
+  @override
   String get okButton => 'OK';
 
   @override
@@ -153,6 +163,9 @@ class KitLocalizationsPt extends KitLocalizations {
   String get copy => 'Copiar';
 
   @override
+  String get discard => 'Descartar';
+
+  @override
   String get firstPostsOnly => 'Apenas primeiras postagens';
 
   @override
@@ -199,6 +212,18 @@ class KitLocalizationsPt extends KitLocalizations {
 
   @override
   String get tags => 'Tags';
+
+  @override
+  String get discardPostQuestion => 'Você deseja excluir sua postagem?';
+
+  @override
+  String get discardChangesQuestion => 'Você deseja descartar suas alterações?';
+
+  @override
+  String get discardChanges => 'Descartar alterações';
+
+  @override
+  String get saveDraft => 'Salvar rascunho';
 
   @override
   String topicMapViews(int count) {
@@ -375,4 +400,7 @@ class KitLocalizationsPt extends KitLocalizations {
 
   @override
   String get postUnlikeAction => 'Desfazer curtida';
+
+  @override
+  String get somethingWentWrongTryAgain => 'Algo deu errado. Tente novamente.';
 }

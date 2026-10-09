@@ -1,5 +1,8 @@
 {
   "@@locale": "fr",
+  "discardFailedCloseQuestion": "Fermer quand même ? Un brouillon déjà enregistré reste dans Brouillons.",
+  "keepEditing": "Continuer à écrire",
+  "closeAnyway": "Fermer quand même",
   "okButton": "OK",
   "copied": "Copié",
   "cancel": "Annuler",
@@ -61,6 +64,7 @@
   "apply": "Appliquer",
   "bookmarks": "Signets",
   "copy": "Copier",
+  "discard": "Abandonner",
   "firstPostsOnly": "Premiers messages uniquement",
   "relevance": "Pertinence",
   "reset": "Réinitialiser",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "Image indisponible",
   "searchFilters": "Filtres de recherche",
   "tags": "Étiquettes",
+  "discardPostQuestion": "Voulez-vous abandonner votre message ?",
+  "discardChangesQuestion": "Voulez-vous annuler vos modifications ?",
+  "discardChanges": "Annuler les modifications",
+  "saveDraft": "Enregistrer le brouillon",
   "topicMapViews": "{count, plural, =1{vue} other{vues}}",
   "topicMapLikes": "{count, plural, other{j'aime}}",
   "topicMapLinks": "{count, plural, =1{lien} other{liens}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "Dernier sujet",
   "searchFieldHint": "Recherche…",
   "postLikeAction": "Aimer le message",
-  "postUnlikeAction": "Annuler le « J'aime »"
+  "postUnlikeAction": "Annuler le « J'aime »",
+  "somethingWentWrongTryAgain": "Une erreur s’est produite. Veuillez réessayer."
 }

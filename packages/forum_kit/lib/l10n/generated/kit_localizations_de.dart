@@ -9,6 +9,16 @@ class KitLocalizationsDe extends KitLocalizations {
   KitLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Trotzdem schließen? Ein bereits gespeicherter Entwurf bleibt unter Entwürfe.';
+
+  @override
+  String get keepEditing => 'Weiter bearbeiten';
+
+  @override
+  String get closeAnyway => 'Trotzdem schließen';
+
+  @override
   String get okButton => 'OK';
 
   @override
@@ -153,6 +163,9 @@ class KitLocalizationsDe extends KitLocalizations {
   String get copy => 'Kopieren';
 
   @override
+  String get discard => 'Verwerfen';
+
+  @override
   String get firstPostsOnly => 'Nur erste Beiträge';
 
   @override
@@ -199,6 +212,19 @@ class KitLocalizationsDe extends KitLocalizations {
 
   @override
   String get tags => 'Schlagwörter';
+
+  @override
+  String get discardPostQuestion => 'Willst du deinen Beitrag verwerfen?';
+
+  @override
+  String get discardChangesQuestion =>
+      'Möchtest du deine Änderungen verwerfen?';
+
+  @override
+  String get discardChanges => 'Änderungen verwerfen';
+
+  @override
+  String get saveDraft => 'Entwurf speichern';
 
   @override
   String topicMapViews(int count) {
@@ -372,4 +398,8 @@ class KitLocalizationsDe extends KitLocalizations {
 
   @override
   String get postUnlikeAction => '„Gefällt mir“ entfernen';
+
+  @override
+  String get somethingWentWrongTryAgain =>
+      'Etwas ist schiefgelaufen. Bitte versuche es erneut.';
 }

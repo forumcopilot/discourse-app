@@ -1,5 +1,8 @@
 {
   "@@locale": "zh",
+  "discardFailedCloseQuestion": "仍要关闭吗？之前保存的草稿会保留在“草稿”中。",
+  "keepEditing": "继续编辑",
+  "closeAnyway": "仍然关闭",
   "okButton": "确定",
   "copied": "已复制",
   "cancel": "取消",
@@ -61,6 +64,7 @@
   "apply": "应用",
   "bookmarks": "书签",
   "copy": "复制",
+  "discard": "放弃",
   "firstPostsOnly": "仅首帖",
   "relevance": "相关性",
   "reset": "重置",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "图片不可用",
   "searchFilters": "搜索筛选",
   "tags": "标签",
+  "discardPostQuestion": "是否要放弃您的帖子？",
+  "discardChangesQuestion": "您确定要放弃所做的更改吗？",
+  "discardChanges": "舍弃更改",
+  "saveDraft": "保存草稿",
   "topicMapViews": "{count, plural, other{浏览}}",
   "topicMapLikes": "{count, plural, other{赞}}",
   "topicMapLinks": "{count, plural, other{链接}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "最新话题",
   "searchFieldHint": "搜索…",
   "postLikeAction": "点赞帖子",
-  "postUnlikeAction": "取消点赞"
+  "postUnlikeAction": "取消点赞",
+  "somethingWentWrongTryAgain": "出了点问题。请重试。"
 }

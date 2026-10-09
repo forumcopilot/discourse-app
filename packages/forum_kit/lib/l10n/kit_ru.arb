@@ -1,5 +1,8 @@
 {
   "@@locale": "ru",
+  "discardFailedCloseQuestion": "Всё равно закрыть? Сохранённый ранее черновик останется в разделе «Черновики».",
+  "keepEditing": "Продолжить",
+  "closeAnyway": "Всё равно закрыть",
   "okButton": "ОК",
   "copied": "Скопировано",
   "cancel": "Отмена",
@@ -61,6 +64,7 @@
   "apply": "Применить",
   "bookmarks": "Закладки",
   "copy": "Копировать",
+  "discard": "Отменить",
   "firstPostsOnly": "Только первые сообщения",
   "relevance": "Релевантность",
   "reset": "Сбросить",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "Изображение недоступно",
   "searchFilters": "Фильтры поиска",
   "tags": "Теги",
+  "discardPostQuestion": "Отказаться от сообщения?",
+  "discardChangesQuestion": "Отменить изменения?",
+  "discardChanges": "Отменить изменения",
+  "saveDraft": "Сохранить черновик",
   "topicMapViews": "{count, plural, one{просмотр} few{просмотра} many{просмотров} other{просмотра}}",
   "topicMapLikes": "{count, plural, one{лайк} few{лайка} many{лайков} other{лайка}}",
   "topicMapLinks": "{count, plural, one{ссылка} few{ссылки} many{ссылок} other{ссылки}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "По недавним темам",
   "searchFieldHint": "Поиск…",
   "postLikeAction": "Поставить лайк сообщению",
-  "postUnlikeAction": "Убрать лайк"
+  "postUnlikeAction": "Убрать лайк",
+  "somethingWentWrongTryAgain": "Что-то пошло не так. Повторите попытку."
 }

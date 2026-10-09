@@ -1,5 +1,8 @@
 {
   "@@locale": "ja",
+  "discardFailedCloseQuestion": "このまま閉じますか？以前に保存した下書きは「下書き」に残ります。",
+  "keepEditing": "編集を続ける",
+  "closeAnyway": "このまま閉じる",
   "okButton": "OK",
   "copied": "コピーしました",
   "cancel": "キャンセル",
@@ -61,6 +64,7 @@
   "apply": "適用",
   "bookmarks": "ブックマーク",
   "copy": "コピー",
+  "discard": "破棄",
   "firstPostsOnly": "最初の投稿のみ",
   "relevance": "関連度",
   "reset": "リセット",
@@ -74,6 +78,10 @@
   "imageNotAvailable": "画像を表示できません",
   "searchFilters": "検索フィルター",
   "tags": "タグ",
+  "discardPostQuestion": "投稿を破棄しますか？",
+  "discardChangesQuestion": "変更を破棄しますか？",
+  "discardChanges": "変更を破棄",
+  "saveDraft": "下書きを保存",
   "topicMapViews": "{count, plural, other{閲覧}}",
   "topicMapLikes": "{count, plural, other{いいね}}",
   "topicMapLinks": "{count, plural, other{リンク}}",
@@ -119,5 +127,6 @@
   "searchSortLatestTopic": "最新のトピック",
   "searchFieldHint": "検索…",
   "postLikeAction": "投稿に「いいね！」する",
-  "postUnlikeAction": "「いいね！」を取り消す"
+  "postUnlikeAction": "「いいね！」を取り消す",
+  "somethingWentWrongTryAgain": "問題が発生しました。もう一度お試しください。"
 }
