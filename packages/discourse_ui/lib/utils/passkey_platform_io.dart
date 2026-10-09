@@ -1,5 +1,2 @@
-import 'dart:io';
-
-bool get isPasskeySupportedByPlatform => Platform.isIOS || Platform.isAndroid;
-bool get isIOSPlatform => Platform.isIOS;
-bool get isAndroidPlatform => Platform.isAndroid;
+// Moved to packages/forum_kit; re-exported so existing imports keep working.
+export 'package:forum_kit/utils/passkey_platform_io.dart';

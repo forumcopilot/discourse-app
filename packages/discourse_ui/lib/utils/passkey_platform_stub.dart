@@ -1,4 +1,2 @@
-// Stub for web where dart:io is not available.
-bool get isPasskeySupportedByPlatform => false;
-bool get isIOSPlatform => false;
-bool get isAndroidPlatform => false;
+// Moved to packages/forum_kit; re-exported so existing imports keep working.
+export 'package:forum_kit/utils/passkey_platform_stub.dart';

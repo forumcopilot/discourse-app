@@ -17,6 +17,8 @@ dependencies:
   shared_preferences: ^2.5.1
   forumcopilot_sdk:
     path: ../forumcopilot_sdk
+  forum_kit:
+    path: ../forum_kit
   discourse_core:
     path: ../discourse_core
   discourse_notifications:

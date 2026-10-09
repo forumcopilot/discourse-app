@@ -10,7 +10,7 @@
 set -e
 cd "$(dirname "$0")"
 
-for pkg in forumcopilot_sdk discourse_core discourse_appearance discourse_notifications discourse_ui; do
+for pkg in forumcopilot_sdk forum_kit discourse_core discourse_appearance discourse_notifications discourse_ui; do
   echo "Resolving packages/$pkg..."
   (cd "packages/$pkg" && dart pub get)
 done
