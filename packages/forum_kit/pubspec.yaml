@@ -29,6 +29,7 @@ dependencies:
   html: '>=0.15.6 <0.15.7' # 0.15.7 drops Element.matches, which flutter_html 3.0.0 still calls
   image_picker: ^1.2.1
   intl: ^0.20.2 # already in the graph via flutter_localizations
+  material_color_utilities: any # the Flutter SDK pins it; HCT for the forum colour scheme
   path: ^1.9.0
   path_provider: ^2.1.0
   permission_handler: ^12.0.0+1
