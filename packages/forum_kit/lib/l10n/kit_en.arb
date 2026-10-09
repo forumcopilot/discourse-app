@@ -1,0 +1,378 @@
+{
+  "@@locale": "en",
+  "okButton": "OK",
+  "copied": "Copied",
+  "cancel": "Cancel",
+  "tryAgain": "Try Again",
+  "latest": "Latest",
+  "language": "Language",
+  "@language": {
+    "description": "Settings section title for language selection"
+  },
+  "all": "All",
+  "reason": "Reason",
+  "pleaseSpecifyReason": "Please specify the reason",
+  "selectDate": "Select date",
+  "search": "Search",
+  "messages": "Messages",
+  "add": "Add",
+  "delete": "Delete",
+  "temporary": "Temporary",
+  "error": "Error: {error}",
+  "@error": {
+    "description": "Generic error message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "none": "None",
+  "italic": "Italic",
+  "link": "Link",
+  "image": "Image",
+  "quote": "Quote",
+  "code": "Code",
+  "participants": "Participants ({count})",
+  "@participants": {
+    "description": "Participants count with label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Menu item to refresh content"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "Menu item to share content"
+  },
+  "reply": "Reply",
+  "@reply": {
+    "description": "Button to reply to a post or message"
+  },
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark theme option"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications tab title"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Button text to edit"
+  },
+  "remove": "Remove",
+  "@remove": {
+    "description": "Button text to remove"
+  },
+  "message": "Message",
+  "@message": {
+    "description": "Label for message field"
+  },
+  "couldNotOpenLink": "Could not open link: {error}",
+  "@couldNotOpenLink": {
+    "description": "Error message when opening link fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "timeGapDaysLater": "{count, plural, =1{1 day later} other{{count} days later}}",
+  "@timeGapDaysLater": {
+    "description": "Divider between posts far apart in time",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeGapMonthsLater": "{count, plural, =1{1 month later} other{{count} months later}}",
+  "@timeGapMonthsLater": {
+    "description": "Divider between posts far apart in time",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeGapYearsLater": "{count, plural, =1{1 year later} other{{count} years later}}",
+  "@timeGapYearsLater": {
+    "description": "Divider between posts far apart in time",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "apply": "Apply",
+  "@apply": {
+    "description": "UI text: Apply"
+  },
+  "bookmarks": "Bookmarks",
+  "@bookmarks": {
+    "description": "UI text: Bookmarks"
+  },
+  "copy": "Copy",
+  "@copy": {
+    "description": "UI text: Copy"
+  },
+  "firstPostsOnly": "First posts only",
+  "@firstPostsOnly": {
+    "description": "UI text: First posts only"
+  },
+  "relevance": "Relevance",
+  "@relevance": {
+    "description": "UI text: Relevance"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "UI text: Reset"
+  },
+  "titleOnly": "Title only",
+  "@titleOnly": {
+    "description": "UI text: Title only"
+  },
+  "solved": "Solved",
+  "@solved": {
+    "description": "UI text: Solved"
+  },
+  "open": "Open",
+  "@open": {
+    "description": "UI text: Open"
+  },
+  "participantCount": "{count, plural, =1{1 participant} other{{count} participants}}",
+  "@participantCount": {
+    "description": "UI text: N participants",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "postNeedsApprovalTitle": "Post Needs Approval",
+  "@postNeedsApprovalTitle": {
+    "description": "Title of the notice shown when a new post is held for moderator approval (Discourse review.approval.title)."
+  },
+  "postNeedsApprovalBody": "We've received your new post but it needs to be approved by a moderator before it will appear. Please be patient.",
+  "@postNeedsApprovalBody": {
+    "description": "Body of that notice (Discourse review.approval.description)."
+  },
+  "tapToOpen": "Tap to open",
+  "@tapToOpen": {
+    "description": "UI text: Tap to open"
+  },
+  "imageNotAvailable": "Image not available",
+  "@imageNotAvailable": {
+    "description": "UI text: Image not available"
+  },
+  "searchFilters": "Search filters",
+  "@searchFilters": {
+    "description": "UI text: Search filters"
+  },
+  "tags": "Tags",
+  "@tags": {
+    "description": "Drawer: Tags"
+  },
+  "topicMapViews": "{count, plural, =1{view} other{views}}",
+  "@topicMapViews": {
+    "description": "Label under the view count in the summary under a topic's first post; the number is shown above it, not in the string",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topicMapLikes": "{count, plural, =1{like} other{likes}}",
+  "@topicMapLikes": {
+    "description": "Label under the like count in the summary under a topic's first post; the number is shown above it",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topicMapLinks": "{count, plural, =1{link} other{links}}",
+  "@topicMapLinks": {
+    "description": "Label under the link count in the summary under a topic's first post; the number is shown above it",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topicMapUsers": "{count, plural, =1{user} other{users}}",
+  "@topicMapUsers": {
+    "description": "Label under the participant count in the summary under a topic's first post; the number is shown above it",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "day": "Day",
+  "@day": {
+    "description": "Birthday dialog: day of the month"
+  },
+  "month": "Month",
+  "@month": {
+    "description": "Birthday dialog: month"
+  },
+  "suspendUser": "Suspend User",
+  "@suspendUser": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendUntil": "Suspend user until",
+  "@suspendUntil": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendForever": "Suspend forever",
+  "@suspendForever": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonNotListening": "Would not listen to staff feedback",
+  "@suspendReasonNotListening": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonStaffTime": "Consumed disproportionate amounts of staff time",
+  "@suspendReasonStaffTime": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonCombative": "Too combative",
+  "@suspendReasonCombative": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonWrongPlace": "In the wrong place",
+  "@suspendReasonWrongPlace": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonNoPurpose": "No constructive purpose to their actions other than creating dissent within the community",
+  "@suspendReasonNoPurpose": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonCustom": "Custom…",
+  "@suspendReasonCustom": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonQuestion": "Why are you suspending? This text will be shown to the user when they try to log in. Keep it short.",
+  "@suspendReasonQuestion": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "closedLabel": "Closed",
+  "@closedLabel": {
+    "description": "Badge on a closed topic in topic lists"
+  },
+  "pleaseSelectSuspensionEndDate": "Choose when the suspension ends",
+  "@pleaseSelectSuspensionEndDate": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "dismissAllNotifications": "Dismiss all",
+  "@dismissAllNotifications": {
+    "description": "Notifications tab app bar: tooltip of the button that marks every notification read (Discourse js.user.dismiss_notifications)"
+  },
+  "searchFilterStatusSection": "Status",
+  "@searchFilterStatusSection": {
+    "description": "Search filters sheet: heading over the topic status chips"
+  },
+  "searchFilterMyActivitySection": "My activity",
+  "@searchFilterMyActivitySection": {
+    "description": "Search filters sheet: heading over the chips about the reader's own activity"
+  },
+  "searchFilterMatchTypeSection": "Match type",
+  "@searchFilterMatchTypeSection": {
+    "description": "Search filters sheet: heading over the Title only / First posts only chips"
+  },
+  "searchTagsFilterHelper": "Space- or comma-separated. Each tag is required.",
+  "@searchTagsFilterHelper": {
+    "description": "Search filters sheet: help under the tags field"
+  },
+  "searchSortBy": "Sort by",
+  "@searchSortBy": {
+    "description": "Search filters sheet: heading over the sort chips (Discourse js.search.sort_by)"
+  },
+  "searchStatusOpen": "Open",
+  "@searchStatusOpen": {
+    "description": "Search filters sheet: status chip, topics that are open"
+  },
+  "searchStatusArchived": "Archived",
+  "@searchStatusArchived": {
+    "description": "Search filters sheet: status chip, topics that are archived"
+  },
+  "searchStatusNoReplies": "No replies",
+  "@searchStatusNoReplies": {
+    "description": "Search filters sheet: status chip, topics with zero replies"
+  },
+  "searchStatusPublicOnly": "Public only",
+  "@searchStatusPublicOnly": {
+    "description": "Search filters sheet: status chip, only public topics"
+  },
+  "searchStatusUnsolved": "Unsolved",
+  "@searchStatusUnsolved": {
+    "description": "Search filters sheet: status chip, topics without a solution (discourse-solved topic_status_filter.unsolved)"
+  },
+  "searchInBookmarked": "I bookmarked",
+  "@searchInBookmarked": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.bookmarks)"
+  },
+  "searchInMyMessages": "In my messages",
+  "@searchInMyMessages": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.private)"
+  },
+  "searchInLiked": "I liked",
+  "@searchInLiked": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.likes)"
+  },
+  "searchInPosted": "I posted in",
+  "@searchInPosted": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.posted)"
+  },
+  "searchInWatching": "I'm watching",
+  "@searchInWatching": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.watching)"
+  },
+  "searchInTracking": "I'm tracking",
+  "@searchInTracking": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.tracking)"
+  },
+  "searchInSeen": "I read",
+  "@searchInSeen": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.seen)"
+  },
+  "searchInUnseen": "I've not read",
+  "@searchInUnseen": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.unseen)"
+  },
+  "searchSortLatestPost": "Latest post",
+  "@searchSortLatestPost": {
+    "description": "Search filters sheet: sort chip (Discourse js.search.latest_post)"
+  },
+  "searchSortMostLiked": "Most liked",
+  "@searchSortMostLiked": {
+    "description": "Search filters sheet: sort chip (Discourse js.search.most_liked)"
+  },
+  "searchSortMostViewed": "Most viewed",
+  "@searchSortMostViewed": {
+    "description": "Search filters sheet: sort chip (Discourse js.search.most_viewed)"
+  },
+  "searchSortLatestTopic": "Latest topic",
+  "@searchSortLatestTopic": {
+    "description": "Search filters sheet: sort chip (Discourse js.search.latest_topic)"
+  },
+  "searchFieldHint": "Search...",
+  "@searchFieldHint": {
+    "description": "Default placeholder of the app's search fields (Discourse js.multi_select.search)"
+  },
+  "postLikeAction": "Like post",
+  "@postLikeAction": {
+    "description": "Screen-reader label of a post's like (heart) button when the reader has not liked it"
+  },
+  "postUnlikeAction": "Unlike post",
+  "@postUnlikeAction": {
+    "description": "Screen-reader label of a post's like (heart) button when the reader has liked it"
+  }
+}
