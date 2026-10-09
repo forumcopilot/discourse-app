@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.50] - 2026-10-08
+
+### Fixed
+- **Selecting text in the composer.** After Back had put the keyboard away, a long-press on a word could select to the end of the post: the keyboard came back up and the text moved under your finger. The text now stays still until you lift your finger, then scrolls the selection above the keyboard.
+- **Tapping under a short post dismisses a selection** and the keyboard, as tapping elsewhere outside the text does. Before, the empty page below the text took no taps.
+
 ## [1.0.49] - 2026-10-06
 
 ### Added
