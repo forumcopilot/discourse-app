@@ -243,6 +243,12 @@ class KitLocalizationsKo extends KitLocalizations {
   String get month => '월';
 
   @override
+  String get chooseEmoji => '이모지 선택';
+
+  @override
+  String get searchEmoji => '이모지 검색';
+
+  @override
   String get suspendUser => '사용자 정지';
 
   @override

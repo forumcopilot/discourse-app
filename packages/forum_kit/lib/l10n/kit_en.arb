@@ -223,6 +223,14 @@
   "@month": {
     "description": "Birthday dialog: month"
   },
+  "chooseEmoji": "Choose emoji",
+  "@chooseEmoji": {
+    "description": "Status sheet: the emoji button, and the emoji picker's title"
+  },
+  "searchEmoji": "Search emoji",
+  "@searchEmoji": {
+    "description": "Emoji picker: search field"
+  },
   "suspendUser": "Suspend User",
   "@suspendUser": {
     "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"

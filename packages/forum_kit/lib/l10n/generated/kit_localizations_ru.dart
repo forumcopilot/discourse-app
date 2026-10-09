@@ -264,6 +264,12 @@ class KitLocalizationsRu extends KitLocalizations {
   String get month => 'Месяц';
 
   @override
+  String get chooseEmoji => 'Выбрать эмодзи';
+
+  @override
+  String get searchEmoji => 'Поиск эмодзи';
+
+  @override
   String get suspendUser => 'Блокировка пользователя';
 
   @override

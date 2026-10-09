@@ -243,6 +243,12 @@ class KitLocalizationsJa extends KitLocalizations {
   String get month => '月';
 
   @override
+  String get chooseEmoji => '絵文字を選択';
+
+  @override
+  String get searchEmoji => '絵文字を検索';
+
+  @override
   String get suspendUser => 'ユーザーを凍結';
 
   @override

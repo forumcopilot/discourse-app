@@ -16,11 +16,14 @@ dependencies:
   crypto: ^3.0.0
   device_info_plus: ^11.2.0
   dio: ^5.4.0
+  discourse_appearance:
+    path: ../discourse_appearance
   file_picker: ^10.3.10
   firebase_messaging: ^16.0.4
   flutter_cache_manager: ^3.4.1
   flutter_highlight: ^0.7.0
   flutter_image_compress: ^2.3.0
+  flutter_inappwebview: ^6.1.5
   flutter_svg: ^2.0.10
   forumcopilot_sdk:
     path: ../forumcopilot_sdk
@@ -41,6 +44,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Only tool/gen_discourse_emoji_data.dart uses it, to pick the fully-qualified
+  # form of each emoji. App code resolves names through the generated Discourse
+  # table in lib/utils/discourse_emoji_data.dart.
+  emojis: ^0.9.9
 
 flutter:
   generate: true

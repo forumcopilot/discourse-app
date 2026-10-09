@@ -80,6 +80,8 @@
   "topicMapUsers": "{count, plural, other{用户}}",
   "day": "日",
   "month": "月",
+  "chooseEmoji": "选择表情符号",
+  "searchEmoji": "搜索表情符号",
   "suspendUser": "封禁用户",
   "suspendUntil": "将用户封禁至",
   "suspendForever": "永久封禁",

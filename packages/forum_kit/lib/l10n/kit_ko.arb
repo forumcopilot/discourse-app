@@ -80,6 +80,8 @@
   "topicMapUsers": "{count, plural, other{사용자}}",
   "day": "일",
   "month": "월",
+  "chooseEmoji": "이모지 선택",
+  "searchEmoji": "이모지 검색",
   "suspendUser": "사용자 정지",
   "suspendUntil": "사용자 정지 기간",
   "suspendForever": "영구 정지",

@@ -251,6 +251,12 @@ class KitLocalizationsEn extends KitLocalizations {
   String get month => 'Month';
 
   @override
+  String get chooseEmoji => 'Choose emoji';
+
+  @override
+  String get searchEmoji => 'Search emoji';
+
+  @override
   String get suspendUser => 'Suspend User';
 
   @override

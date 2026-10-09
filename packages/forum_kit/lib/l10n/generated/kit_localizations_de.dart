@@ -250,6 +250,12 @@ class KitLocalizationsDe extends KitLocalizations {
   String get month => 'Monat';
 
   @override
+  String get chooseEmoji => 'Emoji auswählen';
+
+  @override
+  String get searchEmoji => 'Emoji suchen';
+
+  @override
   String get suspendUser => 'Benutzer sperren';
 
   @override

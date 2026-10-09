@@ -242,6 +242,12 @@ class KitLocalizationsZh extends KitLocalizations {
   String get month => '月';
 
   @override
+  String get chooseEmoji => '选择表情符号';
+
+  @override
+  String get searchEmoji => '搜索表情符号';
+
+  @override
   String get suspendUser => '封禁用户';
 
   @override

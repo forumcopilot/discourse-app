@@ -108,6 +108,8 @@
   "topicMapUsers": "{count, plural, =1{gebruiker} other{gebruikers}}",
   "day": "Dag",
   "month": "Maand",
+  "chooseEmoji": "Emoji kiezen",
+  "searchEmoji": "Emoji zoeken",
   "suspendUser": "Gebruiker schorsen",
   "suspendUntil": "Gebruiker schorsen tot",
   "suspendForever": "Voor altijd schorsen",

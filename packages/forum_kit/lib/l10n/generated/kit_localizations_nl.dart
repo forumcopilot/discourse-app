@@ -251,6 +251,12 @@ class KitLocalizationsNl extends KitLocalizations {
   String get month => 'Maand';
 
   @override
+  String get chooseEmoji => 'Emoji kiezen';
+
+  @override
+  String get searchEmoji => 'Emoji zoeken';
+
+  @override
   String get suspendUser => 'Gebruiker schorsen';
 
   @override

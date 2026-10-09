@@ -80,6 +80,8 @@
   "topicMapUsers": "{count, plural, other{ユーザー}}",
   "day": "日",
   "month": "月",
+  "chooseEmoji": "絵文字を選択",
+  "searchEmoji": "絵文字を検索",
   "suspendUser": "ユーザーを凍結",
   "suspendUntil": "次の期間までユーザーを凍結する",
   "suspendForever": "永久に凍結する",

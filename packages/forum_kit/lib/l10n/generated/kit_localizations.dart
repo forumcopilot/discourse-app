@@ -458,6 +458,18 @@ abstract class KitLocalizations {
   /// **'Month'**
   String get month;
 
+  /// Status sheet: the emoji button, and the emoji picker's title
+  ///
+  /// In en, this message translates to:
+  /// **'Choose emoji'**
+  String get chooseEmoji;
+
+  /// Emoji picker: search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search emoji'**
+  String get searchEmoji;
+
   /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
   ///
   /// In en, this message translates to:

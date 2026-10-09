@@ -80,6 +80,8 @@
   "topicMapUsers": "{count, plural, one{пользователь} few{пользователя} many{пользователей} other{пользователя}}",
   "day": "День",
   "month": "Месяц",
+  "chooseEmoji": "Выбрать эмодзи",
+  "searchEmoji": "Поиск эмодзи",
   "suspendUser": "Блокировка пользователя",
   "suspendUntil": "Блокировка пользователя до",
   "suspendForever": "Бессрочная блокировка",

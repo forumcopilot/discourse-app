@@ -80,6 +80,8 @@
   "topicMapUsers": "{count, plural, =1{utente} other{utenti}}",
   "day": "Giorno",
   "month": "Mese",
+  "chooseEmoji": "Scegli emoji",
+  "searchEmoji": "Cerca emoji",
   "suspendUser": "Sospendi Utente",
   "suspendUntil": "Sospendi utente fino a",
   "suspendForever": "Sospendi definitivamente",
