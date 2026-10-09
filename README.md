@@ -23,7 +23,7 @@ Built and tested on Android, iOS and macOS. Flutter 3.32 or newer (CI builds wit
 
 ## Try it without building anything
 
-**[ABDA – A Better Discourse App](https://betterdiscourse.app)** is this project shipped as a product: the exact screens in this repo, plus a directory of 2,400+ public Discourse forums to open them against. Open your own forum in it by address and you are looking at what this template gives your community — minus the forum chooser, plus your name and icon. It is on its way to the App Store and Google Play; the site carries the download links as they go live, and until then the quick start below builds the same thing.
+**[ABDA – A Better Discourse App](https://betterdiscourse.app)** is this project shipped as a product: the exact screens in this repo, plus a directory of 2,400+ public Discourse forums to open them against. Open your own forum in it by address and you are looking at what this template gives your community — minus the forum chooser, plus your name and icon. Get it on [Google Play](https://play.google.com/store/apps/details?id=com.forumcopilot.abda); the App Store version is coming soon, and until then the quick start below builds the same thing for iPhone.
 
 ---
 
