@@ -159,6 +159,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
   late final TextEditingController _contentController;
   final FocusNode _titleFocusNode = FocusNode();
   final FocusNode _contentFocusNode = FocusNode();
+  final _scrollController = _HoldWhilePressedScrollController();
   bool _isSubmitting = false;
 
   /// What the composer opened with, for [_hasChanges] when the page has no
@@ -266,6 +267,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     }
     _titleFocusNode.dispose();
     _contentFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -1411,9 +1413,16 @@ class _MessageComposePageState extends State<MessageComposePage> {
           child: Column(
             children: [
               Expanded(
+                // Expand, so the page under a short post is the scroll
+                // view's and a tap there leaves the text. Sized to the post
+                // it was nobody's: a selection could not be tapped away.
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
                     SingleChildScrollView(
+                      controller: _scrollController,
+                      // What the primary scroll view it was had.
+                      physics: const AlwaysScrollableScrollPhysics(),
                       child: Padding(
                         padding: DesignTokens.paddingL,
                         child: Column(
@@ -1493,23 +1502,30 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                 enabled: !_isSubmitting,
                               ),
                             if (widget.showTitleField) SizedBox(height: DesignTokens.spacingL),
-                            TextField(
-                              controller: _contentController,
-                              focusNode: _contentFocusNode,
-                              minLines: 10,
-                              maxLines: null,
-                              keyboardType: TextInputType.multiline,
-                              textCapitalization: TextCapitalization.sentences,
-                              decoration: InputDecoration(
-                                labelText: widget.contentLabel ??
-                                    AppLocalizations.of(context)!.content,
-                                hintText: widget.contentHint ??
-                                    AppLocalizations.of(context)!
-                                        .composerContentHint,
-                                alignLabelWithHint: true,
-                                floatingLabelBehavior: FloatingLabelBehavior.always,
+                            // The page holds still while a finger is on the
+                            // text: see _HoldWhilePressedScrollController.
+                            Listener(
+                              onPointerDown: (_) => _scrollController.press(),
+                              onPointerUp: (_) => _scrollController.lift(),
+                              onPointerCancel: (_) => _scrollController.lift(),
+                              child: TextField(
+                                controller: _contentController,
+                                focusNode: _contentFocusNode,
+                                minLines: 10,
+                                maxLines: null,
+                                keyboardType: TextInputType.multiline,
+                                textCapitalization: TextCapitalization.sentences,
+                                decoration: InputDecoration(
+                                  labelText: widget.contentLabel ??
+                                      AppLocalizations.of(context)!.content,
+                                  hintText: widget.contentHint ??
+                                      AppLocalizations.of(context)!
+                                          .composerContentHint,
+                                  alignLabelWithHint: true,
+                                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                                ),
+                                enabled: !_isSubmitting,
                               ),
-                              enabled: !_isSubmitting,
                             ),
                             SizedBox(height: DesignTokens.spacingL),
                             _buildAttachmentsList(),
@@ -1536,6 +1552,82 @@ class _MessageComposePageState extends State<MessageComposePage> {
       ),
     ),
     );
+  }
+}
+
+/// The composer's scroll view, held still while a finger is on the text.
+///
+/// Flutter brings the keyboard up for a long-press too (Android's own text
+/// fields leave it down), and the page then scrolls the selection above it
+/// while the finger is still down. The finger is over other words by then,
+/// and the selection ran on to them: after Back had put the keyboard away, a
+/// long-press on one word selected to the end of the post. The page now
+/// keeps still until the finger lifts, then brings the selection into view.
+class _HoldWhilePressedScrollController extends ScrollController {
+  int _fingers = 0;
+
+  bool get _held => _fingers > 0;
+
+  void press() => _fingers++;
+
+  void lift() {
+    if (_fingers == 0 || --_fingers > 0) return;
+    for (final position in positions) {
+      (position as _HoldWhilePressedScrollPosition)._afterLift();
+    }
+  }
+
+  @override
+  ScrollPosition createScrollPosition(ScrollPhysics physics,
+          ScrollContext context, ScrollPosition? oldPosition) =>
+      _HoldWhilePressedScrollPosition(
+        this,
+        physics: physics,
+        context: context,
+        initialPixels: initialScrollOffset,
+        keepScrollOffset: keepScrollOffset,
+        oldPosition: oldPosition,
+        debugLabel: debugLabel,
+      );
+}
+
+class _HoldWhilePressedScrollPosition extends ScrollPositionWithSingleContext {
+  _HoldWhilePressedScrollPosition(
+    this._controller, {
+    required super.physics,
+    required super.context,
+    super.initialPixels,
+    super.keepScrollOffset,
+    super.oldPosition,
+    super.debugLabel,
+  });
+
+  final _HoldWhilePressedScrollController _controller;
+
+  /// Where showing the selection asked to scroll while held, and from where.
+  double? _heldTarget;
+  double? _heldFrom;
+
+  /// How the text field shows its caret or selection ([showOnScreen]);
+  /// drags and flings scroll by other means and are never held.
+  @override
+  Future<void> moveTo(double to,
+      {Duration? duration, Curve? curve, bool? clamp = true}) {
+    if (_controller._held) {
+      _heldTarget = to;
+      _heldFrom = pixels;
+      return Future<void>.value();
+    }
+    return super.moveTo(to, duration: duration, curve: curve, clamp: clamp);
+  }
+
+  void _afterLift() {
+    final target = _heldTarget;
+    _heldTarget = null;
+    // Not over a scroll the reader made meanwhile.
+    if (target == null || _heldFrom != pixels) return;
+    animateTo(target.clamp(minScrollExtent, maxScrollExtent),
+        duration: kThemeAnimationDuration, curve: Curves.easeOut);
   }
 }
 
