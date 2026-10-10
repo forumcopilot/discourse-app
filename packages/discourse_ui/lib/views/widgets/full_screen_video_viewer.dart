@@ -26,6 +26,11 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
   VideoPlayerController? _controller;
   late Future<void> _initializeFuture;
 
+  /// Which attempt to open the video is current. A Retry releases the
+  /// current player and starts a new attempt; an older one still in flight
+  /// then gives up rather than replace the new attempt's player.
+  int _attempt = 0;
+
   @override
   void initState() {
     super.initState();
@@ -36,15 +41,17 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
   /// from their signed address, a file a guest may not fetch with the
   /// user's key (see ForumMedia.resolvePlayable) — then starts it.
   Future<void> _open() async {
+    final attempt = ++_attempt;
     final media =
         await ForumMedia.resolvePlayable(widget.auth, widget.videoUrl);
-    if (!mounted) return;
+    if (!mounted || attempt != _attempt) return;
     final controller =
         VideoPlayerController.networkUrl(media.url, httpHeaders: media.headers);
     _controller = controller;
     controller.addListener(_playbackChanged);
     await controller.initialize();
-    if (!mounted) return;
+    // A Retry since then has already released this player.
+    if (!mounted || attempt != _attempt) return;
     await controller.play();
     if (mounted) setState(() {});
   }
@@ -56,7 +63,9 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
     // Native teardown can finish independently of the next playback attempt.
     previous?.dispose();
     setState(() {
-      _initializeFuture = _open();
+      // The FutureBuilder subscribes on the next frame; a failure before then
+      // must not count as unhandled. The builder still receives it.
+      _initializeFuture = _open()..ignore();
     });
   }
 

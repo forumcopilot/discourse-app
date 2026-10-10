@@ -492,66 +492,67 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
     // The card recipe; the play button's own 48dp target is its padding.
     return EmbeddedCard(
       padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingXS),
-      child: LayoutBuilder(
-        builder: (context, constraints) => Row(
-          children: [
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.all(14),
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              )
-            else
-              IconButton(
-                tooltip: (value?.isPlaying ?? false)
-                    ? (AppLocalizations.of(context)?.mediaPause ?? 'Pause')
-                    : (AppLocalizations.of(context)?.mediaPlay ?? 'Play'),
-                onPressed: _toggle,
-                icon: Icon(
-                  (value?.isPlaying ?? false)
-                      ? Icons.pause_rounded
-                      : Icons.play_arrow_rounded,
-                  color: colorScheme.primary,
-                  size: 28,
-                ),
+      child: Row(
+        children: [
+          if (_loading)
+            const Padding(
+              padding: EdgeInsets.all(14),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
-            Expanded(
-              child: ready
-                  ? VideoProgressIndicator(
-                      controller,
-                      allowScrubbing: true,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      colors: VideoProgressColors(
-                        playedColor: colorScheme.primary,
-                        bufferedColor: colorScheme.primary.withValues(alpha: 0.3),
-                        backgroundColor: colorScheme.outlineVariant,
-                      ),
-                    )
-                  : Container(height: 4, color: colorScheme.outlineVariant),
-            ),
-            // Large text must share the row's width with the play button and
-            // progress bar; an unconstrained duration can overflow a narrow post.
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: constraints.maxWidth / 2),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  ready
-                      ? '${_time(value.position)} / ${_time(value.duration)}'
-                      : '0:00',
-                  textAlign: TextAlign.end,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
+            )
+          else
+            IconButton(
+              tooltip: (value?.isPlaying ?? false)
+                  ? (AppLocalizations.of(context)?.mediaPause ?? 'Pause')
+                  : (AppLocalizations.of(context)?.mediaPlay ?? 'Play'),
+              onPressed: _toggle,
+              icon: Icon(
+                (value?.isPlaying ?? false)
+                    ? Icons.pause_rounded
+                    : Icons.play_arrow_rounded,
+                color: colorScheme.primary,
+                size: 28,
               ),
             ),
-          ],
-        ),
+          Expanded(
+            child: ready
+                ? VideoProgressIndicator(
+                    controller,
+                    allowScrubbing: true,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    colors: VideoProgressColors(
+                      playedColor: colorScheme.primary,
+                      bufferedColor: colorScheme.primary.withValues(alpha: 0.3),
+                      backgroundColor: colorScheme.outlineVariant,
+                    ),
+                  )
+                : Container(height: 4, color: colorScheme.outlineVariant),
+          ),
+          // Large text must share the row's width with the play button and
+          // progress bar; an unconstrained duration can overflow a narrow post.
+          // Capped by the screen, not a LayoutBuilder: post tables size their
+          // cells from intrinsic sizes, which a LayoutBuilder cannot report.
+          ConstrainedBox(
+            constraints:
+                BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width / 2),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                ready
+                    ? '${_time(value.position)} / ${_time(value.duration)}'
+                    : '0:00',
+                textAlign: TextAlign.end,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
