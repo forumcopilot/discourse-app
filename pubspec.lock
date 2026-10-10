@@ -705,6 +705,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  forum_kit:
+    dependency: transitive
+    description:
+      path: "packages/forum_kit"
+      relative: true
+    source: path
+    version: "0.1.0"
   forumcopilot_sdk:
     dependency: "direct main"
     description:

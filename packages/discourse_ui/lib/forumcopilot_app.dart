@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/generated/app_localizations.dart';
+import 'package:forum_kit/l10n/kit_l10n.dart';
 import 'package:discourse_ui/utils/error_dialog.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:get/get.dart';
@@ -82,6 +83,7 @@ class _ForumCopilotAppState extends State<ForumCopilotApp> {
         navigatorKey: globalNavigatorKey,
         localizationsDelegates: const [
           AppLocalizations.delegate,
+          KitLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,

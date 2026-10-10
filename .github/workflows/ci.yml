@@ -44,6 +44,13 @@ jobs:
         # to commit the output.
         run: git diff --exit-code --stat -- packages/forumcopilot_sdk
 
+      - name: forum_kit stays platform-neutral
+        # The kit is shared with flarum-app: it must never reach Discourse code.
+        run: |
+          if grep -rnE --include="*.dart" "package:discourse_(core|ui|notifications)/" packages/forum_kit; then
+            echo "forum_kit imports a Discourse package"; exit 1
+          fi
+
       - name: Analyze
         # Errors and warnings fail the build. Infos do not: flutter analyze
         # makes them fatal by default, and the vendored SDK carries ~900

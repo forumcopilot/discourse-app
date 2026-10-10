@@ -10,7 +10,7 @@
 set -e
 cd "$(dirname "$0")"
 
-for pkg in forumcopilot_sdk discourse_core discourse_appearance discourse_notifications discourse_ui; do
+for pkg in forumcopilot_sdk forum_kit discourse_core discourse_appearance discourse_notifications discourse_ui; do
   echo "Resolving packages/$pkg..."
   (cd "packages/$pkg" && dart pub get)
 done
@@ -21,8 +21,9 @@ done
 echo "Generating forumcopilot_sdk mappers..."
 (cd packages/forumcopilot_sdk && dart run build_runner build --delete-conflicting-outputs)
 
-# l10n.yaml and `generate: true` live in discourse_ui, not at the root —
-# run from the root, gen-l10n aborts (that was CI's first red run).
+# l10n.yaml and `generate: true` live in forum_kit and discourse_ui, not at
+# the root — run from the root, gen-l10n aborts (that was CI's first red run).
 echo "Generating localizations..."
+(cd packages/forum_kit && flutter gen-l10n)
 (cd packages/discourse_ui && flutter gen-l10n)
 echo "Done."

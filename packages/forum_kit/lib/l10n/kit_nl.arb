@@ -1,0 +1,160 @@
+{
+  "@@locale": "nl",
+  "discardFailedCloseQuestion": "Toch sluiten? Een eerder opgeslagen concept blijft bij Concepten.",
+  "keepEditing": "Verder bewerken",
+  "closeAnyway": "Toch sluiten",
+  "okButton": "OK",
+  "copied": "Gekopieerd",
+  "cancel": "Annuleren",
+  "tryAgain": "Opnieuw proberen",
+  "latest": "Nieuwste",
+  "language": "Taal",
+  "@language": {
+    "description": "Settings section title for language selection"
+  },
+  "all": "Alles",
+  "reason": "Reden",
+  "pleaseSpecifyReason": "Geef de reden op",
+  "selectDate": "Selecteer datum",
+  "search": "Zoeken",
+  "messages": "Berichten",
+  "add": "Toevoegen",
+  "delete": "Verwijderen",
+  "temporary": "Tijdelijk",
+  "error": "Fout: {error}",
+  "@error": {
+    "description": "Generic error message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "none": "Geen",
+  "italic": "Cursief",
+  "link": "Link",
+  "image": "Afbeelding",
+  "quote": "Citaat",
+  "code": "Code",
+  "participants": "Deelnemers ({count})",
+  "@participants": {
+    "description": "Participants count with label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "refresh": "Vernieuwen",
+  "@refresh": {
+    "description": "Menu item to refresh content"
+  },
+  "share": "Delen",
+  "@share": {
+    "description": "Menu item to share content"
+  },
+  "reply": "Beantwoorden",
+  "@reply": {
+    "description": "Button to reply to a post or message"
+  },
+  "dark": "Donker",
+  "@dark": {
+    "description": "Dark theme option"
+  },
+  "notifications": "Meldingen",
+  "@notifications": {
+    "description": "Notifications tab title"
+  },
+  "edit": "Bewerken",
+  "@edit": {
+    "description": "Button text to edit"
+  },
+  "remove": "Verwijderen",
+  "@remove": {
+    "description": "Button text to remove"
+  },
+  "message": "Bericht",
+  "@message": {
+    "description": "Label for message field"
+  },
+  "couldNotOpenLink": "Kon link niet openen: {error}",
+  "@couldNotOpenLink": {
+    "description": "Error message when opening link fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "timeGapDaysLater": "{count, plural, =1{1 dag later} other{{count} dagen later}}",
+  "timeGapMonthsLater": "{count, plural, =1{1 maand later} other{{count} maanden later}}",
+  "timeGapYearsLater": "{count, plural, =1{1 jaar later} other{{count} jaar later}}",
+  "apply": "Toepassen",
+  "bookmarks": "Bladwijzers",
+  "copy": "Kopiëren",
+  "discard": "Verwerpen",
+  "firstPostsOnly": "Alleen eerste berichten",
+  "relevance": "Relevantie",
+  "reset": "Herstellen",
+  "titleOnly": "Alleen titel",
+  "solved": "Opgelost",
+  "open": "Openen",
+  "participantCount": "{count, plural, =1{1 deelnemer} other{{count} deelnemers}}",
+  "postNeedsApprovalTitle": "Bericht vereist goedkeuring",
+  "postNeedsApprovalBody": "We hebben je nieuwe bericht ontvangen, maar dit moet eerst door een moderator worden goedgekeurd voordat het zichtbaar wordt. Heb geduld.",
+  "tapToOpen": "Tik om te openen",
+  "imageNotAvailable": "Afbeelding niet beschikbaar",
+  "searchFilters": "Zoekfilters",
+  "tags": "Tags",
+  "discardPostQuestion": "Wil je je bericht weggooien?",
+  "discardChangesQuestion": "Wil je je wijzigingen negeren?",
+  "discardChanges": "Wijzigingen negeren",
+  "saveDraft": "Concept opslaan",
+  "topicMapViews": "{count, plural, =1{weergave} other{weergaven}}",
+  "topicMapLikes": "{count, plural, =1{like} other{likes}}",
+  "topicMapLinks": "{count, plural, =1{link} other{links}}",
+  "topicMapUsers": "{count, plural, =1{gebruiker} other{gebruikers}}",
+  "day": "Dag",
+  "month": "Maand",
+  "chooseEmoji": "Emoji kiezen",
+  "searchEmoji": "Emoji zoeken",
+  "suspendUser": "Gebruiker schorsen",
+  "suspendUntil": "Gebruiker schorsen tot",
+  "suspendForever": "Voor altijd schorsen",
+  "suspendReasonNotListening": "Wilde niet naar feedback van medewerkers luisteren",
+  "suspendReasonStaffTime": "Heeft onevenredig veel tijd van medewerkers verbruikt",
+  "suspendReasonCombative": "Te strijdlustig",
+  "suspendReasonWrongPlace": "Op de verkeerde plek",
+  "suspendReasonNoPurpose": "Geen constructief doel voor hun acties, anders dan het creëren van onenigheid binnen de community",
+  "suspendReasonCustom": "Aangepast…",
+  "suspendReasonQuestion": "Waarom schors je? Deze tekst wordt aan de gebruiker weergegeven wanneer deze zich probeert aan te melden. Houd het kort.",
+  "closedLabel": "Gesloten",
+  "pleaseSelectSuspensionEndDate": "Kies wanneer de schorsing eindigt",
+  "dismissAllNotifications": "Alles negeren",
+  "searchFilterStatusSection": "Status",
+  "searchFilterMyActivitySection": "Mijn activiteit",
+  "searchFilterMatchTypeSection": "Soort overeenkomst",
+  "searchTagsFilterHelper": "Gescheiden door spaties of komma's. Elke tag is vereist.",
+  "searchSortBy": "Sorteren op",
+  "searchStatusOpen": "Open",
+  "searchStatusArchived": "Gearchiveerd",
+  "searchStatusNoReplies": "Zonder antwoorden",
+  "searchStatusPublicOnly": "Alleen openbaar",
+  "searchStatusUnsolved": "Onopgelost",
+  "searchInBookmarked": "Met bladwijzer",
+  "searchInMyMessages": "In mijn berichten",
+  "searchInLiked": "Door mij geliket",
+  "searchInPosted": "Waarin ik iets heb geplaatst",
+  "searchInWatching": "Die ik observeer",
+  "searchInTracking": "Die ik volg",
+  "searchInSeen": "Die ik heb gelezen",
+  "searchInUnseen": "Die ik niet heb gelezen",
+  "searchSortLatestPost": "Nieuwste bericht",
+  "searchSortMostLiked": "Meest geliket",
+  "searchSortMostViewed": "Meest bekeken",
+  "searchSortLatestTopic": "Nieuwste topic",
+  "searchFieldHint": "Zoeken…",
+  "postLikeAction": "Bericht liken",
+  "postUnlikeAction": "Like ongedaan maken",
+  "somethingWentWrongTryAgain": "Er ging iets mis. Probeer het opnieuw."
+}

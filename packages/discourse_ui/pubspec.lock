@@ -222,14 +222,6 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
-  emojis:
-    dependency: "direct dev"
-    description:
-      name: emojis
-      sha256: "2e4d847c3f1e2670f30dc355909ce6fa7808b4e626c34a4dd503a360995a38bf"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.9.9"
   fake_async:
     dependency: transitive
     description:
@@ -658,6 +650,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  forum_kit:
+    dependency: "direct main"
+    description:
+      path: "../forum_kit"
+      relative: true
+    source: path
+    version: "0.1.0"
   forumcopilot_sdk:
     dependency: "direct main"
     description:
