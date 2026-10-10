@@ -1582,5 +1582,6 @@
   "mediaPause": "Пауза",
   "chatChannelStatusReadOnly": "Только для чтения",
   "chatChannelStatusClosed": "Закрыт",
-  "chatChannelStatusArchived": "Архивирован"
+  "chatChannelStatusArchived": "Архивирован",
+  "failedToLoadAudio": "Не удалось загрузить аудио"
 }

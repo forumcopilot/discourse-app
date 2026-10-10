@@ -1582,5 +1582,6 @@
   "mediaPause": "일시 정지",
   "chatChannelStatusReadOnly": "읽기 전용",
   "chatChannelStatusClosed": "닫힘",
-  "chatChannelStatusArchived": "보관됨"
+  "chatChannelStatusArchived": "보관됨",
+  "failedToLoadAudio": "오디오를 불러오지 못했습니다"
 }

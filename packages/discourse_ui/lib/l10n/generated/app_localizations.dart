@@ -8567,6 +8567,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Archived'**
   String get chatChannelStatusArchived;
+
+  /// Inline audio player error with retry and browser actions
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load audio'**
+  String get failedToLoadAudio;
 }
 
 class _AppLocalizationsDelegate

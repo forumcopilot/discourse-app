@@ -1582,5 +1582,6 @@
   "mediaPause": "Mettre en pause",
   "chatChannelStatusReadOnly": "Lecture seule",
   "chatChannelStatusClosed": "Fermé",
-  "chatChannelStatusArchived": "Archivé"
+  "chatChannelStatusArchived": "Archivé",
+  "failedToLoadAudio": "Impossible de charger le fichier audio"
 }

@@ -1739,5 +1739,6 @@
   "mediaPause": "Pauzeren",
   "chatChannelStatusReadOnly": "Alleen-lezen",
   "chatChannelStatusClosed": "Gesloten",
-  "chatChannelStatusArchived": "Gearchiveerd"
+  "chatChannelStatusArchived": "Gearchiveerd",
+  "failedToLoadAudio": "Audio laden mislukt"
 }
