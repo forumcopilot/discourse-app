@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.51] - 2026-10-10
+
+### Changed
+- **The app's generic UI layer is its own package, `forum_kit`**, shared with flarum-app: the theme and forum colours, shared widgets, caches, logging, emoji data, and the strings those use. Nothing changes on screen. Files that moved leave a re-export in discourse_ui, so apps built on this repository compile as before; `packages/forum_kit` never imports Discourse code, and CI checks that it doesn't.
+- **forum_kit's strings live only in forum_kit.** discourse_ui reads them from the kit (`l10n.kit.<key>`), in the same language and with the same translations, instead of keeping copies.
+
 ## [1.0.50] - 2026-10-08
 
 ### Fixed
