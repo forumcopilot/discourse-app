@@ -5,6 +5,7 @@ import 'package:discourse_ui/views/profile/user_card_sheet.dart';
 import 'package:discourse_ui/views/widgets/post_actions.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import '../../l10n/kit_strings.dart';
 
 class AvatarActions {
   /// A picture tapped on a post opens the person's user card, over the
@@ -45,7 +46,7 @@ class AvatarActions {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context)?.kit.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {

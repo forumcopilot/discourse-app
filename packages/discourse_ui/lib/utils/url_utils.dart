@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart'; // Added for BuildContext
 import '../l10n/generated/app_localizations.dart';
+import '../l10n/kit_strings.dart';
 
 /// Forum template types enum
 enum ForumTemplate {
@@ -805,7 +806,7 @@ class UrlUtils {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.couldNotOpenLink(
+            content: Text(AppLocalizations.of(context)!.kit.couldNotOpenLink(
                 url.length > 50 ? '${url.substring(0, 50)}...' : url)),
             duration: const Duration(seconds: 2),
           ),

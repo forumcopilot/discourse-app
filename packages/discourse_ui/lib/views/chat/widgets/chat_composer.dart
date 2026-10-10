@@ -14,6 +14,7 @@ import '../../../theme/design_tokens.dart';
 import '../../../utils/attachment_constraints_utils.dart';
 import '../../../utils/file_picker_utils.dart';
 import '../../../utils/file_utils.dart';
+import '../../../l10n/kit_strings.dart';
 
 /// Bottom-anchored message composer for the chat channel view.
 ///
@@ -321,7 +322,7 @@ class _ChatComposerState extends State<ChatComposer> {
           ),
           IconButton(
             icon: const Icon(Icons.close, size: 20),
-            tooltip: l10n.cancel,
+            tooltip: l10n.kit.cancel,
             onPressed: widget.onCancelContext,
           ),
         ],
@@ -428,7 +429,7 @@ class _ChatComposerState extends State<ChatComposer> {
                       suffixIcon: widget.enabled
                           ? IconButton(
                               icon: const Icon(Icons.emoji_emotions_outlined),
-                              tooltip: AppLocalizations.of(context)!.chooseEmoji,
+                              tooltip: AppLocalizations.of(context)!.kit.chooseEmoji,
                               onPressed: _sending ? null : _pickEmoji,
                             )
                           : null,

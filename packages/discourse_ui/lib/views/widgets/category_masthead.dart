@@ -13,6 +13,7 @@ import 'brand_image.dart';
 import 'category_badge.dart' show categoryForum, categoryMarkColor;
 import 'category_tile_mark.dart';
 import 'sheet_title.dart';
+import '../../l10n/kit_strings.dart';
 
 /// The top of a category's page, laid out like the forum's own header: where
 /// it sits (the forum, and the parent for a subcategory), the category's own
@@ -98,7 +99,7 @@ class CategoryMasthead extends StatelessWidget {
             ),
           ),
         IconButton(
-          tooltip: l10n.search,
+          tooltip: l10n.kit.search,
           icon: const Icon(Icons.search),
           onPressed: onSearch,
         ),

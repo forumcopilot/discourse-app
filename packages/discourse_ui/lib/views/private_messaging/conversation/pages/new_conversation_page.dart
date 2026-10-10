@@ -16,6 +16,7 @@ import '../../../../utils/discourse_draft_controller.dart';
 import '../../../../utils/post_submission.dart';
 import '../../../lists/posts_list.dart' show PostsListMode;
 import '../../../post_page.dart';
+import '../../../../l10n/kit_strings.dart';
 
 /// New Message: the shared composer ([MessageComposePage]) with the
 /// recipients above the title.
@@ -241,7 +242,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
             ),
           ActionChip(
             avatar: const Icon(Icons.add),
-            label: Text(l10n.add),
+            label: Text(l10n.kit.add),
             onPressed: _addRecipient,
           ),
         ],
@@ -258,7 +259,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
       submitLabel: l10n.send,
       showTitleField: true,
       titleHint: l10n.messageTitleHint,
-      contentLabel: l10n.message,
+      contentLabel: l10n.kit.message,
       contentHint: l10n.writeYourMessage,
       extraHeader: _recipientField(),
       titleController: _titleController,

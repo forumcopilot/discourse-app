@@ -13,6 +13,7 @@ import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart' show chatChannelTitle;
 import 'chat_people_sheet.dart';
 import 'widgets/chat_channel_avatar.dart';
+import '../../l10n/kit_strings.dart';
 
 /// A channel's or group chat's info and settings, opened from its header, as
 /// Discourse's channel info: who is in it (and adding people to a group
@@ -139,7 +140,7 @@ class _ChatChannelInfoPageState extends State<ChatChannelInfoPage> {
       builder: (d) => AlertDialog(
         content: Text('${l10n.chatRemoveMember} ${user.username}?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(d, false), child: Text(l10n.cancel)),
+          TextButton(onPressed: () => Navigator.pop(d, false), child: Text(l10n.kit.cancel)),
           FilledButton(onPressed: () => Navigator.pop(d, true), child: Text(l10n.chatRemoveMember)),
         ],
       ),
@@ -180,7 +181,7 @@ class _ChatChannelInfoPageState extends State<ChatChannelInfoPage> {
         builder: (d) => AlertDialog(
           content: Text(l10n.chatLeaveGroupInfo),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(d, false), child: Text(l10n.cancel)),
+            TextButton(onPressed: () => Navigator.pop(d, false), child: Text(l10n.kit.cancel)),
             FilledButton(onPressed: () => Navigator.pop(d, true), child: Text(l10n.chatLeave)),
           ],
         ),

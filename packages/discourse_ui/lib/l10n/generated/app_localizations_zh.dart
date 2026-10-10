@@ -15,15 +15,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get draftSessionChanged => '登录状态已改变。请先复制文本，再重新打开编辑器处理草稿。';
 
   @override
-  String get discardFailedCloseQuestion => '仍要关闭吗？之前保存的草稿会保留在“草稿”中。';
-
-  @override
-  String get keepEditing => '继续编辑';
-
-  @override
-  String get closeAnyway => '仍然关闭';
-
-  @override
   String get uploadSessionChanged => '上传过程中登录状态已改变。请重新打开此页面后再试。';
 
   @override
@@ -45,28 +36,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorTitle => '错误';
 
   @override
-  String get okButton => '确定';
-
-  @override
   String get retryButton => '重试';
 
   @override
   String get copyToClipboard => '复制到剪贴板';
 
   @override
-  String get copied => '已复制';
-
-  @override
   String get errorMessageCopiedToClipboard => '错误消息已复制到剪贴板';
 
   @override
   String get dismiss => '关闭';
-
-  @override
-  String get cancel => '取消';
-
-  @override
-  String get tryAgain => '重试';
 
   @override
   String get anErrorOccurred => '发生错误';
@@ -130,9 +109,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get youNeedToBeSignedInToViewUnreadTopics => '您需要登录才能查看未读话题';
 
   @override
-  String get latest => '最新';
-
-  @override
   String get unread => '未读';
 
   @override
@@ -153,12 +129,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get newConversation => '新消息';
 
   @override
-  String get language => '语言';
-
-  @override
-  String get all => '全部';
-
-  @override
   String get topicsOnly => '仅话题';
 
   @override
@@ -176,9 +146,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseWaitForThreadToLoad => '请等待话题加载';
 
   @override
-  String get reason => '原因';
-
-  @override
   String get participantsLabel => '参与者';
 
   @override
@@ -193,12 +160,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get newTopic => '新话题';
-
-  @override
-  String get pleaseSpecifyReason => '请说明原因';
-
-  @override
-  String get selectDate => '选择日期';
 
   @override
   String get moreOptions => '更多选项';
@@ -261,9 +222,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noSubject => '无主题';
 
   @override
-  String get search => '搜索';
-
-  @override
   String get logout => '退出登录';
 
   @override
@@ -282,16 +240,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get profile => '资料';
 
   @override
-  String get messages => '消息';
-
-  @override
-  String get add => '添加';
-
-  @override
   String get retry => '重试';
-
-  @override
-  String get delete => '删除';
 
   @override
   String get deleteMessage => '删除消息';
@@ -356,27 +305,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get next => '下一步';
 
   @override
-  String get temporary => '临时';
-
-  @override
   String get back => '返回';
 
   @override
   String get confirm => '确认';
 
   @override
-  String error(String error) {
-    return '错误: $error';
-  }
-
-  @override
   String get removeAttachment => '删除附件';
 
   @override
   String get areYouSureYouWantToRemoveThisAttachment => '您确定要删除此附件吗？';
-
-  @override
-  String get none => '无';
 
   @override
   String get attachFile => '附加文件';
@@ -391,28 +329,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bold => '粗体';
 
   @override
-  String get italic => '斜体';
-
-  @override
   String get underline => '下划线';
 
   @override
   String get strikethrough => '删除线';
 
   @override
-  String get link => '链接';
-
-  @override
-  String get image => '图片';
-
-  @override
   String get video => '视频';
-
-  @override
-  String get quote => '引用';
-
-  @override
-  String get code => '代码';
 
   @override
   String get spoiler => '剧透';
@@ -427,11 +350,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get listItem => '列表项';
 
   @override
-  String participants(int count) {
-    return '参与者 ($count)';
-  }
-
-  @override
   String get markAsUnread => '标记为未读';
 
   @override
@@ -441,16 +359,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enterKeywordsToSearchTopics => '输入关键词以搜索话题...';
 
   @override
-  String get refresh => '刷新';
-
-  @override
-  String get share => '分享';
-
-  @override
   String get viewOnWeb => '在网页中查看';
-
-  @override
-  String get reply => '回复';
 
   @override
   String get vote => '投票';
@@ -489,9 +398,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get light => '浅色';
 
   @override
-  String get dark => '深色';
-
-  @override
   String get appearance => '外观';
 
   @override
@@ -513,9 +419,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get home => '首页';
-
-  @override
-  String get notifications => '通知';
 
   @override
   String get notificationsTab => '通知';
@@ -597,16 +500,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get edit => '编辑';
-
-  @override
-  String get remove => '删除';
-
-  @override
   String get subject => '主题';
-
-  @override
-  String get message => '消息';
 
   @override
   String get titleCannotBeEmpty => '标题不能为空';
@@ -636,11 +530,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return '下载$filename时出错: $error';
-  }
-
-  @override
-  String couldNotOpenLink(String error) {
-    return '无法打开链接: $error';
   }
 
   @override
@@ -707,36 +596,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String timeGapDaysLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 天后',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapMonthsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 个月后',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapYearsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 年后',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get profileViews => '浏览量';
 
   @override
@@ -767,12 +626,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get allNotificationsMarkedAsRead => '所有通知已标记为已读';
 
   @override
-  String get apply => '应用';
-
-  @override
-  String get bookmarks => '书签';
-
-  @override
   String reviewableBy(String username) {
     return '由 $username 发布';
   }
@@ -788,9 +641,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get clearReminder => '清除提醒';
-
-  @override
-  String get copy => '复制';
 
   @override
   String get copyLink => '复制链接';
@@ -823,9 +673,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteMessageQuestion => '删除消息？';
 
   @override
-  String get discard => '放弃';
-
-  @override
   String get doNotDisturb => '请勿打扰';
 
   @override
@@ -850,9 +697,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failedToUpdateNotificationLevel => '无法更新通知级别';
-
-  @override
-  String get firstPostsOnly => '仅首帖';
 
   @override
   String get ignoredUsers => '已忽略的用户';
@@ -936,9 +780,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pushNotifications => '推送通知';
 
   @override
-  String get relevance => '相关性';
-
-  @override
   String get reminderTimeMustBeInFuture => '提醒时间必须在将来';
 
   @override
@@ -962,9 +803,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String requestToJoinGroup(String group) {
     return '申请加入 $group';
   }
-
-  @override
-  String get reset => '重置';
 
   @override
   String get resizeAndUpload => '缩小并上传';
@@ -1014,9 +852,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return '已取消忽略 @$username';
   }
-
-  @override
-  String get titleOnly => '仅标题';
 
   @override
   String get tomorrow => '明天';
@@ -1102,9 +937,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pleaseLoginToViewUserProfiles => '请登录后查看用户资料。';
-
-  @override
-  String get solved => '已解决';
 
   @override
   String get hot => '热门';
@@ -1194,9 +1026,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get openConversationConfirmation => '打开此消息？打开后将重新接受新回复。';
-
-  @override
-  String get open => '打开';
 
   @override
   String get leaveConversation3 => '离开消息';
@@ -1299,16 +1128,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String participantCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 位参与者',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get chatChannels => '频道';
 
   @override
@@ -1402,12 +1221,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get takePhoto => '拍照';
 
   @override
-  String get postNeedsApprovalTitle => '帖子需要审批';
-
-  @override
-  String get postNeedsApprovalBody => '我们已收到您的帖子，不过需要由版主批准才能显示。请耐心等待。';
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return '最多允许 $count 个附件';
   }
@@ -1490,12 +1303,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchUser => '搜索用户';
 
   @override
-  String get tapToOpen => '点击打开';
-
-  @override
-  String get imageNotAvailable => '图片不可用';
-
-  @override
   String postsCount(Object count) {
     return '$count 篇帖子';
   }
@@ -1572,9 +1379,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noReactionsYet => '还没有反应';
 
   @override
-  String get searchFilters => '搜索筛选';
-
-  @override
   String get suggestedTopics => '推荐话题';
 
   @override
@@ -1606,9 +1410,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => '无法加载类别。';
-
-  @override
-  String get tags => '标签';
 
   @override
   String get community => '社区';
@@ -1943,18 +1744,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get createTopic => '创建话题';
 
   @override
-  String get discardPostQuestion => '是否要放弃您的帖子？';
-
-  @override
-  String get discardChangesQuestion => '您确定要放弃所做的更改吗？';
-
-  @override
-  String get discardChanges => '舍弃更改';
-
-  @override
-  String get saveDraft => '保存草稿';
-
-  @override
   String get notificationSettings => '通知设置';
 
   @override
@@ -2037,46 +1826,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dismissedTopics => '已忽略';
-
-  @override
-  String topicMapViews(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '浏览',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLikes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '赞',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLinks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '链接',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapUsers(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '用户',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get markAsSolution => '标记为解决方案';
@@ -2598,12 +2347,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get coverRemoved => '已移除封面';
 
   @override
-  String get day => '日';
-
-  @override
-  String get month => '月';
-
-  @override
   String get displayName => '显示名称';
 
   @override
@@ -2850,9 +2593,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get yourPhoto => '你的照片';
 
   @override
-  String get chooseEmoji => '选择表情符号';
-
-  @override
   String get clearStatus => '清除状态';
 
   @override
@@ -2875,9 +2615,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get removeStatusAfter => '移除状态';
-
-  @override
-  String get searchEmoji => '搜索表情符号';
 
   @override
   String get setStatus => '设置状态';
@@ -3287,16 +3024,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signUp => '注册';
 
   @override
-  String get suspendUser => '封禁用户';
-
-  @override
   String get unsuspend => '取消封禁';
-
-  @override
-  String get suspendUntil => '将用户封禁至';
-
-  @override
-  String get suspendForever => '永久封禁';
 
   @override
   String failedToSuspendUser(String error) {
@@ -3309,34 +3037,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get suspendReasonNotListening => '不听从管理人员反馈';
-
-  @override
-  String get suspendReasonStaffTime => '消耗了过多的管理人员时间';
-
-  @override
-  String get suspendReasonCombative => '好斗';
-
-  @override
-  String get suspendReasonWrongPlace => '在错误的地方';
-
-  @override
-  String get suspendReasonNoPurpose => '除了在社区内引起异议外，该用户的行动没有任何建设性的目的';
-
-  @override
-  String get suspendReasonCustom => '自定义…';
-
-  @override
-  String get suspendReasonQuestion => '您为什么封禁该用户？当用户尝试登录时将看到此文本。尽量简洁。';
-
-  @override
-  String get closedLabel => '已关闭';
-
-  @override
   String get flaggingPost => '正在举报帖子…';
-
-  @override
-  String get pleaseSelectSuspensionEndDate => '请选择封禁结束时间';
 
   @override
   String get suspendingUser => '正在封禁用户…';
@@ -3508,9 +3209,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noForumDescription => '暂无描述。';
 
   @override
-  String get dismissAllNotifications => '全部忽略';
-
-  @override
   String get notificationPostIdMissing => '缺少帖子 ID。无法跳转到该帖子。';
 
   @override
@@ -3619,75 +3317,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get searchFiltersButtonTooltip => '筛选';
-
-  @override
-  String get searchFilterStatusSection => '状态';
-
-  @override
-  String get searchFilterMyActivitySection => '我的活动';
-
-  @override
-  String get searchFilterMatchTypeSection => '匹配类型';
-
-  @override
-  String get searchTagsFilterHelper => '用空格或逗号分隔。须包含每个标签。';
-
-  @override
-  String get searchSortBy => '排序依据';
-
-  @override
-  String get searchStatusOpen => '开放';
-
-  @override
-  String get searchStatusArchived => '已归档';
-
-  @override
-  String get searchStatusNoReplies => '无回复';
-
-  @override
-  String get searchStatusPublicOnly => '仅公开';
-
-  @override
-  String get searchStatusUnsolved => '未解决';
-
-  @override
-  String get searchInBookmarked => '我已加入书签';
-
-  @override
-  String get searchInMyMessages => '在我的消息中';
-
-  @override
-  String get searchInLiked => '我赞过';
-
-  @override
-  String get searchInPosted => '我发过帖';
-
-  @override
-  String get searchInWatching => '我正在关注';
-
-  @override
-  String get searchInTracking => '我正在跟踪';
-
-  @override
-  String get searchInSeen => '我读过';
-
-  @override
-  String get searchInUnseen => '我还没读过';
-
-  @override
-  String get searchSortLatestPost => '最新帖子';
-
-  @override
-  String get searchSortMostLiked => '赞最多';
-
-  @override
-  String get searchSortMostViewed => '浏览最多';
-
-  @override
-  String get searchSortLatestTopic => '最新话题';
-
-  @override
-  String get searchFieldHint => '搜索…';
 
   @override
   String get bookmarksUnavailable => '书签不可用';
@@ -4297,12 +3926,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get postLikeAction => '点赞帖子';
-
-  @override
-  String get postUnlikeAction => '取消点赞';
-
-  @override
   String get postVoteRemoveFailed => '无法撤销投票（可能已超过撤销时限）';
 
   @override
@@ -4610,9 +4233,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get passwordFieldLabel => '密码';
-
-  @override
-  String get somethingWentWrongTryAgain => '出了点问题。请重试。';
 
   @override
   String get unexpectedErrorTryAgain => '发生意外错误。请重试。';

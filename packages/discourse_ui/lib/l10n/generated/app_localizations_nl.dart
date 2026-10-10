@@ -17,16 +17,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Je aanmelding is gewijzigd. Kopieer je tekst voordat je de editor opnieuw opent om met concepten te werken.';
 
   @override
-  String get discardFailedCloseQuestion =>
-      'Toch sluiten? Een eerder opgeslagen concept blijft bij Concepten.';
-
-  @override
-  String get keepEditing => 'Verder bewerken';
-
-  @override
-  String get closeAnyway => 'Toch sluiten';
-
-  @override
   String get uploadSessionChanged =>
       'Je aanmelding is tijdens het uploaden gewijzigd. Open dit scherm opnieuw voordat je het nogmaals probeert.';
 
@@ -50,16 +40,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get errorTitle => 'Fout';
 
   @override
-  String get okButton => 'OK';
-
-  @override
   String get retryButton => 'Opnieuw';
 
   @override
   String get copyToClipboard => 'Kopiëren naar klembord';
-
-  @override
-  String get copied => 'Gekopieerd';
 
   @override
   String get errorMessageCopiedToClipboard =>
@@ -67,12 +51,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get dismiss => 'Sluiten';
-
-  @override
-  String get cancel => 'Annuleren';
-
-  @override
-  String get tryAgain => 'Opnieuw proberen';
 
   @override
   String get anErrorOccurred => 'Er is een fout opgetreden';
@@ -148,9 +126,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Je moet aangemeld zijn om je ongelezen topics te bekijken.';
 
   @override
-  String get latest => 'Nieuwste';
-
-  @override
   String get unread => 'Ongelezen';
 
   @override
@@ -172,12 +147,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get newConversation => 'Nieuw bericht';
 
   @override
-  String get language => 'Taal';
-
-  @override
-  String get all => 'Alles';
-
-  @override
   String get topicsOnly => 'Alleen topics';
 
   @override
@@ -196,9 +165,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pleaseWaitForThreadToLoad => 'Wacht tot het topic is geladen';
 
   @override
-  String get reason => 'Reden';
-
-  @override
   String get participantsLabel => 'Deelnemers';
 
   @override
@@ -213,12 +179,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get newTopic => 'Nieuw topic';
-
-  @override
-  String get pleaseSpecifyReason => 'Geef de reden op';
-
-  @override
-  String get selectDate => 'Selecteer datum';
 
   @override
   String get moreOptions => 'Meer opties';
@@ -282,9 +242,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noSubject => 'Geen onderwerp';
 
   @override
-  String get search => 'Zoeken';
-
-  @override
   String get logout => 'Uitloggen';
 
   @override
@@ -304,16 +261,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get profile => 'Profiel';
 
   @override
-  String get messages => 'Berichten';
-
-  @override
-  String get add => 'Toevoegen';
-
-  @override
   String get retry => 'Opnieuw';
-
-  @override
-  String get delete => 'Verwijderen';
 
   @override
   String get deleteMessage => 'Bericht verwijderen';
@@ -380,18 +328,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get next => 'Volgende';
 
   @override
-  String get temporary => 'Tijdelijk';
-
-  @override
   String get back => 'Terug';
 
   @override
   String get confirm => 'Bevestigen';
-
-  @override
-  String error(String error) {
-    return 'Fout: $error';
-  }
 
   @override
   String get removeAttachment => 'Bijlage verwijderen';
@@ -399,9 +339,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get areYouSureYouWantToRemoveThisAttachment =>
       'Weet je zeker dat je deze bijlage wilt verwijderen?';
-
-  @override
-  String get none => 'Geen';
 
   @override
   String get attachFile => 'Bestand bijvoegen';
@@ -416,28 +353,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get bold => 'Vet';
 
   @override
-  String get italic => 'Cursief';
-
-  @override
   String get underline => 'Onderstreept';
 
   @override
   String get strikethrough => 'Doorgehaald';
 
   @override
-  String get link => 'Link';
-
-  @override
-  String get image => 'Afbeelding';
-
-  @override
   String get video => 'Video';
-
-  @override
-  String get quote => 'Citaat';
-
-  @override
-  String get code => 'Code';
 
   @override
   String get spoiler => 'Spoiler';
@@ -452,11 +374,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get listItem => 'Lijstitem';
 
   @override
-  String participants(int count) {
-    return 'Deelnemers ($count)';
-  }
-
-  @override
   String get markAsUnread => 'Markeren als ongelezen';
 
   @override
@@ -467,16 +384,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voer zoekwoorden in om topics te zoeken...';
 
   @override
-  String get refresh => 'Vernieuwen';
-
-  @override
-  String get share => 'Delen';
-
-  @override
   String get viewOnWeb => 'Bekijken op web';
-
-  @override
-  String get reply => 'Beantwoorden';
 
   @override
   String get vote => 'Stemmen';
@@ -522,9 +430,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get light => 'Licht';
 
   @override
-  String get dark => 'Donker';
-
-  @override
   String get appearance => 'Weergave';
 
   @override
@@ -546,9 +451,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get home => 'Start';
-
-  @override
-  String get notifications => 'Meldingen';
 
   @override
   String get notificationsTab => 'Meldingen';
@@ -631,16 +533,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get edit => 'Bewerken';
-
-  @override
-  String get remove => 'Verwijderen';
-
-  @override
   String get subject => 'Onderwerp';
-
-  @override
-  String get message => 'Bericht';
 
   @override
   String get titleCannotBeEmpty => 'Titel mag niet leeg zijn';
@@ -670,11 +563,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return 'Fout bij downloaden $filename: $error';
-  }
-
-  @override
-  String couldNotOpenLink(String error) {
-    return 'Kon link niet openen: $error';
   }
 
   @override
@@ -742,39 +630,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String timeGapDaysLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count dagen later',
-      one: '1 dag later',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapMonthsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count maanden later',
-      one: '1 maand later',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapYearsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count jaar later',
-      one: '1 jaar later',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get profileViews => 'Weergaven';
 
   @override
@@ -807,12 +662,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Alle meldingen gemarkeerd als gelezen';
 
   @override
-  String get apply => 'Toepassen';
-
-  @override
-  String get bookmarks => 'Bladwijzers';
-
-  @override
   String reviewableBy(String username) {
     return 'Door $username';
   }
@@ -828,9 +677,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get clearReminder => 'Herinnering verwijderen';
-
-  @override
-  String get copy => 'Kopiëren';
 
   @override
   String get copyLink => 'Link kopiëren';
@@ -863,9 +709,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get deleteMessageQuestion => 'Bericht verwijderen?';
 
   @override
-  String get discard => 'Verwerpen';
-
-  @override
   String get doNotDisturb => 'Niet storen';
 
   @override
@@ -892,9 +735,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get failedToUpdateNotificationLevel =>
       'Meldingsniveau bijwerken mislukt';
-
-  @override
-  String get firstPostsOnly => 'Alleen eerste berichten';
 
   @override
   String get ignoredUsers => 'Genegeerde gebruikers';
@@ -979,9 +819,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pushNotifications => 'Pushmeldingen';
 
   @override
-  String get relevance => 'Relevantie';
-
-  @override
   String get reminderTimeMustBeInFuture =>
       'De herinneringstijd moet in de toekomst liggen';
 
@@ -1006,9 +843,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String requestToJoinGroup(String group) {
     return 'Lidmaatschap van $group aanvragen';
   }
-
-  @override
-  String get reset => 'Herstellen';
 
   @override
   String get resizeAndUpload => 'Verkleinen en uploaden';
@@ -1060,9 +894,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return 'Je negeert @$username niet meer';
   }
-
-  @override
-  String get titleOnly => 'Alleen titel';
 
   @override
   String get tomorrow => 'Morgen';
@@ -1154,9 +985,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get pleaseLoginToViewUserProfiles =>
       'Meld je aan om gebruikersprofielen te bekijken.';
-
-  @override
-  String get solved => 'Opgelost';
 
   @override
   String get hot => 'Populair';
@@ -1251,9 +1079,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get openConversationConfirmation =>
       'Dit bericht openen? Nieuwe antwoorden zijn dan weer mogelijk.';
-
-  @override
-  String get open => 'Openen';
 
   @override
   String get leaveConversation3 => 'Bericht verlaten';
@@ -1361,17 +1186,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String participantCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count deelnemers',
-      one: '1 deelnemer',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get chatChannels => 'Kanalen';
 
   @override
@@ -1472,13 +1286,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get takePhoto => 'Foto maken';
 
   @override
-  String get postNeedsApprovalTitle => 'Bericht vereist goedkeuring';
-
-  @override
-  String get postNeedsApprovalBody =>
-      'We hebben je nieuwe bericht ontvangen, maar dit moet eerst door een moderator worden goedgekeurd voordat het zichtbaar wordt. Heb geduld.';
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return 'Maximaal $count bijlage(n) toegestaan';
   }
@@ -1569,12 +1376,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get searchUser => 'Gebruiker zoeken';
 
   @override
-  String get tapToOpen => 'Tik om te openen';
-
-  @override
-  String get imageNotAvailable => 'Afbeelding niet beschikbaar';
-
-  @override
   String postsCount(Object count) {
     return '$count berichten';
   }
@@ -1659,9 +1460,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noReactionsYet => 'Nog geen reacties';
 
   @override
-  String get searchFilters => 'Zoekfilters';
-
-  @override
   String get suggestedTopics => 'Voorgestelde topics';
 
   @override
@@ -1695,9 +1493,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => 'Categorieën laden mislukt.';
-
-  @override
-  String get tags => 'Tags';
 
   @override
   String get community => 'Community';
@@ -2046,18 +1841,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get createTopic => 'Topic maken';
 
   @override
-  String get discardPostQuestion => 'Wil je je bericht weggooien?';
-
-  @override
-  String get discardChangesQuestion => 'Wil je je wijzigingen negeren?';
-
-  @override
-  String get discardChanges => 'Wijzigingen negeren';
-
-  @override
-  String get saveDraft => 'Concept opslaan';
-
-  @override
   String get notificationSettings => 'Meldingsinstellingen';
 
   @override
@@ -2144,50 +1927,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get dismissedTopics => 'Genegeerd';
-
-  @override
-  String topicMapViews(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'weergaven',
-      one: 'weergave',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLikes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'likes',
-      one: 'like',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLinks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'links',
-      one: 'link',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapUsers(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'gebruikers',
-      one: 'gebruiker',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get markAsSolution => 'Markeren als oplossing';
@@ -2733,12 +2472,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get coverRemoved => 'Omslag verwijderd';
 
   @override
-  String get day => 'Dag';
-
-  @override
-  String get month => 'Maand';
-
-  @override
   String get displayName => 'Weergavenaam';
 
   @override
@@ -2998,9 +2731,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get yourPhoto => 'Je foto';
 
   @override
-  String get chooseEmoji => 'Emoji kiezen';
-
-  @override
   String get clearStatus => 'Status wissen';
 
   @override
@@ -3023,9 +2753,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get removeStatusAfter => 'Status verwijderen';
-
-  @override
-  String get searchEmoji => 'Emoji zoeken';
 
   @override
   String get setStatus => 'Status instellen';
@@ -3478,16 +3205,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get signUp => 'Registreren';
 
   @override
-  String get suspendUser => 'Gebruiker schorsen';
-
-  @override
   String get unsuspend => 'Schorsing opheffen';
-
-  @override
-  String get suspendUntil => 'Gebruiker schorsen tot';
-
-  @override
-  String get suspendForever => 'Voor altijd schorsen';
 
   @override
   String failedToSuspendUser(String error) {
@@ -3500,39 +3218,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get suspendReasonNotListening =>
-      'Wilde niet naar feedback van medewerkers luisteren';
-
-  @override
-  String get suspendReasonStaffTime =>
-      'Heeft onevenredig veel tijd van medewerkers verbruikt';
-
-  @override
-  String get suspendReasonCombative => 'Te strijdlustig';
-
-  @override
-  String get suspendReasonWrongPlace => 'Op de verkeerde plek';
-
-  @override
-  String get suspendReasonNoPurpose =>
-      'Geen constructief doel voor hun acties, anders dan het creëren van onenigheid binnen de community';
-
-  @override
-  String get suspendReasonCustom => 'Aangepast…';
-
-  @override
-  String get suspendReasonQuestion =>
-      'Waarom schors je? Deze tekst wordt aan de gebruiker weergegeven wanneer deze zich probeert aan te melden. Houd het kort.';
-
-  @override
-  String get closedLabel => 'Gesloten';
-
-  @override
   String get flaggingPost => 'Bericht markeren…';
-
-  @override
-  String get pleaseSelectSuspensionEndDate =>
-      'Kies wanneer de schorsing eindigt';
 
   @override
   String get suspendingUser => 'Gebruiker schorsen…';
@@ -3723,9 +3409,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noForumDescription => 'Geen beschrijving beschikbaar.';
 
   @override
-  String get dismissAllNotifications => 'Alles negeren';
-
-  @override
   String get notificationPostIdMissing =>
       'Bericht-ID ontbreekt. Kan niet naar het bericht gaan.';
 
@@ -3854,76 +3537,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get searchFiltersButtonTooltip => 'Filters';
-
-  @override
-  String get searchFilterStatusSection => 'Status';
-
-  @override
-  String get searchFilterMyActivitySection => 'Mijn activiteit';
-
-  @override
-  String get searchFilterMatchTypeSection => 'Soort overeenkomst';
-
-  @override
-  String get searchTagsFilterHelper =>
-      'Gescheiden door spaties of komma\'s. Elke tag is vereist.';
-
-  @override
-  String get searchSortBy => 'Sorteren op';
-
-  @override
-  String get searchStatusOpen => 'Open';
-
-  @override
-  String get searchStatusArchived => 'Gearchiveerd';
-
-  @override
-  String get searchStatusNoReplies => 'Zonder antwoorden';
-
-  @override
-  String get searchStatusPublicOnly => 'Alleen openbaar';
-
-  @override
-  String get searchStatusUnsolved => 'Onopgelost';
-
-  @override
-  String get searchInBookmarked => 'Met bladwijzer';
-
-  @override
-  String get searchInMyMessages => 'In mijn berichten';
-
-  @override
-  String get searchInLiked => 'Door mij geliket';
-
-  @override
-  String get searchInPosted => 'Waarin ik iets heb geplaatst';
-
-  @override
-  String get searchInWatching => 'Die ik observeer';
-
-  @override
-  String get searchInTracking => 'Die ik volg';
-
-  @override
-  String get searchInSeen => 'Die ik heb gelezen';
-
-  @override
-  String get searchInUnseen => 'Die ik niet heb gelezen';
-
-  @override
-  String get searchSortLatestPost => 'Nieuwste bericht';
-
-  @override
-  String get searchSortMostLiked => 'Meest geliket';
-
-  @override
-  String get searchSortMostViewed => 'Meest bekeken';
-
-  @override
-  String get searchSortLatestTopic => 'Nieuwste topic';
-
-  @override
-  String get searchFieldHint => 'Zoeken…';
 
   @override
   String get bookmarksUnavailable => 'Bladwijzers zijn niet beschikbaar';
@@ -4565,12 +4178,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get postLikeAction => 'Bericht liken';
-
-  @override
-  String get postUnlikeAction => 'Like ongedaan maken';
-
-  @override
   String get postVoteRemoveFailed =>
       'Stem verwijderen mislukt (tijd om ongedaan te maken verstreken?)';
 
@@ -4901,10 +4508,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get passwordFieldLabel => 'Wachtwoord';
-
-  @override
-  String get somethingWentWrongTryAgain =>
-      'Er ging iets mis. Probeer het opnieuw.';
 
   @override
   String get unexpectedErrorTryAgain =>

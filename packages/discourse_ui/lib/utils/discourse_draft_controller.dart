@@ -10,6 +10,7 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 
 import '../core/logging/app_logger.dart';
 import '../l10n/app_l10n.dart';
+import '../l10n/kit_strings.dart';
 
 /// Wraps a pair of [TextEditingController]s (title + content) and
 /// transparently mirrors their contents to a server-side draft at the
@@ -158,7 +159,7 @@ class DiscourseDraftController {
       _ensureSession();
       if (!result.result) {
         throw Exception(
-            result.resultText ?? appL10n().somethingWentWrongTryAgain);
+            result.resultText ?? appL10n().kit.somethingWentWrongTryAgain);
       }
       final draft = result.draft;
       _sequence = draft?.sequence ?? 0;
@@ -226,7 +227,7 @@ class DiscourseDraftController {
     await initialize();
     _ensureSession();
     if (!_loaded) {
-      throw _loadError ?? Exception(appL10n().somethingWentWrongTryAgain);
+      throw _loadError ?? Exception(appL10n().kit.somethingWentWrongTryAgain);
     }
   }
 
@@ -399,7 +400,7 @@ class DiscourseDraftController {
       _ensureSession();
       if (!result.result) {
         throw Exception(
-            result.resultText ?? appL10n().somethingWentWrongTryAgain);
+            result.resultText ?? appL10n().kit.somethingWentWrongTryAgain);
       }
       if (result.sequence != null) _sequence = result.sequence!;
     }
@@ -467,7 +468,7 @@ class DiscourseDraftController {
     _ensureSession();
     if (!result.result) {
       throw Exception(
-          result.resultText ?? appL10n().somethingWentWrongTryAgain);
+          result.resultText ?? appL10n().kit.somethingWentWrongTryAgain);
     }
   }
 

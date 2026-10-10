@@ -8,6 +8,7 @@ import '../../utils/post_reactions.dart';
 import '../widgets/reaction_glyph.dart';
 import '../../theme/forum_colors.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Action row under a post, laid out as Discourse web's post menu: the
 /// "N replies" disclosure ([leading]) on the left, the actions packed on
@@ -314,7 +315,7 @@ class _ReactButton extends StatelessWidget {
         onTap: onTap,
         onLongPress: longPress,
         semanticLabel: !liked
-            ? l10n.postLikeAction
+            ? l10n.kit.postLikeAction
             : locked
                 ? l10n.reactionButtonLocked(reactionDisplayName(mine.id))
                 : l10n.reactionButtonRemoveLike,

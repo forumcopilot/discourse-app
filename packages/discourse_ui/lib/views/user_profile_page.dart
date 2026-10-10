@@ -15,6 +15,7 @@ import '../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../utils/error_message.dart';
 import 'package:discourse_ui/l10n/app_l10n.dart';
+import '../l10n/kit_strings.dart';
 
 class UserProfilePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -205,7 +206,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     Icon(Icons.share_outlined,
                         color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: DesignTokens.spacingM),
-                    Text(AppLocalizations.of(context)!.share),
+                    Text(AppLocalizations.of(context)!.kit.share),
                   ]),
                 ),
                 PopupMenuItem<String>(
@@ -263,7 +264,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                         const SizedBox(width: DesignTokens.spacingM),
                         Text(
-                          _userInfo!.isBanned ? AppLocalizations.of(context)!.unsuspend : AppLocalizations.of(context)!.suspendUser,
+                          _userInfo!.isBanned ? AppLocalizations.of(context)!.unsuspend : AppLocalizations.of(context)!.kit.suspendUser,
                         ),
                       ],
                     ),
@@ -550,7 +551,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -709,7 +710,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
+            child: Text(l10n.kit.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),

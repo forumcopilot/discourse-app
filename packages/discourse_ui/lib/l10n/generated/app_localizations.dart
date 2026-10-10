@@ -128,24 +128,6 @@ abstract class AppLocalizations {
   /// **'Your sign-in changed. Copy your text before reopening the composer to work with drafts.'**
   String get draftSessionChanged;
 
-  /// After Discard failed (offline, or the sign-in changed): offer to close the composer without discarding; an earlier saved draft is kept.
-  ///
-  /// In en, this message translates to:
-  /// **'Close anyway? A draft saved earlier stays in Drafts.'**
-  String get discardFailedCloseQuestion;
-
-  /// Button: stay in the composer.
-  ///
-  /// In en, this message translates to:
-  /// **'Keep editing'**
-  String get keepEditing;
-
-  /// Button: close the composer although its draft could not be discarded.
-  ///
-  /// In en, this message translates to:
-  /// **'Close anyway'**
-  String get closeAnyway;
-
   /// An attachment upload overlapped a logout or credential change; its result cannot be used in the current session.
   ///
   /// In en, this message translates to:
@@ -188,12 +170,6 @@ abstract class AppLocalizations {
   /// **'Error'**
   String get errorTitle;
 
-  /// No description provided for @okButton.
-  ///
-  /// In en, this message translates to:
-  /// **'OK'**
-  String get okButton;
-
   /// No description provided for @retryButton.
   ///
   /// In en, this message translates to:
@@ -206,12 +182,6 @@ abstract class AppLocalizations {
   /// **'Copy to Clipboard'**
   String get copyToClipboard;
 
-  /// No description provided for @copied.
-  ///
-  /// In en, this message translates to:
-  /// **'Copied'**
-  String get copied;
-
   /// No description provided for @errorMessageCopiedToClipboard.
   ///
   /// In en, this message translates to:
@@ -223,18 +193,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dismiss'**
   String get dismiss;
-
-  /// No description provided for @cancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
-
-  /// No description provided for @tryAgain.
-  ///
-  /// In en, this message translates to:
-  /// **'Try Again'**
-  String get tryAgain;
 
   /// No description provided for @anErrorOccurred.
   ///
@@ -356,12 +314,6 @@ abstract class AppLocalizations {
   /// **'You need to be signed in to view your unread topics.'**
   String get youNeedToBeSignedInToViewUnreadTopics;
 
-  /// No description provided for @latest.
-  ///
-  /// In en, this message translates to:
-  /// **'Latest'**
-  String get latest;
-
   /// No description provided for @unread.
   ///
   /// In en, this message translates to:
@@ -398,18 +350,6 @@ abstract class AppLocalizations {
   /// **'New Message'**
   String get newConversation;
 
-  /// Settings section title for language selection
-  ///
-  /// In en, this message translates to:
-  /// **'Language'**
-  String get language;
-
-  /// No description provided for @all.
-  ///
-  /// In en, this message translates to:
-  /// **'All'**
-  String get all;
-
   /// No description provided for @topicsOnly.
   ///
   /// In en, this message translates to:
@@ -440,12 +380,6 @@ abstract class AppLocalizations {
   /// **'Please wait for the topic to load'**
   String get pleaseWaitForThreadToLoad;
 
-  /// No description provided for @reason.
-  ///
-  /// In en, this message translates to:
-  /// **'Reason'**
-  String get reason;
-
   /// Label for participants (without count)
   ///
   /// In en, this message translates to:
@@ -469,18 +403,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New Topic'**
   String get newTopic;
-
-  /// No description provided for @pleaseSpecifyReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Please specify the reason'**
-  String get pleaseSpecifyReason;
-
-  /// No description provided for @selectDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Select date'**
-  String get selectDate;
 
   /// No description provided for @moreOptions.
   ///
@@ -584,12 +506,6 @@ abstract class AppLocalizations {
   /// **'No subject'**
   String get noSubject;
 
-  /// No description provided for @search.
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get search;
-
   /// No description provided for @logout.
   ///
   /// In en, this message translates to:
@@ -626,29 +542,11 @@ abstract class AppLocalizations {
   /// **'Profile'**
   String get profile;
 
-  /// No description provided for @messages.
-  ///
-  /// In en, this message translates to:
-  /// **'Messages'**
-  String get messages;
-
-  /// No description provided for @add.
-  ///
-  /// In en, this message translates to:
-  /// **'Add'**
-  String get add;
-
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:
   /// **'Retry'**
   String get retry;
-
-  /// No description provided for @delete.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete'**
-  String get delete;
 
   /// No description provided for @deleteMessage.
   ///
@@ -758,12 +656,6 @@ abstract class AppLocalizations {
   /// **'Next'**
   String get next;
 
-  /// No description provided for @temporary.
-  ///
-  /// In en, this message translates to:
-  /// **'Temporary'**
-  String get temporary;
-
   /// No description provided for @back.
   ///
   /// In en, this message translates to:
@@ -776,12 +668,6 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get confirm;
 
-  /// Generic error message
-  ///
-  /// In en, this message translates to:
-  /// **'Error: {error}'**
-  String error(String error);
-
   /// No description provided for @removeAttachment.
   ///
   /// In en, this message translates to:
@@ -793,12 +679,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to remove this attachment?'**
   String get areYouSureYouWantToRemoveThisAttachment;
-
-  /// No description provided for @none.
-  ///
-  /// In en, this message translates to:
-  /// **'None'**
-  String get none;
 
   /// Accessibility label for attach file button
   ///
@@ -824,12 +704,6 @@ abstract class AppLocalizations {
   /// **'Bold'**
   String get bold;
 
-  /// No description provided for @italic.
-  ///
-  /// In en, this message translates to:
-  /// **'Italic'**
-  String get italic;
-
   /// No description provided for @underline.
   ///
   /// In en, this message translates to:
@@ -842,35 +716,11 @@ abstract class AppLocalizations {
   /// **'Strikethrough'**
   String get strikethrough;
 
-  /// No description provided for @link.
-  ///
-  /// In en, this message translates to:
-  /// **'Link'**
-  String get link;
-
-  /// No description provided for @image.
-  ///
-  /// In en, this message translates to:
-  /// **'Image'**
-  String get image;
-
   /// No description provided for @video.
   ///
   /// In en, this message translates to:
   /// **'Video'**
   String get video;
-
-  /// No description provided for @quote.
-  ///
-  /// In en, this message translates to:
-  /// **'Quote'**
-  String get quote;
-
-  /// No description provided for @code.
-  ///
-  /// In en, this message translates to:
-  /// **'Code'**
-  String get code;
 
   /// No description provided for @spoiler.
   ///
@@ -896,12 +746,6 @@ abstract class AppLocalizations {
   /// **'List Item'**
   String get listItem;
 
-  /// Participants count with label
-  ///
-  /// In en, this message translates to:
-  /// **'Participants ({count})'**
-  String participants(int count);
-
   /// No description provided for @markAsUnread.
   ///
   /// In en, this message translates to:
@@ -920,29 +764,11 @@ abstract class AppLocalizations {
   /// **'Enter keywords to search topics...'**
   String get enterKeywordsToSearchTopics;
 
-  /// Menu item to refresh content
-  ///
-  /// In en, this message translates to:
-  /// **'Refresh'**
-  String get refresh;
-
-  /// Menu item to share content
-  ///
-  /// In en, this message translates to:
-  /// **'Share'**
-  String get share;
-
   /// Menu item to view content on web browser
   ///
   /// In en, this message translates to:
   /// **'View on Web'**
   String get viewOnWeb;
-
-  /// Button to reply to a post or message
-  ///
-  /// In en, this message translates to:
-  /// **'Reply'**
-  String get reply;
 
   /// Button to submit poll vote
   ///
@@ -1004,12 +830,6 @@ abstract class AppLocalizations {
   /// **'Light'**
   String get light;
 
-  /// Dark theme option
-  ///
-  /// In en, this message translates to:
-  /// **'Dark'**
-  String get dark;
-
   /// Drawer row and sheet title for choosing light, dark or the device's setting
   ///
   /// In en, this message translates to:
@@ -1051,12 +871,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Home'**
   String get home;
-
-  /// Notifications tab title
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
-  String get notifications;
 
   /// Short bottom navigation label for Notifications. Keep concise so it fits on narrow phones with larger text.
   ///
@@ -1196,29 +1010,11 @@ abstract class AppLocalizations {
   /// **'Enter {count}-digit code'**
   String enterCode(int count);
 
-  /// Button text to edit
-  ///
-  /// In en, this message translates to:
-  /// **'Edit'**
-  String get edit;
-
-  /// Button text to remove
-  ///
-  /// In en, this message translates to:
-  /// **'Remove'**
-  String get remove;
-
   /// Label for subject field
   ///
   /// In en, this message translates to:
   /// **'Subject'**
   String get subject;
-
-  /// Label for message field
-  ///
-  /// In en, this message translates to:
-  /// **'Message'**
-  String get message;
 
   /// Validation message when title is empty
   ///
@@ -1267,12 +1063,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error downloading {filename}: {error}'**
   String errorDownloading(String filename, String error);
-
-  /// Error message when opening link fails
-  ///
-  /// In en, this message translates to:
-  /// **'Could not open link: {error}'**
-  String couldNotOpenLink(String error);
 
   /// Loading indicator while translating
   ///
@@ -1376,24 +1166,6 @@ abstract class AppLocalizations {
   /// **'in reply to post #{number}'**
   String inReplyToPost(int number);
 
-  /// Divider between posts far apart in time
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 day later} other{{count} days later}}'**
-  String timeGapDaysLater(int count);
-
-  /// Divider between posts far apart in time
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 month later} other{{count} months later}}'**
-  String timeGapMonthsLater(int count);
-
-  /// Divider between posts far apart in time
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 year later} other{{count} years later}}'**
-  String timeGapYearsLater(int count);
-
   /// Profile header stat: how many times the profile was viewed
   ///
   /// In en, this message translates to:
@@ -1436,18 +1208,6 @@ abstract class AppLocalizations {
   /// **'All notifications marked as read'**
   String get allNotificationsMarkedAsRead;
 
-  /// UI text: Apply
-  ///
-  /// In en, this message translates to:
-  /// **'Apply'**
-  String get apply;
-
-  /// UI text: Bookmarks
-  ///
-  /// In en, this message translates to:
-  /// **'Bookmarks'**
-  String get bookmarks;
-
   /// UI text: By {username}
   ///
   /// In en, this message translates to:
@@ -1477,12 +1237,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear reminder'**
   String get clearReminder;
-
-  /// UI text: Copy
-  ///
-  /// In en, this message translates to:
-  /// **'Copy'**
-  String get copy;
 
   /// UI text: Copy link
   ///
@@ -1532,12 +1286,6 @@ abstract class AppLocalizations {
   /// **'Delete message?'**
   String get deleteMessageQuestion;
 
-  /// UI text: Discard
-  ///
-  /// In en, this message translates to:
-  /// **'Discard'**
-  String get discard;
-
   /// UI text: Do not disturb
   ///
   /// In en, this message translates to:
@@ -1585,12 +1333,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to update notification level'**
   String get failedToUpdateNotificationLevel;
-
-  /// UI text: First posts only
-  ///
-  /// In en, this message translates to:
-  /// **'First posts only'**
-  String get firstPostsOnly;
 
   /// UI text: Ignored users
   ///
@@ -1742,12 +1484,6 @@ abstract class AppLocalizations {
   /// **'Push notifications'**
   String get pushNotifications;
 
-  /// UI text: Relevance
-  ///
-  /// In en, this message translates to:
-  /// **'Relevance'**
-  String get relevance;
-
   /// UI text: Reminder time must be in the future
   ///
   /// In en, this message translates to:
@@ -1789,12 +1525,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Request to join {group}'**
   String requestToJoinGroup(String group);
-
-  /// UI text: Reset
-  ///
-  /// In en, this message translates to:
-  /// **'Reset'**
-  String get reset;
 
   /// UI text: Resize and upload
   ///
@@ -1885,12 +1615,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stopped ignoring @{username}'**
   String stoppedIgnoringUser(String username);
-
-  /// UI text: Title only
-  ///
-  /// In en, this message translates to:
-  /// **'Title only'**
-  String get titleOnly;
 
   /// UI text: Tomorrow
   ///
@@ -2047,12 +1771,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please login to view user profiles.'**
   String get pleaseLoginToViewUserProfiles;
-
-  /// UI text: Solved
-  ///
-  /// In en, this message translates to:
-  /// **'Solved'**
-  String get solved;
 
   /// UI text: Hot
   ///
@@ -2215,12 +1933,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open this message? It will accept new replies again.'**
   String get openConversationConfirmation;
-
-  /// UI text: Open
-  ///
-  /// In en, this message translates to:
-  /// **'Open'**
-  String get open;
 
   /// UI text: Leave message
   ///
@@ -2402,12 +2114,6 @@ abstract class AppLocalizations {
   /// **'{group} has been invited to the message'**
   String groupHasBeenInvited(String group);
 
-  /// UI text: N participants
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 participant} other{{count} participants}}'**
-  String participantCount(int count);
-
   /// UI text (Discourse chat): Channels
   ///
   /// In en, this message translates to:
@@ -2582,18 +2288,6 @@ abstract class AppLocalizations {
   /// **'Take photo'**
   String get takePhoto;
 
-  /// Title of the notice shown when a new post is held for moderator approval (Discourse review.approval.title).
-  ///
-  /// In en, this message translates to:
-  /// **'Post Needs Approval'**
-  String get postNeedsApprovalTitle;
-
-  /// Body of that notice (Discourse review.approval.description).
-  ///
-  /// In en, this message translates to:
-  /// **'We\'ve received your new post but it needs to be approved by a moderator before it will appear. Please be patient.'**
-  String get postNeedsApprovalBody;
-
   /// UI text: Maximum of {count} attachment(s) allowed
   ///
   /// In en, this message translates to:
@@ -2738,18 +2432,6 @@ abstract class AppLocalizations {
   /// **'Search User'**
   String get searchUser;
 
-  /// UI text: Tap to open
-  ///
-  /// In en, this message translates to:
-  /// **'Tap to open'**
-  String get tapToOpen;
-
-  /// UI text: Image not available
-  ///
-  /// In en, this message translates to:
-  /// **'Image not available'**
-  String get imageNotAvailable;
-
   /// UI text: {total_posts0} Posts
   ///
   /// In en, this message translates to:
@@ -2872,12 +2554,6 @@ abstract class AppLocalizations {
   /// **'No reactions yet'**
   String get noReactionsYet;
 
-  /// UI text: Search filters
-  ///
-  /// In en, this message translates to:
-  /// **'Search filters'**
-  String get searchFilters;
-
   /// UI text: Suggested Topics
   ///
   /// In en, this message translates to:
@@ -2943,12 +2619,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t load categories.'**
   String get couldNotLoadCategories;
-
-  /// Drawer: Tags
-  ///
-  /// In en, this message translates to:
-  /// **'Tags'**
-  String get tags;
 
   /// Drawer: Community
   ///
@@ -3454,30 +3124,6 @@ abstract class AppLocalizations {
   /// **'Create Topic'**
   String get createTopic;
 
-  /// Asked when a composer with unsaved writing is closed (Discourse post.cancel_composer.confirm).
-  ///
-  /// In en, this message translates to:
-  /// **'Do you want to discard your post?'**
-  String get discardPostQuestion;
-
-  /// Asked when an edit with unsaved changes is closed (Discourse post.cancel_composer.confirm_edit).
-  ///
-  /// In en, this message translates to:
-  /// **'Do you want to discard your changes?'**
-  String get discardChangesQuestion;
-
-  /// Button that throws away unsaved edits (Discourse post.cancel_composer.discard_edit).
-  ///
-  /// In en, this message translates to:
-  /// **'Discard changes'**
-  String get discardChanges;
-
-  /// Button that closes a composer and keeps what was written as a draft.
-  ///
-  /// In en, this message translates to:
-  /// **'Save draft'**
-  String get saveDraft;
-
   /// The drawer row and page for choosing notifications: named apart from the Notifications tab, which lists them.
   ///
   /// In en, this message translates to:
@@ -3591,30 +3237,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dismissed'**
   String get dismissedTopics;
-
-  /// Label under the view count in the summary under a topic's first post; the number is shown above it, not in the string
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{view} other{views}}'**
-  String topicMapViews(int count);
-
-  /// Label under the like count in the summary under a topic's first post; the number is shown above it
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{like} other{likes}}'**
-  String topicMapLikes(int count);
-
-  /// Label under the link count in the summary under a topic's first post; the number is shown above it
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{link} other{links}}'**
-  String topicMapLinks(int count);
-
-  /// Label under the participant count in the summary under a topic's first post; the number is shown above it
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{user} other{users}}'**
-  String topicMapUsers(int count);
 
   /// Post menu item (discourse-solved): mark this reply as the topic's solution. Shown only to the topic's owner and staff
   ///
@@ -4492,18 +4114,6 @@ abstract class AppLocalizations {
   /// **'Cover removed'**
   String get coverRemoved;
 
-  /// Birthday dialog: day of the month
-  ///
-  /// In en, this message translates to:
-  /// **'Day'**
-  String get day;
-
-  /// Birthday dialog: month
-  ///
-  /// In en, this message translates to:
-  /// **'Month'**
-  String get month;
-
   /// Edit profile: the person's name (not their username)
   ///
   /// In en, this message translates to:
@@ -4930,12 +4540,6 @@ abstract class AppLocalizations {
   /// **'Your photo'**
   String get yourPhoto;
 
-  /// Status sheet: the emoji button, and the emoji picker's title
-  ///
-  /// In en, this message translates to:
-  /// **'Choose emoji'**
-  String get chooseEmoji;
-
   /// Status sheet: remove the status now
   ///
   /// In en, this message translates to:
@@ -4983,12 +4587,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove status'**
   String get removeStatusAfter;
-
-  /// Emoji picker: search field
-  ///
-  /// In en, this message translates to:
-  /// **'Search emoji'**
-  String get searchEmoji;
 
   /// Status sheet title
   ///
@@ -5617,26 +5215,8 @@ abstract class AppLocalizations {
   /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
   ///
   /// In en, this message translates to:
-  /// **'Suspend User'**
-  String get suspendUser;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
   /// **'Unsuspend'**
   String get unsuspend;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'Suspend user until'**
-  String get suspendUntil;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'Suspend forever'**
-  String get suspendForever;
 
   /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
   ///
@@ -5650,65 +5230,11 @@ abstract class AppLocalizations {
   /// **'Something went wrong unsuspending this user: {error}'**
   String failedToUnsuspendUser(String error);
 
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'Would not listen to staff feedback'**
-  String get suspendReasonNotListening;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'Consumed disproportionate amounts of staff time'**
-  String get suspendReasonStaffTime;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'Too combative'**
-  String get suspendReasonCombative;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'In the wrong place'**
-  String get suspendReasonWrongPlace;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'No constructive purpose to their actions other than creating dissent within the community'**
-  String get suspendReasonNoPurpose;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'Custom…'**
-  String get suspendReasonCustom;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'Why are you suspending? This text will be shown to the user when they try to log in. Keep it short.'**
-  String get suspendReasonQuestion;
-
-  /// Badge on a closed topic in topic lists
-  ///
-  /// In en, this message translates to:
-  /// **'Closed'**
-  String get closedLabel;
-
   /// Snackbar while a flag is being sent
   ///
   /// In en, this message translates to:
   /// **'Flagging post…'**
   String get flaggingPost;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'Choose when the suspension ends'**
-  String get pleaseSelectSuspensionEndDate;
 
   /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
   ///
@@ -5998,12 +5524,6 @@ abstract class AppLocalizations {
   /// **'No description available.'**
   String get noForumDescription;
 
-  /// Notifications tab app bar: tooltip of the button that marks every notification read (Discourse js.user.dismiss_notifications)
-  ///
-  /// In en, this message translates to:
-  /// **'Dismiss all'**
-  String get dismissAllNotifications;
-
   /// Notifications tab: error dialog when a tapped notification names no post
   ///
   /// In en, this message translates to:
@@ -6219,144 +5739,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Filters'**
   String get searchFiltersButtonTooltip;
-
-  /// Search filters sheet: heading over the topic status chips
-  ///
-  /// In en, this message translates to:
-  /// **'Status'**
-  String get searchFilterStatusSection;
-
-  /// Search filters sheet: heading over the chips about the reader's own activity
-  ///
-  /// In en, this message translates to:
-  /// **'My activity'**
-  String get searchFilterMyActivitySection;
-
-  /// Search filters sheet: heading over the Title only / First posts only chips
-  ///
-  /// In en, this message translates to:
-  /// **'Match type'**
-  String get searchFilterMatchTypeSection;
-
-  /// Search filters sheet: help under the tags field
-  ///
-  /// In en, this message translates to:
-  /// **'Space- or comma-separated. Each tag is required.'**
-  String get searchTagsFilterHelper;
-
-  /// Search filters sheet: heading over the sort chips (Discourse js.search.sort_by)
-  ///
-  /// In en, this message translates to:
-  /// **'Sort by'**
-  String get searchSortBy;
-
-  /// Search filters sheet: status chip, topics that are open
-  ///
-  /// In en, this message translates to:
-  /// **'Open'**
-  String get searchStatusOpen;
-
-  /// Search filters sheet: status chip, topics that are archived
-  ///
-  /// In en, this message translates to:
-  /// **'Archived'**
-  String get searchStatusArchived;
-
-  /// Search filters sheet: status chip, topics with zero replies
-  ///
-  /// In en, this message translates to:
-  /// **'No replies'**
-  String get searchStatusNoReplies;
-
-  /// Search filters sheet: status chip, only public topics
-  ///
-  /// In en, this message translates to:
-  /// **'Public only'**
-  String get searchStatusPublicOnly;
-
-  /// Search filters sheet: status chip, topics without a solution (discourse-solved topic_status_filter.unsolved)
-  ///
-  /// In en, this message translates to:
-  /// **'Unsolved'**
-  String get searchStatusUnsolved;
-
-  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.bookmarks)
-  ///
-  /// In en, this message translates to:
-  /// **'I bookmarked'**
-  String get searchInBookmarked;
-
-  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.private)
-  ///
-  /// In en, this message translates to:
-  /// **'In my messages'**
-  String get searchInMyMessages;
-
-  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.likes)
-  ///
-  /// In en, this message translates to:
-  /// **'I liked'**
-  String get searchInLiked;
-
-  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.posted)
-  ///
-  /// In en, this message translates to:
-  /// **'I posted in'**
-  String get searchInPosted;
-
-  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.watching)
-  ///
-  /// In en, this message translates to:
-  /// **'I\'m watching'**
-  String get searchInWatching;
-
-  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.tracking)
-  ///
-  /// In en, this message translates to:
-  /// **'I\'m tracking'**
-  String get searchInTracking;
-
-  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.seen)
-  ///
-  /// In en, this message translates to:
-  /// **'I read'**
-  String get searchInSeen;
-
-  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.unseen)
-  ///
-  /// In en, this message translates to:
-  /// **'I\'ve not read'**
-  String get searchInUnseen;
-
-  /// Search filters sheet: sort chip (Discourse js.search.latest_post)
-  ///
-  /// In en, this message translates to:
-  /// **'Latest post'**
-  String get searchSortLatestPost;
-
-  /// Search filters sheet: sort chip (Discourse js.search.most_liked)
-  ///
-  /// In en, this message translates to:
-  /// **'Most liked'**
-  String get searchSortMostLiked;
-
-  /// Search filters sheet: sort chip (Discourse js.search.most_viewed)
-  ///
-  /// In en, this message translates to:
-  /// **'Most viewed'**
-  String get searchSortMostViewed;
-
-  /// Search filters sheet: sort chip (Discourse js.search.latest_topic)
-  ///
-  /// In en, this message translates to:
-  /// **'Latest topic'**
-  String get searchSortLatestTopic;
-
-  /// Default placeholder of the app's search fields (Discourse js.multi_select.search)
-  ///
-  /// In en, this message translates to:
-  /// **'Search...'**
-  String get searchFieldHint;
 
   /// Bookmarks page: error when the forum's bookmarks cannot be reached at all
   ///
@@ -7396,18 +6778,6 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{{reaction}, 1 person} other{{reaction}, {count} people}}'**
   String reactionFilterSemantics(String reaction, int count);
 
-  /// Screen-reader label of a post's like (heart) button when the reader has not liked it
-  ///
-  /// In en, this message translates to:
-  /// **'Like post'**
-  String get postLikeAction;
-
-  /// Screen-reader label of a post's like (heart) button when the reader has liked it
-  ///
-  /// In en, this message translates to:
-  /// **'Unlike post'**
-  String get postUnlikeAction;
-
   /// Snackbar when taking back an up/down vote on a post (discourse-post-voting) fails and the server gave no reason
   ///
   /// In en, this message translates to:
@@ -7979,12 +7349,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password'**
   String get passwordFieldLabel;
-
-  /// Generic error message when an error has no readable text of its own
-  ///
-  /// In en, this message translates to:
-  /// **'Something went wrong. Please try again.'**
-  String get somethingWentWrongTryAgain;
 
   /// Error dialog: message for an unexpected error
   ///

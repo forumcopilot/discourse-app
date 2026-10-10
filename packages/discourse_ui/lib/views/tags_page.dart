@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'tabs/tags_tab.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../l10n/kit_strings.dart';
 
 /// Standalone wrapper around `TagsTab` for full-page navigation.
 ///
@@ -24,7 +25,7 @@ class TagsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SimpleListAppBar(title: AppLocalizations.of(context)!.tags),
+      appBar: SimpleListAppBar(title: AppLocalizations.of(context)!.kit.tags),
       body: TagsTab(
         isActive: true,
         siteContext: siteContext,

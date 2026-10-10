@@ -10,6 +10,7 @@ import '../../services/site_proxy_service.dart';
 import '../../theme/design_tokens.dart';
 import '../widgets/user_avatar.dart';
 import '../widgets/user_list_row.dart';
+import '../../l10n/kit_strings.dart';
 
 /// "New message" bottom sheet: people and groups from the chat plugin's
 /// own search, picked as chips, plus plain comma-separated names. One person
@@ -350,7 +351,7 @@ class _ChatPeopleSheetState extends State<ChatPeopleSheet> {
             children: [
               TextButton(
                 onPressed: _creating ? null : () => Navigator.of(context).pop(),
-                child: Text(AppLocalizations.of(context)!.cancel),
+                child: Text(AppLocalizations.of(context)!.kit.cancel),
               ),
               const SizedBox(width: DesignTokens.spacingS),
               FilledButton(

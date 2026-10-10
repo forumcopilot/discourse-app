@@ -11,6 +11,7 @@ import 'site_home_tab.dart';
 import 'tabs/notification_list_tab.dart';
 import 'tabs/topic_list_tab.dart';
 import 'user_profile_page.dart';
+import '../l10n/kit_strings.dart';
 
 /// One of the forum home's lists as a page of its own: where a link to the
 /// forum's topics, its categories, the inbox or the notifications leads from
@@ -66,14 +67,14 @@ class ForumListPage extends StatelessWidget {
           CategoriesList(siteContext: siteContext, standalone: true),
         ),
       SiteHomeTab.inbox || SiteHomeTab.messages => (
-          l10n.messages,
+          l10n.kit.messages,
           PrivateMessageListTab(
               siteContext: siteContext,
               isActive: true,
               initialGroup: messageGroup),
         ),
       SiteHomeTab.notifications || SiteHomeTab.profile => (
-          l10n.notifications,
+          l10n.kit.notifications,
           NotificationListTab(siteContext: siteContext, isActive: true),
         ),
     };

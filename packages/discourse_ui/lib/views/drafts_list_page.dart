@@ -24,6 +24,7 @@ import '../utils/error_message.dart';
 import '../utils/snackbar_helper.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../l10n/kit_strings.dart';
 
 /// Discourse-native drafts list (`/drafts.json`). Surfaces all of the
 /// current user's saved drafts — new topics, replies, and PMs.
@@ -470,7 +471,7 @@ class _DraftTile extends StatelessWidget {
         .where((s) => s.isNotEmpty)
         .toList();
     final what = switch (kind) {
-      _DraftKind.reply => l10n.reply,
+      _DraftKind.reply => l10n.kit.reply,
       _DraftKind.newTopic => l10n.draftKindNewTopic,
       _DraftKind.message => recipients.isEmpty
           ? l10n.newConversation
@@ -557,7 +558,7 @@ class _DraftTile extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  tooltip: l10n.discard,
+                  tooltip: l10n.kit.discard,
                   color: colorScheme.onSurfaceVariant,
                   onPressed: onDiscard,
                 ),

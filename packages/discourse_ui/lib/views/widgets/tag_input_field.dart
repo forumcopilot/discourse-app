@@ -6,6 +6,7 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
+import '../../l10n/kit_strings.dart';
 
 /// A composer-friendly tag input: text field + chip row + autocomplete
 /// menu backed by `/tags/filter/search.json`.
@@ -177,7 +178,7 @@ class _TagInputFieldState extends State<TagInputField> {
           focusNode: _focusNode,
           enabled: !atCap,
           decoration: InputDecoration(
-            labelText: widget.label ?? l10n.tags,
+            labelText: widget.label ?? l10n.kit.tags,
             hintText: atCap
                 ? l10n.tagInputMaxReached
                 : (_tags.isEmpty

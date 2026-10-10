@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../users_directory_page.dart';
+import '../../l10n/kit_strings.dart';
 
 class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final SiteContext siteContext;
@@ -25,7 +26,7 @@ class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       // back button instead. Same widget, right leading icon in both
       // contexts.
       title: Text(
-        AppLocalizations.of(context)!.messages,
+        AppLocalizations.of(context)!.kit.messages,
       ),
       actions: [
         if (isLoggedIn) _buildMembersButton(context, colorScheme),

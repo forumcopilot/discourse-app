@@ -13,6 +13,7 @@ import '../user_search_page.dart';
 import '../widgets/sheet_title.dart';
 import '../widgets/user_avatar.dart';
 import '../../utils/app_navigation.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Who is on a private message — its groups first, as Discourse lists them,
 /// then its people — with Invite when the viewer may add someone.
@@ -78,7 +79,7 @@ class MessageParticipantsSheet {
                         trailing: canRemove && conversationId != null
                             ? IconButton(
                                 icon: const Icon(Icons.group_remove_outlined),
-                                tooltip: l10n.remove,
+                                tooltip: l10n.kit.remove,
                                 onPressed: () => _remove(sheet, conversationId,
                                     group.name, group.label,
                                     isGroup: true, onRemoved: onInviteSuccess),
@@ -103,7 +104,7 @@ class MessageParticipantsSheet {
                         trailing: removable(p.username)
                             ? IconButton(
                                 icon: const Icon(Icons.person_remove_outlined),
-                                tooltip: l10n.remove,
+                                tooltip: l10n.kit.remove,
                                 onPressed: () => _remove(sheet,
                                     conversationId!, p.username, p.username,
                                     isGroup: false, onRemoved: onInviteSuccess),
@@ -152,11 +153,11 @@ class MessageParticipantsSheet {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialog, false),
-            child: Text(l10n.cancel),
+            child: Text(l10n.kit.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialog, true),
-            child: Text(l10n.remove),
+            child: Text(l10n.kit.remove),
           ),
         ],
       ),

@@ -1,9 +1,6 @@
 {
   "accountSessionChanged": "Je aanmelding is gewijzigd. Open dit scherm opnieuw om verder te gaan.",
   "draftSessionChanged": "Je aanmelding is gewijzigd. Kopieer je tekst voordat je de editor opnieuw opent om met concepten te werken.",
-  "discardFailedCloseQuestion": "Toch sluiten? Een eerder opgeslagen concept blijft bij Concepten.",
-  "keepEditing": "Verder bewerken",
-  "closeAnyway": "Toch sluiten",
   "uploadSessionChanged": "Je aanmelding is tijdens het uploaden gewijzigd. Open dit scherm opnieuw voordat je het nogmaals probeert.",
   "@@locale": "nl",
   "submissionUnconfirmed": "We konden niet bevestigen dat dit is verzonden. Je tekst is behouden. Controleer het forum voordat je het opnieuw probeert.",
@@ -12,14 +9,10 @@
   "passkeyContinuePrompt": "Use your passkey to continue",
   "continueButton": "Doorgaan",
   "errorTitle": "Fout",
-  "okButton": "OK",
   "retryButton": "Opnieuw",
   "copyToClipboard": "Kopiëren naar klembord",
-  "copied": "Gekopieerd",
   "errorMessageCopiedToClipboard": "Foutbericht gekopieerd naar klembord",
   "dismiss": "Sluiten",
-  "cancel": "Annuleren",
-  "tryAgain": "Opnieuw proberen",
   "anErrorOccurred": "Er is een fout opgetreden",
   "accountPendingApproval": "Je account wacht op goedkeuring. Je kunt het forum bekijken, maar niet posten tot een moderator je account goedkeurt.",
   "checkEmailToConfirm": "Controleer je e-mail om je account te bevestigen. Klik op de bevestigingslink in de e-mail die we je hebben gestuurd.",
@@ -40,7 +33,6 @@
   "youAreAllCaughtUp": "Je bent helemaal bij!",
   "signInToViewUnreadTopics": "Log in om ongelezen topics te bekijken",
   "youNeedToBeSignedInToViewUnreadTopics": "Je moet aangemeld zijn om je ongelezen topics te bekijken.",
-  "latest": "Nieuwste",
   "unread": "Ongelezen",
   "failedToConnectToSite": "Kon geen verbinding maken met de site. De site kan offline of onbereikbaar zijn.",
   "connectionFailed": "Verbinding mislukt",
@@ -55,8 +47,6 @@
   },
   "loading": "Laden...",
   "newConversation": "Nieuw bericht",
-  "language": "Taal",
-  "all": "Alles",
   "topicsOnly": "Alleen topics",
   "titlesOnly": "Alleen titels",
   "failedToShareTopic": "Kon topic niet delen: {error}",
@@ -72,7 +62,6 @@
   "unsubscribeFrom": "abonnement opzeggen van",
   "youCannotReplyToThisThread": "Je kunt niet op dit topic antwoorden",
   "pleaseWaitForThreadToLoad": "Wacht tot het topic is geladen",
-  "reason": "Reden",
   "participantsLabel": "Deelnemers",
   "@participantsLabel": {
     "description": "Label for participants (without count)"
@@ -96,8 +85,6 @@
     }
   },
   "newTopic": "Nieuw topic",
-  "pleaseSpecifyReason": "Geef de reden op",
-  "selectDate": "Selecteer datum",
   "moreOptions": "Meer opties",
   "topicClosed": "Topic gesloten",
   "topicOpened": "Topic geopend",
@@ -132,17 +119,13 @@
     }
   },
   "noSubject": "Geen onderwerp",
-  "search": "Zoeken",
   "logout": "Uitloggen",
   "areYouSureYouWantToLogout": "Weet je zeker dat je je wilt afmelden?",
   "signIn": "Inloggen",
   "notificationTest": "Meldingstest",
   "forum": "Categorie",
   "profile": "Profiel",
-  "messages": "Berichten",
-  "add": "Toevoegen",
   "retry": "Opnieuw",
-  "delete": "Verwijderen",
   "deleteMessage": "Bericht verwijderen",
   "deletingPost": "Bericht verwijderen...",
   "failedToUnlikePost": "Kon bericht niet unliken: {error}",
@@ -193,64 +176,27 @@
   "location": "Locatie",
   "website": "Website",
   "next": "Volgende",
-  "temporary": "Tijdelijk",
   "back": "Terug",
   "confirm": "Bevestigen",
-  "error": "Fout: {error}",
-  "@error": {
-    "description": "Generic error message",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "removeAttachment": "Bijlage verwijderen",
   "areYouSureYouWantToRemoveThisAttachment": "Weet je zeker dat je deze bijlage wilt verwijderen?",
-  "none": "Geen",
   "attachFile": "Bestand bijvoegen",
   "uploadImage": "Afbeelding uploaden",
   "formatting": "Opmaak",
   "bold": "Vet",
-  "italic": "Cursief",
   "underline": "Onderstreept",
   "strikethrough": "Doorgehaald",
-  "link": "Link",
-  "image": "Afbeelding",
   "video": "Video",
-  "quote": "Citaat",
-  "code": "Code",
   "spoiler": "Spoiler",
   "bulletList": "Opsomming",
   "numberedList": "Genummerde lijst",
   "listItem": "Lijstitem",
-  "participants": "Deelnemers ({count})",
-  "@participants": {
-    "description": "Participants count with label",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "markAsUnread": "Markeren als ongelezen",
   "invite": "Uitnodigen",
   "enterKeywordsToSearchTopics": "Voer zoekwoorden in om topics te zoeken...",
-  "refresh": "Vernieuwen",
-  "@refresh": {
-    "description": "Menu item to refresh content"
-  },
-  "share": "Delen",
-  "@share": {
-    "description": "Menu item to share content"
-  },
   "viewOnWeb": "Bekijken op web",
   "@viewOnWeb": {
     "description": "Menu item to view content on web browser"
-  },
-  "reply": "Beantwoorden",
-  "@reply": {
-    "description": "Button to reply to a post or message"
   },
   "vote": "Stemmen",
   "votesCount": "{count, plural, one{{count} stem} other{{count} stemmen}}",
@@ -267,19 +213,12 @@
   "@enterKeywordsToFindTopicsAndPosts": {
     "description": "Hint text for searching topics and posts"
   },
-  "@language": {
-    "description": "Settings section title for language selection"
-  },
   "light": "Licht",
   "@light": {
     "description": "Light theme option"
   },
-  "dark": "Donker",
   "appearance": "Weergave",
   "appearanceSystem": "Systeemstandaard",
-  "@dark": {
-    "description": "Dark theme option"
-  },
   "version": "versie {version} ({buildNumber})",
   "@version": {
     "description": "App version display",
@@ -314,11 +253,7 @@
   "@home": {
     "description": "Home tab title"
   },
-  "notifications": "Meldingen",
   "notificationsTab": "Meldingen",
-  "@notifications": {
-    "description": "Notifications tab title"
-  },
   "forums": "Categorieën",
   "@forums": {
     "description": "Forums tab title (plural)"
@@ -432,21 +367,9 @@
       }
     }
   },
-  "edit": "Bewerken",
-  "@edit": {
-    "description": "Button text to edit"
-  },
-  "remove": "Verwijderen",
-  "@remove": {
-    "description": "Button text to remove"
-  },
   "subject": "Onderwerp",
   "@subject": {
     "description": "Label for subject field"
-  },
-  "message": "Bericht",
-  "@message": {
-    "description": "Label for message field"
   },
   "titleCannotBeEmpty": "Titel mag niet leeg zijn",
   "@titleCannotBeEmpty": {
@@ -501,15 +424,6 @@
   "@failedToSaveConversation": {
     "description": "Error message when saving conversation fails"
   },
-  "couldNotOpenLink": "Kon link niet openen: {error}",
-  "@couldNotOpenLink": {
-    "description": "Error message when opening link fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "@attachFile": {
     "description": "Accessibility label for attach file button"
   },
@@ -542,9 +456,6 @@
   "topicLastReplyBy": "{username} antwoordde {time}",
   "inReplyToUser": "als antwoord op {username}",
   "inReplyToPost": "als antwoord op bericht #{number}",
-  "timeGapDaysLater": "{count, plural, =1{1 dag later} other{{count} dagen later}}",
-  "timeGapMonthsLater": "{count, plural, =1{1 maand later} other{{count} maanden later}}",
-  "timeGapYearsLater": "{count, plural, =1{1 jaar later} other{{count} jaar later}}",
   "profileViews": "Weergaven",
   "badges": "Badges",
   "chatWithUser": "Chat",
@@ -552,14 +463,11 @@
   "chat": "Chat",
   "moreBadges": "+{count} meer",
   "allNotificationsMarkedAsRead": "Alle meldingen gemarkeerd als gelezen",
-  "apply": "Toepassen",
-  "bookmarks": "Bladwijzers",
   "reviewableBy": "Door {username}",
   "changeEmail": "E-mailadres wijzigen",
   "changePassword": "Wachtwoord wijzigen",
   "checkingStatus": "Status controleren…",
   "clearReminder": "Herinnering verwijderen",
-  "copy": "Kopiëren",
   "copyLink": "Link kopiëren",
   "couldNotEnableNotifications": "Meldingen konden niet worden ingeschakeld: {error}",
   "couldNotFindBookmark": "Deze bladwijzer is niet gevonden",
@@ -568,7 +476,6 @@
   "customDateAndTime": "Eigen datum en tijd",
   "deleteAccount": "Account verwijderen",
   "deleteMessageQuestion": "Bericht verwijderen?",
-  "discard": "Verwerpen",
   "doNotDisturb": "Niet storen",
   "editHistory": "Bewerkingsgeschiedenis",
   "editProfile": "Profiel bewerken",
@@ -577,7 +484,6 @@
   "pushEnabledForThisLogin": "Ingeschakeld voor deze aanmelding",
   "failedToLoadMoreTopics": "Meer topics laden mislukt. Scroll om opnieuw te proberen.",
   "failedToUpdateNotificationLevel": "Meldingsniveau bijwerken mislukt",
-  "firstPostsOnly": "Alleen eerste berichten",
   "ignoredUsers": "Genegeerde gebruikers",
   "inTwoHours": "Over twee uur",
   "inviteByEmail": "Uitnodigen via e-mail",
@@ -603,7 +509,6 @@
   "pleaseLogInToReact": "Meld je aan om te reageren",
   "pleaseLogInToVote": "Meld je aan om te stemmen",
   "pushNotifications": "Pushmeldingen",
-  "relevance": "Relevantie",
   "reminderTimeMustBeInFuture": "De herinneringstijd moet in de toekomst liggen",
   "removeBookmark": "Bladwijzer verwijderen",
   "removeVote": "Stem verwijderen",
@@ -611,7 +516,6 @@
   "reportedBy": "Gemeld door {username}",
   "requestToJoin": "Lidmaatschap aanvragen",
   "requestToJoinGroup": "Lidmaatschap van {group} aanvragen",
-  "reset": "Herstellen",
   "resizeAndUpload": "Verkleinen en uploaden",
   "checkConnectionAndRetry": "Controleer je internetverbinding en probeer het opnieuw.",
   "reviewQueue": "Beoordelingswachtrij",
@@ -627,7 +531,6 @@
   "signInFailed": "Aanmelden mislukt: {error}",
   "startChat": "Chat starten",
   "stoppedIgnoringUser": "Je negeert @{username} niet meer",
-  "titleOnly": "Alleen titel",
   "tomorrow": "Morgen",
   "turnOff": "Uitschakelen",
   "turnOnNotifications": "Meldingen inschakelen",
@@ -654,7 +557,6 @@
   "solution": "Oplossing",
   "deleted": "VERWIJDERD",
   "pleaseLoginToViewUserProfiles": "Meld je aan om gebruikersprofielen te bekijken.",
-  "solved": "Opgelost",
   "hot": "Populair",
   "pinned": "Vastgezet",
   "locked": "Vergrendeld",
@@ -682,7 +584,6 @@
   "close": "Sluiten",
   "openConversation2": "Bericht openen",
   "openConversationConfirmation": "Dit bericht openen? Nieuwe antwoorden zijn dan weer mogelijk.",
-  "open": "Openen",
   "leaveConversation3": "Bericht verlaten",
   "leaveConversationConfirmation": "Weet je zeker dat je jezelf uit dit bericht wilt verwijderen? Je kunt het dan niet meer zien of erop antwoorden.",
   "editConversation2": "Titel bewerken",
@@ -713,7 +614,6 @@
   "noArchivedMessages": "Je hebt geen gearchiveerde berichten",
   "noArchivedMessagesHint": "Archiveer een bericht via het ⋮-menu om het hier te bewaren.",
   "groupHasBeenInvited": "{group} is uitgenodigd voor het bericht",
-  "participantCount": "{count, plural, =1{1 deelnemer} other{{count} deelnemers}}",
   "chatChannels": "Kanalen",
   "chatDms": "Directe berichten",
   "chatNoChannels": "Je neemt nog niet deel aan kanalen!",
@@ -743,8 +643,6 @@
   "chatAttachFile": "Voeg een bestand toe",
   "chatRemoveUpload": "Bestand verwijderen",
   "takePhoto": "Foto maken",
-  "postNeedsApprovalTitle": "Bericht vereist goedkeuring",
-  "postNeedsApprovalBody": "We hebben je nieuwe bericht ontvangen, maar dit moet eerst door een moderator worden goedgekeurd voordat het zichtbaar wordt. Heb geduld.",
   "maximumAttachmentsAllowed": "Maximaal {count} bijlage(n) toegestaan",
   "noImagesFoundToDisplay": "Geen afbeeldingen gevonden om weer te geven.",
   "searchForTopics": "Topics zoeken",
@@ -769,8 +667,6 @@
   "noTagsMatch": "Geen tags komen overeen met \"{filter}\".",
   "noTopicsTagged": "Geen topics met tag \"{tag}\"",
   "searchUser": "Gebruiker zoeken",
-  "tapToOpen": "Tik om te openen",
-  "imageNotAvailable": "Afbeelding niet beschikbaar",
   "postsCount": "{count} berichten",
   "permissionDeniedToSaveImage": "Geen toestemming om de afbeelding op te slaan",
   "postNotFound": "Bericht niet gevonden.",
@@ -791,7 +687,6 @@
   "react": "Reageren",
   "reactionsAreNotEnabledOnThisForum": "Reacties zijn niet ingeschakeld op dit forum.",
   "noReactionsYet": "Nog geen reacties",
-  "searchFilters": "Zoekfilters",
   "suggestedTopics": "Voorgestelde topics",
   "suggestedMessages": "Voorgestelde berichten",
   "voteRemoved": "Stem verwijderd",
@@ -803,7 +698,6 @@
   "dontUpload": "Niet uploaden",
   "dontAskAgainAlwaysResize": "Niet meer vragen — altijd passend verkleinen",
   "couldNotLoadCategories": "Categorieën laden mislukt.",
-  "tags": "Tags",
   "community": "Community",
   "users": "Gebruikers",
   "groups": "Groepen",
@@ -887,15 +781,7 @@
   "deletedYourself": "Je account is verwijderd.",
   "deleteYourselfNotAllowed": "Neem contact op met een medewerker als je wilt dat je account wordt verwijderd.",
   "createTopic": "Topic maken",
-  "discardPostQuestion": "Wil je je bericht weggooien?",
-  "discardChangesQuestion": "Wil je je wijzigingen negeren?",
-  "discardChanges": "Wijzigingen negeren",
-  "saveDraft": "Concept opslaan",
   "notificationSettings": "Meldingsinstellingen",
-  "topicMapViews": "{count, plural, =1{weergave} other{weergaven}}",
-  "topicMapLikes": "{count, plural, =1{like} other{likes}}",
-  "topicMapLinks": "{count, plural, =1{link} other{links}}",
-  "topicMapUsers": "{count, plural, =1{gebruiker} other{gebruikers}}",
   "markAsSolution": "Markeren als oplossing",
   "unmarkAsSolution": "Markering als oplossing opheffen",
   "searchForumName": "Zoeken in {forum}",
@@ -1042,8 +928,6 @@
   "coverPhoto": "Omslagfoto",
   "coverPhotoSheetHint": "Getoond bovenaan je profiel, achter je foto. Brede foto’s werken het best, ongeveer 3 op 1.",
   "coverRemoved": "Omslag verwijderd",
-  "day": "Dag",
-  "month": "Maand",
   "displayName": "Weergavenaam",
   "displayNameHelper": "Getoond bij je berichten. Je gebruikersnaam blijft @{username}.",
   "emailPasswordInAccount": "E-mail, wachtwoord en inloggen",
@@ -1115,7 +999,6 @@
   "usernameChanged": "Je gebruikersnaam is nu @{username}",
   "usernameLockedExplanation": "Op dit forum kunnen leden hun gebruikersnaam alleen kort na het aanmelden wijzigen. Een moderator kan hem voor je wijzigen.",
   "yourPhoto": "Je foto",
-  "chooseEmoji": "Emoji kiezen",
   "clearStatus": "Status wissen",
   "clearText": "Wissen",
   "inOneHour": "Over een uur",
@@ -1124,7 +1007,6 @@
   "pauseNotificationsUntilStatusClears": "Tot je status verdwijnt",
   "pickATime": "Kies een tijd",
   "removeStatusAfter": "Status verwijderen",
-  "searchEmoji": "Emoji zoeken",
   "setStatus": "Status instellen",
   "setAStatus": "Stel een status in",
   "statusUpdated": "Status bijgewerkt",
@@ -1229,22 +1111,10 @@
   "flagAction": "Markeren",
   "flagPost": "Bericht markeren",
   "signUp": "Registreren",
-  "suspendUser": "Gebruiker schorsen",
   "unsuspend": "Schorsing opheffen",
-  "suspendUntil": "Gebruiker schorsen tot",
-  "suspendForever": "Voor altijd schorsen",
   "failedToSuspendUser": "Er is iets misgegaan bij het schorsen van deze gebruiker: {error}",
   "failedToUnsuspendUser": "Er is iets misgegaan bij het opheffen van de schorsing van deze gebruiker: {error}",
-  "suspendReasonNotListening": "Wilde niet naar feedback van medewerkers luisteren",
-  "suspendReasonStaffTime": "Heeft onevenredig veel tijd van medewerkers verbruikt",
-  "suspendReasonCombative": "Te strijdlustig",
-  "suspendReasonWrongPlace": "Op de verkeerde plek",
-  "suspendReasonNoPurpose": "Geen constructief doel voor hun acties, anders dan het creëren van onenigheid binnen de community",
-  "suspendReasonCustom": "Aangepast…",
-  "suspendReasonQuestion": "Waarom schors je? Deze tekst wordt aan de gebruiker weergegeven wanneer deze zich probeert aan te melden. Houd het kort.",
-  "closedLabel": "Gesloten",
   "flaggingPost": "Bericht markeren…",
-  "pleaseSelectSuspensionEndDate": "Kies wanneer de schorsing eindigt",
   "suspendingUser": "Gebruiker schorsen…",
   "unsuspendingUser": "Schorsing opheffen…",
   "userSuspended": "Gebruiker geschorst",
@@ -1293,7 +1163,6 @@
   "failedToMarkNotificationsRead": "Meldingen markeren als gelezen mislukt",
   "forumNameFallback": "Forum",
   "noForumDescription": "Geen beschrijving beschikbaar.",
-  "dismissAllNotifications": "Alles negeren",
   "notificationPostIdMissing": "Bericht-ID ontbreekt. Kan niet naar het bericht gaan.",
   "notificationTopicIdMissingForPost": "Topic-ID ontbreekt. Kan niet naar het bericht gaan.",
   "notificationTopicIdMissing": "Topic-ID ontbreekt. Kan het topic niet openen.",
@@ -1330,29 +1199,6 @@
   "tagTopicsLoadFailed": "Laden mislukt",
   "searchFailedWithError": "Zoeken mislukt: {error}",
   "searchFiltersButtonTooltip": "Filters",
-  "searchFilterStatusSection": "Status",
-  "searchFilterMyActivitySection": "Mijn activiteit",
-  "searchFilterMatchTypeSection": "Soort overeenkomst",
-  "searchTagsFilterHelper": "Gescheiden door spaties of komma's. Elke tag is vereist.",
-  "searchSortBy": "Sorteren op",
-  "searchStatusOpen": "Open",
-  "searchStatusArchived": "Gearchiveerd",
-  "searchStatusNoReplies": "Zonder antwoorden",
-  "searchStatusPublicOnly": "Alleen openbaar",
-  "searchStatusUnsolved": "Onopgelost",
-  "searchInBookmarked": "Met bladwijzer",
-  "searchInMyMessages": "In mijn berichten",
-  "searchInLiked": "Door mij geliket",
-  "searchInPosted": "Waarin ik iets heb geplaatst",
-  "searchInWatching": "Die ik observeer",
-  "searchInTracking": "Die ik volg",
-  "searchInSeen": "Die ik heb gelezen",
-  "searchInUnseen": "Die ik niet heb gelezen",
-  "searchSortLatestPost": "Nieuwste bericht",
-  "searchSortMostLiked": "Meest geliket",
-  "searchSortMostViewed": "Meest bekeken",
-  "searchSortLatestTopic": "Nieuwste topic",
-  "searchFieldHint": "Zoeken…",
   "bookmarksUnavailable": "Bladwijzers zijn niet beschikbaar",
   "failedToLoadBookmarks": "Bladwijzers laden mislukt",
   "failedToRemoveBookmark": "Bladwijzer verwijderen mislukt",
@@ -1526,8 +1372,6 @@
   "changeYourReaction": "Je reactie wijzigen",
   "reactionTapAgainToRemove": "Tik nogmaals op je reactie om die te verwijderen.",
   "reactionFilterSemantics": "{count, plural, =1{{reaction}, 1 persoon} other{{reaction}, {count} personen}}",
-  "postLikeAction": "Bericht liken",
-  "postUnlikeAction": "Like ongedaan maken",
   "postVoteRemoveFailed": "Stem verwijderen mislukt (tijd om ongedaan te maken verstreken?)",
   "postVoteCastFailed": "Stemmen mislukt",
   "postUpvote": "Omhoog stemmen",
@@ -1623,7 +1467,6 @@
   "invalidAuthenticationCode": "Ongeldige authenticatiecode",
   "tfaVerificationError": "Er is een fout opgetreden bij de verificatie. Probeer het opnieuw.",
   "passwordFieldLabel": "Wachtwoord",
-  "somethingWentWrongTryAgain": "Er ging iets mis. Probeer het opnieuw.",
   "unexpectedErrorTryAgain": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
   "errorNoInternetConnection": "Geen internetverbinding. Controleer je netwerkinstellingen.",
   "errorRequestTimedOut": "Time-out bij het verzoek. Probeer het opnieuw.",

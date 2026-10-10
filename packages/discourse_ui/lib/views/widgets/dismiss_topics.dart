@@ -7,6 +7,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../services/topic_tracking_service.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/error_dialog.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Which of Discourse's two dismissals a list offers: web puts "Dismiss
 /// New" on the New list and "Dismiss…" on Unread, and nowhere else.
@@ -101,7 +102,7 @@ Future<void> dismissTopics(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(l10n.cancel),
+          child: Text(l10n.kit.cancel),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
@@ -144,7 +145,7 @@ Future<void> dismissNewAndUnread(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(l10n.cancel),
+          child: Text(l10n.kit.cancel),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),

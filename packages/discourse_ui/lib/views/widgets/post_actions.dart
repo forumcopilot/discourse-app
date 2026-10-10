@@ -18,6 +18,7 @@ import '../../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/views/widgets/discourse_report_dialog.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../../l10n/kit_strings.dart';
 
 class PostActionsHandler {
   final SiteContext siteContext;
@@ -383,7 +384,7 @@ class PostActionsHandler {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context)?.kit.cancel ?? 'Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -689,7 +690,7 @@ class PostActionsHandler {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(AppLocalizations.of(context)!.kit.cancel),
           ),
           TextButton(
             onPressed: () async {

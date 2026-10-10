@@ -11,6 +11,7 @@ import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../l10n/kit_strings.dart';
 
 /// Invites screen — Discourse-native shareable invite links and email
 /// invites (`DiscourseInviteProxy`, no XenForo-shaped SDK counterpart).
@@ -341,7 +342,7 @@ class _InvitesPageState extends State<InvitesPage> {
                           );
                         },
                         icon: const Icon(Icons.copy_rounded),
-                        label: Text(AppLocalizations.of(context)!.copy),
+                        label: Text(AppLocalizations.of(context)!.kit.copy),
                       ),
                     ),
                     SizedBox(width: DesignTokens.spacingM),
@@ -350,7 +351,7 @@ class _InvitesPageState extends State<InvitesPage> {
                         onPressed: () => SharePlus.instance
                             .share(ShareParams(text: invite.link)),
                         icon: const Icon(Icons.share_outlined),
-                        label: Text(AppLocalizations.of(context)!.share),
+                        label: Text(AppLocalizations.of(context)!.kit.share),
                       ),
                     ),
                   ],
@@ -412,7 +413,7 @@ class _InvitesPageState extends State<InvitesPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -475,7 +476,7 @@ class _InvitesPageState extends State<InvitesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(AppLocalizations.of(context)!.kit.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(

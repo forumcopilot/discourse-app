@@ -8,6 +8,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../theme/forum_identity.dart';
 import 'brand_image.dart';
 import 'forum_icon_tile.dart';
+import '../../l10n/kit_strings.dart';
 
 /// The top of a forum's Home: the forum's own header, as its website draws
 /// it, with the forum's name, one line about the forum, how active it is,
@@ -119,7 +120,7 @@ class ForumMasthead extends StatelessWidget {
       actions: [
         _CollapsedOnly(
           child: IconButton(
-            tooltip: AppLocalizations.of(context)!.search,
+            tooltip: AppLocalizations.of(context)!.kit.search,
             icon: const Icon(Icons.search),
             onPressed: onSearch,
           ),

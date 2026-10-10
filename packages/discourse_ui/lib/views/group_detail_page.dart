@@ -14,6 +14,7 @@ import '../utils/error_message.dart';
 import 'widgets/remote_circle_avatar.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'widgets/text_entry_page.dart';
+import '../l10n/kit_strings.dart';
 
 /// Phase 5.18c-2 — single-group screen. Fetches the group's metadata
 /// (`/groups/{name}.json`) and the first page of members
@@ -204,7 +205,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),

@@ -11,6 +11,7 @@ import '../../utils/error_message.dart';
 import '../../utils/file_utils.dart';
 import '../../utils/url_utils.dart';
 import 'post_body_extensions.dart' show EmbeddedCard, FileRow;
+import '../../l10n/kit_strings.dart';
 
 /// A file in a post or a chat message — a cooked `a.attachment`, a chat
 /// upload — as the one [FileRow] in an [EmbeddedCard]: the type tile, the
@@ -163,14 +164,14 @@ class _AttachmentFileCardState extends State<AttachmentFileCard> {
         ].join(' • ')),
         trailing: [
           IconButton(
-            tooltip: l10n.share,
+            tooltip: l10n.kit.share,
             onPressed: hasUrl ? _share : null,
             icon: Icon(Icons.share_outlined,
                 size: DesignTokens.iconSizeM, color: colorScheme.onSurfaceVariant),
           ),
           if (_busy)
             IconButton(
-              tooltip: l10n.cancel,
+              tooltip: l10n.kit.cancel,
               onPressed: () => _cancel?.cancel(),
               icon: SizedBox(
                 width: DesignTokens.iconSizeM,

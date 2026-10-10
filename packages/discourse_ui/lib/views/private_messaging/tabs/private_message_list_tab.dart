@@ -13,6 +13,7 @@ import '../../../theme/design_tokens.dart';
 import '../../widgets/filter_chip_bar.dart';
 import '../../search_page.dart';
 import '../conversation/list/conversation_list.dart';
+import '../../../l10n/kit_strings.dart';
 
 /// Lists the user's messages as Discourse web does: Inbox (received and sent,
 /// merged), Unread, New, Sent and Archive, with the number new and unread
@@ -329,7 +330,7 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
                   // web's search does from the messages page.
                   IconButton(
                     icon: const Icon(Icons.search),
-                    tooltip: l10n.search,
+                    tooltip: l10n.kit.search,
                     onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => SearchPage(
                         siteContext: widget.siteContext,

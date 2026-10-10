@@ -22,6 +22,7 @@ import 'package:discourse_core/discourse_core.dart'
 import 'package:discourse_ui/views/widgets/notification_level_sheet.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../l10n/kit_strings.dart';
 
 class ForumTopicsPage extends StatefulWidget {
   final FCForum forum;
@@ -251,7 +252,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       _ => 0,
     };
     return switch (f) {
-      _CategoryFilter.latest => l10n.latest,
+      _CategoryFilter.latest => l10n.kit.latest,
       _CategoryFilter.hot => l10n.hot,
       _CategoryFilter.newTopics when n > 0 => l10n.filterNewWithCount(n),
       _CategoryFilter.newTopics => l10n.filterNew,

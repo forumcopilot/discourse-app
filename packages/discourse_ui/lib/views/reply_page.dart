@@ -14,6 +14,7 @@ import 'package:dio/dio.dart';
 import '../utils/discourse_draft_controller.dart';
 import '../utils/post_submission.dart';
 import '../services/attachment_upload_service.dart';
+import '../l10n/kit_strings.dart';
 
 class ReplyPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -340,9 +341,9 @@ class _ReplyPageState extends State<ReplyPage> {
           // Use a stable key based on postId to preserve widget state (including attachments)
           Widget compose = MessageComposePage(
             key: ValueKey('reply_with_quote_${widget.postId}'),
-            submitLabel: AppLocalizations.of(context)!.reply,
+            submitLabel: AppLocalizations.of(context)!.kit.reply,
             siteContext: widget.siteContext,
-            title: AppLocalizations.of(context)!.reply,
+            title: AppLocalizations.of(context)!.kit.reply,
             showTitleField: false,
             initialContent: quoteContent,
             titleController: _titleController,
@@ -406,9 +407,9 @@ class _ReplyPageState extends State<ReplyPage> {
       );
     } else {
       return MessageComposePage(
-        submitLabel: AppLocalizations.of(context)!.reply,
+        submitLabel: AppLocalizations.of(context)!.kit.reply,
         siteContext: widget.siteContext,
-        title: AppLocalizations.of(context)!.reply,
+        title: AppLocalizations.of(context)!.kit.reply,
         showTitleField: false,
         initialContent: _getInitialContent(),
         titleController: _titleController,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../../utils/url_utils.dart';
+import '../../l10n/kit_strings.dart';
 
 class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
@@ -25,7 +26,7 @@ class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (isLoggedIn && username != null && username.isNotEmpty)
           IconButton(
             icon: const Icon(Icons.share_outlined),
-            tooltip: l10n.share,
+            tooltip: l10n.kit.share,
             onPressed: () => UrlUtils.shareUrl(
                 '${siteContext.site.url.replaceAll(RegExp(r'/+$'), '')}'
                 '/u/${Uri.encodeComponent(username)}'),

@@ -16,16 +16,6 @@ class AppLocalizationsKo extends AppLocalizations {
       '로그인 상태가 변경되었습니다. 초안을 편집하려면 입력한 내용을 복사한 후 작성 화면을 다시 열어 주세요.';
 
   @override
-  String get discardFailedCloseQuestion =>
-      '그래도 닫을까요? 이전에 저장한 글은 임시 저장에 남아 있습니다.';
-
-  @override
-  String get keepEditing => '계속 작성';
-
-  @override
-  String get closeAnyway => '그래도 닫기';
-
-  @override
   String get uploadSessionChanged =>
       '업로드 중에 로그인 상태가 변경되었습니다. 이 화면을 다시 연 후 다시 시도해 주세요.';
 
@@ -49,28 +39,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get errorTitle => '오류';
 
   @override
-  String get okButton => '확인';
-
-  @override
   String get retryButton => '다시 시도';
 
   @override
   String get copyToClipboard => '클립보드에 복사';
 
   @override
-  String get copied => '복사됨';
-
-  @override
   String get errorMessageCopiedToClipboard => '오류 메시지가 클립보드에 복사되었습니다';
 
   @override
   String get dismiss => '닫기';
-
-  @override
-  String get cancel => '취소';
-
-  @override
-  String get tryAgain => '다시 시도';
 
   @override
   String get anErrorOccurred => '오류가 발생했습니다';
@@ -139,9 +117,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get youNeedToBeSignedInToViewUnreadTopics => '읽지 않은 주제를 보려면 로그인해야 합니다';
 
   @override
-  String get latest => '최신';
-
-  @override
   String get unread => '읽지 않음';
 
   @override
@@ -163,12 +138,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get newConversation => '새 메시지';
 
   @override
-  String get language => '언어';
-
-  @override
-  String get all => '전체';
-
-  @override
   String get topicsOnly => '주제만';
 
   @override
@@ -186,9 +155,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pleaseWaitForThreadToLoad => '글을 불러올 때까지 기다려 주세요';
 
   @override
-  String get reason => '사유';
-
-  @override
   String get participantsLabel => '참가자';
 
   @override
@@ -203,12 +169,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get newTopic => '새 주제';
-
-  @override
-  String get pleaseSpecifyReason => '사유를 지정하세요';
-
-  @override
-  String get selectDate => '날짜 선택';
 
   @override
   String get moreOptions => '더 많은 옵션';
@@ -271,9 +231,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noSubject => '제목 없음';
 
   @override
-  String get search => '검색';
-
-  @override
   String get logout => '로그아웃';
 
   @override
@@ -292,16 +249,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get profile => '프로필';
 
   @override
-  String get messages => '메시지';
-
-  @override
-  String get add => '추가';
-
-  @override
   String get retry => '다시 시도';
-
-  @override
-  String get delete => '삭제';
 
   @override
   String get deleteMessage => '메시지 삭제';
@@ -366,27 +314,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get next => '다음';
 
   @override
-  String get temporary => '임시';
-
-  @override
   String get back => '뒤로';
 
   @override
   String get confirm => '확인';
 
   @override
-  String error(String error) {
-    return '오류: $error';
-  }
-
-  @override
   String get removeAttachment => '첨부 파일 제거';
 
   @override
   String get areYouSureYouWantToRemoveThisAttachment => '이 첨부 파일을 제거하시겠습니까?';
-
-  @override
-  String get none => '없음';
 
   @override
   String get attachFile => '파일 첨부';
@@ -401,28 +338,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get bold => '굵게';
 
   @override
-  String get italic => '기울임꼴';
-
-  @override
   String get underline => '밑줄';
 
   @override
   String get strikethrough => '취소선';
 
   @override
-  String get link => '링크';
-
-  @override
-  String get image => '이미지';
-
-  @override
   String get video => '동영상';
-
-  @override
-  String get quote => '인용';
-
-  @override
-  String get code => '코드';
 
   @override
   String get spoiler => '스포일러';
@@ -437,11 +359,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get listItem => '목록 항목';
 
   @override
-  String participants(int count) {
-    return '참가자 ($count)';
-  }
-
-  @override
   String get markAsUnread => '읽지 않음으로 표시';
 
   @override
@@ -451,16 +368,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get enterKeywordsToSearchTopics => '주제를 검색할 키워드 입력...';
 
   @override
-  String get refresh => '새로고침';
-
-  @override
-  String get share => '공유';
-
-  @override
   String get viewOnWeb => '웹에서 보기';
-
-  @override
-  String get reply => '답장';
 
   @override
   String get vote => '투표';
@@ -499,9 +407,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get light => '라이트';
 
   @override
-  String get dark => '다크';
-
-  @override
   String get appearance => '테마';
 
   @override
@@ -523,9 +428,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get home => '홈';
-
-  @override
-  String get notifications => '알림';
 
   @override
   String get notificationsTab => '알림';
@@ -607,16 +509,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get edit => '편집';
-
-  @override
-  String get remove => '제거';
-
-  @override
   String get subject => '제목';
-
-  @override
-  String get message => '메시지';
 
   @override
   String get titleCannotBeEmpty => '제목을 입력하세요';
@@ -646,11 +539,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return '$filename 다운로드 오류: $error';
-  }
-
-  @override
-  String couldNotOpenLink(String error) {
-    return '링크를 열 수 없습니다: $error';
   }
 
   @override
@@ -717,36 +605,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String timeGapDaysLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count일 후',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapMonthsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count개월 후',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapYearsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count년 후',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get profileViews => '조회수';
 
   @override
@@ -777,12 +635,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get allNotificationsMarkedAsRead => '모든 알림을 읽음으로 표시했습니다';
 
   @override
-  String get apply => '적용';
-
-  @override
-  String get bookmarks => '북마크';
-
-  @override
   String reviewableBy(String username) {
     return '$username 작성';
   }
@@ -798,9 +650,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get clearReminder => '알림 지우기';
-
-  @override
-  String get copy => '복사';
 
   @override
   String get copyLink => '링크 복사';
@@ -833,9 +682,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteMessageQuestion => '메시지를 삭제할까요?';
 
   @override
-  String get discard => '버리기';
-
-  @override
   String get doNotDisturb => '방해 금지';
 
   @override
@@ -860,9 +706,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get failedToUpdateNotificationLevel => '알림 수준을 변경하지 못했습니다';
-
-  @override
-  String get firstPostsOnly => '첫 게시물만';
 
   @override
   String get ignoredUsers => '무시한 사용자';
@@ -946,9 +789,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pushNotifications => '푸시 알림';
 
   @override
-  String get relevance => '관련성';
-
-  @override
   String get reminderTimeMustBeInFuture => '알림 시간은 미래여야 합니다';
 
   @override
@@ -972,9 +812,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String requestToJoinGroup(String group) {
     return '$group 가입 요청';
   }
-
-  @override
-  String get reset => '초기화';
 
   @override
   String get resizeAndUpload => '크기 조정 후 업로드';
@@ -1024,9 +861,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return '@$username 무시를 해제했습니다';
   }
-
-  @override
-  String get titleOnly => '제목만';
 
   @override
   String get tomorrow => '내일';
@@ -1114,9 +948,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pleaseLoginToViewUserProfiles => '사용자 프로필을 보려면 로그인하세요.';
-
-  @override
-  String get solved => '해결됨';
 
   @override
   String get hot => '인기';
@@ -1207,9 +1038,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get openConversationConfirmation => '이 메시지를 열까요? 다시 새 답글을 받을 수 있습니다.';
-
-  @override
-  String get open => '열기';
 
   @override
   String get leaveConversation3 => '메시지에서 나가기';
@@ -1313,16 +1141,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String participantCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '참여자 $count명',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get chatChannels => '채널';
 
   @override
@@ -1416,13 +1234,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get takePhoto => '사진 촬영';
 
   @override
-  String get postNeedsApprovalTitle => '승인이 필요한 게시물';
-
-  @override
-  String get postNeedsApprovalBody =>
-      '새 게시물이 있습니다. 그러나 이 게시물이 보여지려면 운영자의 승인이 필요합니다. 잠시 기다려 주세요.';
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return '최대 $count개의 첨부 파일만 허용됩니다';
   }
@@ -1508,12 +1319,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get searchUser => '사용자 검색';
 
   @override
-  String get tapToOpen => '탭하여 열기';
-
-  @override
-  String get imageNotAvailable => '이미지를 사용할 수 없습니다';
-
-  @override
   String postsCount(Object count) {
     return '게시물 $count개';
   }
@@ -1592,9 +1397,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noReactionsYet => '아직 반응이 없습니다';
 
   @override
-  String get searchFilters => '검색 필터';
-
-  @override
   String get suggestedTopics => '추천 주제';
 
   @override
@@ -1627,9 +1429,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => '카테고리를 불러오지 못했습니다.';
-
-  @override
-  String get tags => '태그';
 
   @override
   String get community => '커뮤니티';
@@ -1966,18 +1765,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get createTopic => '글 작성하기';
 
   @override
-  String get discardPostQuestion => '게시물을 버리시겠습니까?';
-
-  @override
-  String get discardChangesQuestion => '변경 사항을 버리시겠습니까?';
-
-  @override
-  String get discardChanges => '변경 사항 버리기';
-
-  @override
-  String get saveDraft => '임시 저장';
-
-  @override
   String get notificationSettings => '알림 설정';
 
   @override
@@ -2060,46 +1847,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get dismissedTopics => '읽음으로 표시함';
-
-  @override
-  String topicMapViews(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '조회',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLikes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '좋아요',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLinks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '링크',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapUsers(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '사용자',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get markAsSolution => '해결책으로 표시';
@@ -2625,12 +2372,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get coverRemoved => '커버를 삭제했습니다';
 
   @override
-  String get day => '일';
-
-  @override
-  String get month => '월';
-
-  @override
   String get displayName => '표시 이름';
 
   @override
@@ -2878,9 +2619,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get yourPhoto => '내 사진';
 
   @override
-  String get chooseEmoji => '이모지 선택';
-
-  @override
   String get clearStatus => '상태 지우기';
 
   @override
@@ -2903,9 +2641,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get removeStatusAfter => '상태 삭제';
-
-  @override
-  String get searchEmoji => '이모지 검색';
 
   @override
   String get setStatus => '상태 설정';
@@ -3336,16 +3071,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get signUp => '회원가입';
 
   @override
-  String get suspendUser => '사용자 정지';
-
-  @override
   String get unsuspend => '정지 해제';
-
-  @override
-  String get suspendUntil => '사용자 정지 기간';
-
-  @override
-  String get suspendForever => '영구 정지';
 
   @override
   String failedToSuspendUser(String error) {
@@ -3358,35 +3084,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get suspendReasonNotListening => '운영진의 피드백을 따르지 않음';
-
-  @override
-  String get suspendReasonStaffTime => '운영진의 시간을 과도하게 빼앗음';
-
-  @override
-  String get suspendReasonCombative => '분란 조장';
-
-  @override
-  String get suspendReasonWrongPlace => '이곳과 맞지 않음';
-
-  @override
-  String get suspendReasonNoPurpose => '커뮤니티 내에서 반대하는 것 외에는 건설적인 목적이 없음';
-
-  @override
-  String get suspendReasonCustom => '직접 입력…';
-
-  @override
-  String get suspendReasonQuestion =>
-      '정지 이유는 무엇인가요? 이 텍스트는 해당 사용자가 로그인할 때 보입니다. 짧게 적어주세요.';
-
-  @override
-  String get closedLabel => '잠김';
-
-  @override
   String get flaggingPost => '게시물 신고 중…';
-
-  @override
-  String get pleaseSelectSuspensionEndDate => '정지가 끝나는 날짜를 선택하세요';
 
   @override
   String get suspendingUser => '사용자를 정지하는 중…';
@@ -3562,9 +3260,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noForumDescription => '설명이 없습니다.';
 
   @override
-  String get dismissAllNotifications => '모두 해제';
-
-  @override
   String get notificationPostIdMissing => '게시물 ID가 없습니다. 게시물로 이동할 수 없습니다.';
 
   @override
@@ -3675,75 +3370,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get searchFiltersButtonTooltip => '필터';
-
-  @override
-  String get searchFilterStatusSection => '상태';
-
-  @override
-  String get searchFilterMyActivitySection => '내 활동';
-
-  @override
-  String get searchFilterMatchTypeSection => '일치 유형';
-
-  @override
-  String get searchTagsFilterHelper => '공백 또는 쉼표로 구분합니다. 모든 태그가 있어야 합니다.';
-
-  @override
-  String get searchSortBy => '정렬 기준';
-
-  @override
-  String get searchStatusOpen => '열림';
-
-  @override
-  String get searchStatusArchived => '보관됨';
-
-  @override
-  String get searchStatusNoReplies => '댓글 없음';
-
-  @override
-  String get searchStatusPublicOnly => '공개만';
-
-  @override
-  String get searchStatusUnsolved => '미해결';
-
-  @override
-  String get searchInBookmarked => '내가 북마크함';
-
-  @override
-  String get searchInMyMessages => '내 메시지에서';
-
-  @override
-  String get searchInLiked => '내가 좋아요 누름';
-
-  @override
-  String get searchInPosted => '내가 게시한 위치';
-
-  @override
-  String get searchInWatching => '내가 구독 중';
-
-  @override
-  String get searchInTracking => '내가 추적 중';
-
-  @override
-  String get searchInSeen => '읽음';
-
-  @override
-  String get searchInUnseen => '읽지 않음';
-
-  @override
-  String get searchSortLatestPost => '최신 게시물';
-
-  @override
-  String get searchSortMostLiked => '가장 많은 좋아요';
-
-  @override
-  String get searchSortMostViewed => '가장 높은 조회수';
-
-  @override
-  String get searchSortLatestTopic => '최신 글';
-
-  @override
-  String get searchFieldHint => '검색…';
 
   @override
   String get bookmarksUnavailable => '북마크를 사용할 수 없습니다';
@@ -4360,12 +3986,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get postLikeAction => '게시물에 좋아요 표시';
-
-  @override
-  String get postUnlikeAction => '좋아요 취소';
-
-  @override
   String get postVoteRemoveFailed => '투표를 취소하지 못했습니다(취소 가능 시간이 지났을 수 있습니다)';
 
   @override
@@ -4677,9 +4297,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get passwordFieldLabel => '비밀번호';
-
-  @override
-  String get somethingWentWrongTryAgain => '문제가 발생했습니다. 다시 시도하세요.';
 
   @override
   String get unexpectedErrorTryAgain => '예기치 않은 오류가 발생했습니다. 다시 시도하세요.';

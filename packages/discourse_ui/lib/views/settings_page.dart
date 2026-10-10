@@ -14,6 +14,7 @@ import '../utils/error_message.dart';
 import 'widgets/section_header.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../l10n/kit_strings.dart';
 
 /// Account and privacy, opened from the Profile tab: changing email and
 /// password, ignored users, the website's preferences for everything the
@@ -160,7 +161,7 @@ class ForumSettingsPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
@@ -256,7 +257,7 @@ class ForumSettingsPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             TextButton(
               onPressed: () async {
@@ -287,7 +288,7 @@ class ForumSettingsPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.cancel),
+            child: Text(l10n.kit.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
@@ -324,7 +325,7 @@ class ForumSettingsPage extends StatelessWidget {
       await Get.dialog<void>(AlertDialog(
         content: Text(l10n.deletedYourself),
         actions: [
-          TextButton(onPressed: Get.back, child: Text(l10n.okButton)),
+          TextButton(onPressed: Get.back, child: Text(l10n.kit.okButton)),
         ],
       ));
       return;
@@ -339,7 +340,7 @@ class ForumSettingsPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.okButton),
+            child: Text(l10n.kit.okButton),
           ),
         ],
       ),

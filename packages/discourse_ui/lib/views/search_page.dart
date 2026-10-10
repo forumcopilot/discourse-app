@@ -19,6 +19,7 @@ import '../controllers/login_controller.dart';
 import 'login_page.dart';
 import 'widgets/search_filters_sheet.dart';
 import '../utils/error_message.dart';
+import '../l10n/kit_strings.dart';
 
 class SearchPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -54,7 +55,7 @@ class _SearchPageState extends State<SearchPage> {
   int _selectedFilterIndex = 0; // 0 = All (Posts), 1 = Topics Only, 2 = Titles Only
   List<String> _getFilterLabels(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return [l10n.all, l10n.topicsOnly, l10n.titlesOnly];
+    return [l10n.kit.all, l10n.topicsOnly, l10n.titlesOnly];
   }
 
   int _topicPage = 1;
@@ -554,7 +555,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context)!.search,
+          AppLocalizations.of(context)!.kit.search,
         ),
         actions: [
           IconButton(

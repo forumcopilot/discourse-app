@@ -46,6 +46,7 @@ import '../edit_profile_page.dart';
 import '../user_profile_page.dart';
 import '../private_messaging/conversation/pages/new_conversation_page.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../../l10n/kit_strings.dart';
 
 /// A website address as Discourse's profile shows it (UserSerializer
 /// #website_name): host without "www." plus the path, no scheme.
@@ -231,7 +232,7 @@ class _ProfileViewState extends State<ProfileView> {
                 : l10n.profileFollowFailed);
       }
     } catch (e) {
-      errorText = l10n.error('$e');
+      errorText = l10n.kit.error('$e');
     }
     if (!mounted) return;
     setState(() {
@@ -1205,7 +1206,7 @@ class _SummaryUnavailable extends StatelessWidget {
             ),
             TextButton(
               onPressed: onRetry,
-              child: Text(AppLocalizations.of(context)!.tryAgain),
+              child: Text(AppLocalizations.of(context)!.kit.tryAgain),
             ),
           ],
         ),

@@ -28,6 +28,7 @@ import 'category_tile_mark.dart';
 import 'drawer_introduction.dart' show DrawerIntroduction;
 import 'forum_icon_tile.dart';
 import 'remote_circle_avatar.dart';
+import '../../l10n/kit_strings.dart';
 
 /// The forum's map, as Discourse's sidebar is on its website: who you are
 /// here, then Community, your categories and your tags, each a section that
@@ -169,7 +170,7 @@ class SiteDrawer extends StatelessWidget {
             ),
             _Section(
               id: 'tags',
-              label: l10n.tags,
+              label: l10n.kit.tags,
               children: [
                 for (final tag in tagsFor(siteContext))
                   _Item(

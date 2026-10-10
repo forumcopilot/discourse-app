@@ -37,6 +37,7 @@ import '../l10n/generated/app_localizations.dart';
 import '../l10n/app_l10n.dart';
 import '../utils/error_message.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../l10n/kit_strings.dart';
 
 class NotificationService with ServiceErrorHandlingMixin {
   static final NotificationService _instance = NotificationService._internal();
@@ -1097,7 +1098,7 @@ class NotificationService with ServiceErrorHandlingMixin {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(),
-                child: Text(l10n.okButton),
+                child: Text(l10n.kit.okButton),
               ),
             ],
           );

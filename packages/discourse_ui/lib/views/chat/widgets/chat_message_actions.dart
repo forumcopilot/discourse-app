@@ -9,6 +9,7 @@ import '../../../theme/design_tokens.dart';
 import '../../../utils/emoji_shortcodes.dart';
 import '../../widgets/reaction_glyph.dart';
 import 'chat_reaction_chips.dart' show kChatDefaultReactions;
+import '../../../l10n/kit_strings.dart';
 
 /// What the reader chose in a chat message's long-press sheet.
 sealed class ChatMessageChoice {
@@ -147,7 +148,7 @@ Future<ChatMessageChoice?> showChatMessageActions(
                         ),
                       if (can.reply)
                         quick(
-                          tooltip: l10n.reply,
+                          tooltip: l10n.kit.reply,
                           onTap: () => pick(const ChatMessageActionChoice(ChatMessageAction.reply)),
                           child: const Icon(Icons.reply),
                         ),
@@ -159,12 +160,12 @@ Future<ChatMessageChoice?> showChatMessageActions(
               if (can.thread) tile(Icons.forum_outlined, l10n.chatOpenThread, ChatMessageAction.thread),
               tile(Icons.copy, l10n.chatCopyText, ChatMessageAction.copyText),
               tile(Icons.link, l10n.copyLink, ChatMessageAction.copyLink),
-              if (can.edit) tile(Icons.edit_outlined, l10n.edit, ChatMessageAction.edit),
+              if (can.edit) tile(Icons.edit_outlined, l10n.kit.edit, ChatMessageAction.edit),
               if (can.pin)
                 tile(can.pinned ? Icons.push_pin : Icons.push_pin_outlined,
                     can.pinned ? l10n.chatUnpinMessage : l10n.chatPinMessage, ChatMessageAction.pin),
               if (can.flag) tile(Icons.flag_outlined, l10n.chatFlag, ChatMessageAction.flag),
-              if (can.delete) tile(Icons.delete_outline, l10n.delete, ChatMessageAction.delete, danger: true),
+              if (can.delete) tile(Icons.delete_outline, l10n.kit.delete, ChatMessageAction.delete, danger: true),
               const SizedBox(height: DesignTokens.spacingS),
             ],
           ),

@@ -35,6 +35,7 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/core/async/async_utils.dart';
 import 'dart:async';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../l10n/kit_strings.dart';
 
 class SiteHomePage extends StatefulWidget {
   final Site? siteToInitialize;
@@ -567,7 +568,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
                 // could close the page under it too.
                 this.context.popOwnRoute();
               },
-              child: Text(AppLocalizations.of(context)!.okButton),
+              child: Text(AppLocalizations.of(context)!.kit.okButton),
             ),
           ],
         );
@@ -1104,7 +1105,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               isLabelVisible: _unreadConversationsCount > 0,
               child: const Icon(Icons.mail_outline),
             ),
-            label: l10n.messages,
+            label: l10n.kit.messages,
           );
         case _notificationsTab:
           return NavigationDestination(
@@ -1115,7 +1116,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               child: const Icon(Icons.notifications_outlined),
             ),
             label: l10n.notificationsTab,
-            tooltip: l10n.notifications,
+            tooltip: l10n.kit.notifications,
           );
         case _profileTab:
           return NavigationDestination(

@@ -3,12 +3,6 @@
   "@accountSessionChanged": {"description": "An account-specific screen no longer belongs to the current sign-in; disable its stale controls."},
   "draftSessionChanged": "Your sign-in changed. Copy your text before reopening the composer to work with drafts.",
   "@draftSessionChanged": {"description": "A draft operation belongs to an earlier sign-in; preserve the editor text and explain how to recover it."},
-  "discardFailedCloseQuestion": "Close anyway? A draft saved earlier stays in Drafts.",
-  "@discardFailedCloseQuestion": {"description": "After Discard failed (offline, or the sign-in changed): offer to close the composer without discarding; an earlier saved draft is kept."},
-  "keepEditing": "Keep editing",
-  "@keepEditing": {"description": "Button: stay in the composer."},
-  "closeAnyway": "Close anyway",
-  "@closeAnyway": {"description": "Button: close the composer although its draft could not be discarded."},
   "uploadSessionChanged": "Your sign-in changed during the upload. Reopen this screen before trying again.",
   "@uploadSessionChanged": {"description": "An attachment upload overlapped a logout or credential change; its result cannot be used in the current session."},
   "@@locale": "en",
@@ -21,14 +15,10 @@
   "passkeyContinuePrompt": "Use your passkey to continue",
   "continueButton": "Continue",
   "errorTitle": "Error",
-  "okButton": "OK",
   "retryButton": "Retry",
   "copyToClipboard": "Copy to Clipboard",
-  "copied": "Copied",
   "errorMessageCopiedToClipboard": "Error message copied to clipboard",
   "dismiss": "Dismiss",
-  "cancel": "Cancel",
-  "tryAgain": "Try Again",
   "anErrorOccurred": "An error occurred",
   "accountPendingApproval": "Your account is pending approval. You can browse the forum but cannot post until a moderator approves your account.",
   "checkEmailToConfirm": "Please check your email to confirm your account. Click the confirmation link in the email we sent you.",
@@ -49,7 +39,6 @@
   "youAreAllCaughtUp": "You're all caught up!",
   "signInToViewUnreadTopics": "Sign in to view unread topics",
   "youNeedToBeSignedInToViewUnreadTopics": "You need to be signed in to view your unread topics.",
-  "latest": "Latest",
   "unread": "Unread",
   "failedToConnectToSite": "Failed to connect to site. The site may be down or unreachable.",
   "connectionFailed": "Connection Failed",
@@ -64,8 +53,6 @@
   },
   "loading": "Loading...",
   "newConversation": "New Message",
-  "language": "Language",
-  "all": "All",
   "topicsOnly": "Topics Only",
   "titlesOnly": "Titles Only",
   "failedToShareTopic": "Failed to share topic: {error}",
@@ -79,7 +66,6 @@
   },
   "youCannotReplyToThisThread": "You cannot reply to this topic",
   "pleaseWaitForThreadToLoad": "Please wait for the topic to load",
-  "reason": "Reason",
   "participantsLabel": "Participants",
   "@participantsLabel": {
     "description": "Label for participants (without count)"
@@ -103,8 +89,6 @@
     }
   },
   "newTopic": "New Topic",
-  "pleaseSpecifyReason": "Please specify the reason",
-  "selectDate": "Select date",
   "moreOptions": "More options",
   "topicClosed": "Topic closed",
   "topicOpened": "Topic opened",
@@ -139,17 +123,13 @@
     }
   },
   "noSubject": "No subject",
-  "search": "Search",
   "logout": "Logout",
   "areYouSureYouWantToLogout": "Are you sure you want to logout?",
   "signIn": "Sign in",
   "notificationTest": "Notification Test",
   "forum": "Category",
   "profile": "Profile",
-  "messages": "Messages",
-  "add": "Add",
   "retry": "Retry",
-  "delete": "Delete",
   "deleteMessage": "Delete Message",
   "deletingPost": "Deleting post...",
   "failedToUnlikePost": "Failed to unlike post: {error}",
@@ -200,64 +180,27 @@
   "location": "Location",
   "website": "Website",
   "next": "Next",
-  "temporary": "Temporary",
   "back": "Back",
   "confirm": "Confirm",
-  "error": "Error: {error}",
-  "@error": {
-    "description": "Generic error message",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "removeAttachment": "Remove Attachment",
   "areYouSureYouWantToRemoveThisAttachment": "Are you sure you want to remove this attachment?",
-  "none": "None",
   "attachFile": "Attach file",
   "uploadImage": "Upload image",
   "formatting": "Formatting",
   "bold": "Bold",
-  "italic": "Italic",
   "underline": "Underline",
   "strikethrough": "Strikethrough",
-  "link": "Link",
-  "image": "Image",
   "video": "Video",
-  "quote": "Quote",
-  "code": "Code",
   "spoiler": "Spoiler",
   "bulletList": "Bullet List",
   "numberedList": "Numbered List",
   "listItem": "List Item",
-  "participants": "Participants ({count})",
-  "@participants": {
-    "description": "Participants count with label",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "markAsUnread": "Mark unread",
   "invite": "Invite",
   "enterKeywordsToSearchTopics": "Enter keywords to search topics...",
-  "refresh": "Refresh",
-  "@refresh": {
-    "description": "Menu item to refresh content"
-  },
-  "share": "Share",
-  "@share": {
-    "description": "Menu item to share content"
-  },
   "viewOnWeb": "View on Web",
   "@viewOnWeb": {
     "description": "Menu item to view content on web browser"
-  },
-  "reply": "Reply",
-  "@reply": {
-    "description": "Button to reply to a post or message"
   },
   "vote": "Vote",
   "@vote": {
@@ -310,16 +253,9 @@
   "@enterKeywordsToFindTopicsAndPosts": {
     "description": "Hint text for searching topics and posts"
   },
-  "@language": {
-    "description": "Settings section title for language selection"
-  },
   "light": "Light",
   "@light": {
     "description": "Light theme option"
-  },
-  "dark": "Dark",
-  "@dark": {
-    "description": "Dark theme option"
   },
   "appearance": "Appearance",
   "@appearance": {
@@ -363,12 +299,8 @@
   "@home": {
     "description": "Home tab title"
   },
-  "notifications": "Notifications",
   "notificationsTab": "Alerts",
   "@notificationsTab": {"description": "Short bottom navigation label for Notifications. Keep concise so it fits on narrow phones with larger text."},
-  "@notifications": {
-    "description": "Notifications tab title"
-  },
   "forums": "Categories",
   "@forums": {
     "description": "Categories tab title (Discourse-native term; the ARB key keeps the legacy 'forums' name for compatibility)"
@@ -482,21 +414,9 @@
       }
     }
   },
-  "edit": "Edit",
-  "@edit": {
-    "description": "Button text to edit"
-  },
-  "remove": "Remove",
-  "@remove": {
-    "description": "Button text to remove"
-  },
   "subject": "Subject",
   "@subject": {
     "description": "Label for subject field"
-  },
-  "message": "Message",
-  "@message": {
-    "description": "Label for message field"
   },
   "titleCannotBeEmpty": "Title cannot be empty",
   "@titleCannotBeEmpty": {
@@ -553,15 +473,6 @@
   },
   "@failedToSaveConversation": {
     "description": "Error message when saving conversation fails"
-  },
-  "couldNotOpenLink": "Could not open link: {error}",
-  "@couldNotOpenLink": {
-    "description": "Error message when opening link fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
   },
   "@attachFile": {
     "description": "Accessibility label for attach file button"
@@ -670,33 +581,6 @@
       }
     }
   },
-  "timeGapDaysLater": "{count, plural, =1{1 day later} other{{count} days later}}",
-  "@timeGapDaysLater": {
-    "description": "Divider between posts far apart in time",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "timeGapMonthsLater": "{count, plural, =1{1 month later} other{{count} months later}}",
-  "@timeGapMonthsLater": {
-    "description": "Divider between posts far apart in time",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "timeGapYearsLater": "{count, plural, =1{1 year later} other{{count} years later}}",
-  "@timeGapYearsLater": {
-    "description": "Divider between posts far apart in time",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "profileViews": "Views",
   "@profileViews": {
     "description": "Profile header stat: how many times the profile was viewed"
@@ -735,14 +619,6 @@
   "@allNotificationsMarkedAsRead": {
     "description": "UI text: All notifications marked as read"
   },
-  "apply": "Apply",
-  "@apply": {
-    "description": "UI text: Apply"
-  },
-  "bookmarks": "Bookmarks",
-  "@bookmarks": {
-    "description": "UI text: Bookmarks"
-  },
   "reviewableBy": "By {username}",
   "@reviewableBy": {
     "description": "UI text: By {username}",
@@ -767,10 +643,6 @@
   "clearReminder": "Clear reminder",
   "@clearReminder": {
     "description": "UI text: Clear reminder"
-  },
-  "copy": "Copy",
-  "@copy": {
-    "description": "UI text: Copy"
   },
   "copyLink": "Copy link",
   "@copyLink": {
@@ -819,10 +691,6 @@
   "@deleteMessageQuestion": {
     "description": "UI text: Delete message?"
   },
-  "discard": "Discard",
-  "@discard": {
-    "description": "UI text: Discard"
-  },
   "doNotDisturb": "Do not disturb",
   "@doNotDisturb": {
     "description": "UI text: Do not disturb"
@@ -859,10 +727,6 @@
   "failedToUpdateNotificationLevel": "Failed to update notification level",
   "@failedToUpdateNotificationLevel": {
     "description": "UI text: Failed to update notification level"
-  },
-  "firstPostsOnly": "First posts only",
-  "@firstPostsOnly": {
-    "description": "UI text: First posts only"
   },
   "ignoredUsers": "Ignored users",
   "@ignoredUsers": {
@@ -979,10 +843,6 @@
   "@pushNotifications": {
     "description": "UI text: Push notifications"
   },
-  "relevance": "Relevance",
-  "@relevance": {
-    "description": "UI text: Relevance"
-  },
   "reminderTimeMustBeInFuture": "Reminder time must be in the future",
   "@reminderTimeMustBeInFuture": {
     "description": "UI text: Reminder time must be in the future"
@@ -1020,10 +880,6 @@
         "type": "String"
       }
     }
-  },
-  "reset": "Reset",
-  "@reset": {
-    "description": "UI text: Reset"
   },
   "resizeAndUpload": "Resize and upload",
   "@resizeAndUpload": {
@@ -1094,10 +950,6 @@
         "type": "String"
       }
     }
-  },
-  "titleOnly": "Title only",
-  "@titleOnly": {
-    "description": "UI text: Title only"
   },
   "tomorrow": "Tomorrow",
   "@tomorrow": {
@@ -1217,10 +1069,6 @@
   "pleaseLoginToViewUserProfiles": "Please login to view user profiles.",
   "@pleaseLoginToViewUserProfiles": {
     "description": "UI text: Please login to view user profiles."
-  },
-  "solved": "Solved",
-  "@solved": {
-    "description": "UI text: Solved"
   },
   "hot": "Hot",
   "@hot": {
@@ -1352,10 +1200,6 @@
   "openConversationConfirmation": "Open this message? It will accept new replies again.",
   "@openConversationConfirmation": {
     "description": "UI text: Open this message? It will accept new replies again."
-  },
-  "open": "Open",
-  "@open": {
-    "description": "UI text: Open"
   },
   "leaveConversation3": "Leave message",
   "@leaveConversation3": {
@@ -1494,15 +1338,6 @@
       }
     }
   },
-  "participantCount": "{count, plural, =1{1 participant} other{{count} participants}}",
-  "@participantCount": {
-    "description": "UI text: N participants",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "chatChannels": "Channels",
   "@chatChannels": {
     "description": "UI text (Discourse chat): Channels"
@@ -1634,14 +1469,6 @@
   "@takePhoto": {
     "description": "Opens the camera to take a photo to attach."
   },
-  "postNeedsApprovalTitle": "Post Needs Approval",
-  "@postNeedsApprovalTitle": {
-    "description": "Title of the notice shown when a new post is held for moderator approval (Discourse review.approval.title)."
-  },
-  "postNeedsApprovalBody": "We've received your new post but it needs to be approved by a moderator before it will appear. Please be patient.",
-  "@postNeedsApprovalBody": {
-    "description": "Body of that notice (Discourse review.approval.description)."
-  },
   "maximumAttachmentsAllowed": "Maximum of {count} attachment(s) allowed",
   "@maximumAttachmentsAllowed": {
     "description": "UI text: Maximum of {count} attachment(s) allowed",
@@ -1752,14 +1579,6 @@
   "searchUser": "Search User",
   "@searchUser": {
     "description": "UI text: Search User"
-  },
-  "tapToOpen": "Tap to open",
-  "@tapToOpen": {
-    "description": "UI text: Tap to open"
-  },
-  "imageNotAvailable": "Image not available",
-  "@imageNotAvailable": {
-    "description": "UI text: Image not available"
   },
   "postsCount": "{count} Posts",
   "@postsCount": {
@@ -1885,10 +1704,6 @@
   "@noReactionsYet": {
     "description": "UI text: No reactions yet"
   },
-  "searchFilters": "Search filters",
-  "@searchFilters": {
-    "description": "UI text: Search filters"
-  },
   "suggestedTopics": "Suggested Topics",
   "suggestedMessages": "Suggested Messages",
   "@suggestedMessages": {
@@ -1932,10 +1747,6 @@
   "couldNotLoadCategories": "Couldn't load categories.",
   "@couldNotLoadCategories": {
     "description": "Snackbar when the category list fails to load"
-  },
-  "tags": "Tags",
-  "@tags": {
-    "description": "Drawer: Tags"
   },
   "community": "Community",
   "@community": {
@@ -2480,22 +2291,6 @@
   "@createTopic": {
     "description": "The composer's submit button for a new topic (Discourse's own wording)."
   },
-  "discardPostQuestion": "Do you want to discard your post?",
-  "@discardPostQuestion": {
-    "description": "Asked when a composer with unsaved writing is closed (Discourse post.cancel_composer.confirm)."
-  },
-  "discardChangesQuestion": "Do you want to discard your changes?",
-  "@discardChangesQuestion": {
-    "description": "Asked when an edit with unsaved changes is closed (Discourse post.cancel_composer.confirm_edit)."
-  },
-  "discardChanges": "Discard changes",
-  "@discardChanges": {
-    "description": "Button that throws away unsaved edits (Discourse post.cancel_composer.discard_edit)."
-  },
-  "saveDraft": "Save draft",
-  "@saveDraft": {
-    "description": "Button that closes a composer and keeps what was written as a draft."
-  },
   "notificationSettings": "Notification settings",
   "@notificationSettings": {
     "description": "The drawer row and page for choosing notifications: named apart from the Notifications tab, which lists them."
@@ -2561,42 +2356,6 @@
   "dismissedTopics": "Dismissed",
   "@dismissedTopics": {
     "description": "Snackbar after dismissing new topics or unread replies."
-  },
-  "topicMapViews": "{count, plural, =1{view} other{views}}",
-  "@topicMapViews": {
-    "description": "Label under the view count in the summary under a topic's first post; the number is shown above it, not in the string",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "topicMapLikes": "{count, plural, =1{like} other{likes}}",
-  "@topicMapLikes": {
-    "description": "Label under the like count in the summary under a topic's first post; the number is shown above it",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "topicMapLinks": "{count, plural, =1{link} other{links}}",
-  "@topicMapLinks": {
-    "description": "Label under the link count in the summary under a topic's first post; the number is shown above it",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "topicMapUsers": "{count, plural, =1{user} other{users}}",
-  "@topicMapUsers": {
-    "description": "Label under the participant count in the summary under a topic's first post; the number is shown above it",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "markAsSolution": "Mark as solution",
   "@markAsSolution": {
@@ -3313,14 +3072,6 @@
   "@coverRemoved": {
     "description": "Snackbar after removing the cover, with Undo"
   },
-  "day": "Day",
-  "@day": {
-    "description": "Birthday dialog: day of the month"
-  },
-  "month": "Month",
-  "@month": {
-    "description": "Birthday dialog: month"
-  },
   "displayName": "Display name",
   "@displayName": {
     "description": "Edit profile: the person's name (not their username)"
@@ -3681,10 +3432,6 @@
   "@yourPhoto": {
     "description": "Profile picture sheet: the photo uploaded earlier"
   },
-  "chooseEmoji": "Choose emoji",
-  "@chooseEmoji": {
-    "description": "Status sheet: the emoji button, and the emoji picker's title"
-  },
   "clearStatus": "Clear status",
   "@clearStatus": {
     "description": "Status sheet: remove the status now"
@@ -3716,10 +3463,6 @@
   "removeStatusAfter": "Remove status",
   "@removeStatusAfter": {
     "description": "Status sheet: heading over when the status clears"
-  },
-  "searchEmoji": "Search emoji",
-  "@searchEmoji": {
-    "description": "Emoji picker: search field"
   },
   "setStatus": "Set status",
   "@setStatus": {
@@ -4268,20 +4011,8 @@
   "@signUp": {
     "description": "Discourse sign_up: the button that opens the forum sign-up page"
   },
-  "suspendUser": "Suspend User",
-  "@suspendUser": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
   "unsuspend": "Unsuspend",
   "@unsuspend": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "suspendUntil": "Suspend user until",
-  "@suspendUntil": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "suspendForever": "Suspend forever",
-  "@suspendForever": {
     "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
   },
   "failedToSuspendUser": "Something went wrong suspending this user: {error}",
@@ -4302,45 +4033,9 @@
       }
     }
   },
-  "suspendReasonNotListening": "Would not listen to staff feedback",
-  "@suspendReasonNotListening": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "suspendReasonStaffTime": "Consumed disproportionate amounts of staff time",
-  "@suspendReasonStaffTime": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "suspendReasonCombative": "Too combative",
-  "@suspendReasonCombative": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "suspendReasonWrongPlace": "In the wrong place",
-  "@suspendReasonWrongPlace": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "suspendReasonNoPurpose": "No constructive purpose to their actions other than creating dissent within the community",
-  "@suspendReasonNoPurpose": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "suspendReasonCustom": "Custom…",
-  "@suspendReasonCustom": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "suspendReasonQuestion": "Why are you suspending? This text will be shown to the user when they try to log in. Keep it short.",
-  "@suspendReasonQuestion": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
-  },
-  "closedLabel": "Closed",
-  "@closedLabel": {
-    "description": "Badge on a closed topic in topic lists"
-  },
   "flaggingPost": "Flagging post…",
   "@flaggingPost": {
     "description": "Snackbar while a flag is being sent"
-  },
-  "pleaseSelectSuspensionEndDate": "Choose when the suspension ends",
-  "@pleaseSelectSuspensionEndDate": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
   },
   "suspendingUser": "Suspending user…",
   "@suspendingUser": {
@@ -4554,10 +4249,6 @@
   "@noForumDescription": {
     "description": "Forum header: shown when the forum has no description"
   },
-  "dismissAllNotifications": "Dismiss all",
-  "@dismissAllNotifications": {
-    "description": "Notifications tab app bar: tooltip of the button that marks every notification read (Discourse js.user.dismiss_notifications)"
-  },
   "notificationPostIdMissing": "Post ID is missing. Cannot navigate to the post.",
   "@notificationPostIdMissing": {
     "description": "Notifications tab: error dialog when a tapped notification names no post"
@@ -4706,98 +4397,6 @@
   "searchFiltersButtonTooltip": "Filters",
   "@searchFiltersButtonTooltip": {
     "description": "Search page app bar: tooltip of the button that opens the search filters"
-  },
-  "searchFilterStatusSection": "Status",
-  "@searchFilterStatusSection": {
-    "description": "Search filters sheet: heading over the topic status chips"
-  },
-  "searchFilterMyActivitySection": "My activity",
-  "@searchFilterMyActivitySection": {
-    "description": "Search filters sheet: heading over the chips about the reader's own activity"
-  },
-  "searchFilterMatchTypeSection": "Match type",
-  "@searchFilterMatchTypeSection": {
-    "description": "Search filters sheet: heading over the Title only / First posts only chips"
-  },
-  "searchTagsFilterHelper": "Space- or comma-separated. Each tag is required.",
-  "@searchTagsFilterHelper": {
-    "description": "Search filters sheet: help under the tags field"
-  },
-  "searchSortBy": "Sort by",
-  "@searchSortBy": {
-    "description": "Search filters sheet: heading over the sort chips (Discourse js.search.sort_by)"
-  },
-  "searchStatusOpen": "Open",
-  "@searchStatusOpen": {
-    "description": "Search filters sheet: status chip, topics that are open"
-  },
-  "searchStatusArchived": "Archived",
-  "@searchStatusArchived": {
-    "description": "Search filters sheet: status chip, topics that are archived"
-  },
-  "searchStatusNoReplies": "No replies",
-  "@searchStatusNoReplies": {
-    "description": "Search filters sheet: status chip, topics with zero replies"
-  },
-  "searchStatusPublicOnly": "Public only",
-  "@searchStatusPublicOnly": {
-    "description": "Search filters sheet: status chip, only public topics"
-  },
-  "searchStatusUnsolved": "Unsolved",
-  "@searchStatusUnsolved": {
-    "description": "Search filters sheet: status chip, topics without a solution (discourse-solved topic_status_filter.unsolved)"
-  },
-  "searchInBookmarked": "I bookmarked",
-  "@searchInBookmarked": {
-    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.bookmarks)"
-  },
-  "searchInMyMessages": "In my messages",
-  "@searchInMyMessages": {
-    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.private)"
-  },
-  "searchInLiked": "I liked",
-  "@searchInLiked": {
-    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.likes)"
-  },
-  "searchInPosted": "I posted in",
-  "@searchInPosted": {
-    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.posted)"
-  },
-  "searchInWatching": "I'm watching",
-  "@searchInWatching": {
-    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.watching)"
-  },
-  "searchInTracking": "I'm tracking",
-  "@searchInTracking": {
-    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.tracking)"
-  },
-  "searchInSeen": "I read",
-  "@searchInSeen": {
-    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.seen)"
-  },
-  "searchInUnseen": "I've not read",
-  "@searchInUnseen": {
-    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.unseen)"
-  },
-  "searchSortLatestPost": "Latest post",
-  "@searchSortLatestPost": {
-    "description": "Search filters sheet: sort chip (Discourse js.search.latest_post)"
-  },
-  "searchSortMostLiked": "Most liked",
-  "@searchSortMostLiked": {
-    "description": "Search filters sheet: sort chip (Discourse js.search.most_liked)"
-  },
-  "searchSortMostViewed": "Most viewed",
-  "@searchSortMostViewed": {
-    "description": "Search filters sheet: sort chip (Discourse js.search.most_viewed)"
-  },
-  "searchSortLatestTopic": "Latest topic",
-  "@searchSortLatestTopic": {
-    "description": "Search filters sheet: sort chip (Discourse js.search.latest_topic)"
-  },
-  "searchFieldHint": "Search...",
-  "@searchFieldHint": {
-    "description": "Default placeholder of the app's search fields (Discourse js.multi_select.search)"
   },
   "bookmarksUnavailable": "Bookmarks are unavailable",
   "@bookmarksUnavailable": {
@@ -5654,14 +5253,6 @@
       }
     }
   },
-  "postLikeAction": "Like post",
-  "@postLikeAction": {
-    "description": "Screen-reader label of a post's like (heart) button when the reader has not liked it"
-  },
-  "postUnlikeAction": "Unlike post",
-  "@postUnlikeAction": {
-    "description": "Screen-reader label of a post's like (heart) button when the reader has liked it"
-  },
   "postVoteRemoveFailed": "Could not remove vote (past undo window?)",
   "@postVoteRemoveFailed": {
     "description": "Snackbar when taking back an up/down vote on a post (discourse-post-voting) fails and the server gave no reason"
@@ -6109,10 +5700,6 @@
   "passwordFieldLabel": "Password",
   "@passwordFieldLabel": {
     "description": "Name of the password field, used in 'Password is required.' (Discourse user.password.title)"
-  },
-  "somethingWentWrongTryAgain": "Something went wrong. Please try again.",
-  "@somethingWentWrongTryAgain": {
-    "description": "Generic error message when an error has no readable text of its own"
   },
   "unexpectedErrorTryAgain": "An unexpected error occurred. Please try again.",
   "@unexpectedErrorTryAgain": {

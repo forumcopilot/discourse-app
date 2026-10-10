@@ -11,6 +11,7 @@ import '../../utils/avatar_cache_utils.dart';
 import '../../theme/design_tokens.dart';
 import '../../theme/style_builders.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/kit_strings.dart';
 // import '../../utils/avatar_color_utils.dart';
 
 class PostListItemHeader extends StatelessWidget {
@@ -318,7 +319,7 @@ class PostListItemHeader extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(AppLocalizations.of(context)!.kit.cancel),
           ),
           TextButton(
             onPressed: () {

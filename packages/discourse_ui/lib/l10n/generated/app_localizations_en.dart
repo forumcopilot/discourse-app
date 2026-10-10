@@ -17,16 +17,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your sign-in changed. Copy your text before reopening the composer to work with drafts.';
 
   @override
-  String get discardFailedCloseQuestion =>
-      'Close anyway? A draft saved earlier stays in Drafts.';
-
-  @override
-  String get keepEditing => 'Keep editing';
-
-  @override
-  String get closeAnyway => 'Close anyway';
-
-  @override
   String get uploadSessionChanged =>
       'Your sign-in changed during the upload. Reopen this screen before trying again.';
 
@@ -50,16 +40,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorTitle => 'Error';
 
   @override
-  String get okButton => 'OK';
-
-  @override
   String get retryButton => 'Retry';
 
   @override
   String get copyToClipboard => 'Copy to Clipboard';
-
-  @override
-  String get copied => 'Copied';
 
   @override
   String get errorMessageCopiedToClipboard =>
@@ -67,12 +51,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dismiss => 'Dismiss';
-
-  @override
-  String get cancel => 'Cancel';
-
-  @override
-  String get tryAgain => 'Try Again';
 
   @override
   String get anErrorOccurred => 'An error occurred';
@@ -146,9 +124,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'You need to be signed in to view your unread topics.';
 
   @override
-  String get latest => 'Latest';
-
-  @override
   String get unread => 'Unread';
 
   @override
@@ -170,12 +145,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newConversation => 'New Message';
 
   @override
-  String get language => 'Language';
-
-  @override
-  String get all => 'All';
-
-  @override
   String get topicsOnly => 'Topics Only';
 
   @override
@@ -193,9 +162,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseWaitForThreadToLoad => 'Please wait for the topic to load';
 
   @override
-  String get reason => 'Reason';
-
-  @override
   String get participantsLabel => 'Participants';
 
   @override
@@ -210,12 +176,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newTopic => 'New Topic';
-
-  @override
-  String get pleaseSpecifyReason => 'Please specify the reason';
-
-  @override
-  String get selectDate => 'Select date';
 
   @override
   String get moreOptions => 'More options';
@@ -279,9 +239,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noSubject => 'No subject';
 
   @override
-  String get search => 'Search';
-
-  @override
   String get logout => 'Logout';
 
   @override
@@ -300,16 +257,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile => 'Profile';
 
   @override
-  String get messages => 'Messages';
-
-  @override
-  String get add => 'Add';
-
-  @override
   String get retry => 'Retry';
-
-  @override
-  String get delete => 'Delete';
 
   @override
   String get deleteMessage => 'Delete Message';
@@ -375,18 +323,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get next => 'Next';
 
   @override
-  String get temporary => 'Temporary';
-
-  @override
   String get back => 'Back';
 
   @override
   String get confirm => 'Confirm';
-
-  @override
-  String error(String error) {
-    return 'Error: $error';
-  }
 
   @override
   String get removeAttachment => 'Remove Attachment';
@@ -394,9 +334,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get areYouSureYouWantToRemoveThisAttachment =>
       'Are you sure you want to remove this attachment?';
-
-  @override
-  String get none => 'None';
 
   @override
   String get attachFile => 'Attach file';
@@ -411,28 +348,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bold => 'Bold';
 
   @override
-  String get italic => 'Italic';
-
-  @override
   String get underline => 'Underline';
 
   @override
   String get strikethrough => 'Strikethrough';
 
   @override
-  String get link => 'Link';
-
-  @override
-  String get image => 'Image';
-
-  @override
   String get video => 'Video';
-
-  @override
-  String get quote => 'Quote';
-
-  @override
-  String get code => 'Code';
 
   @override
   String get spoiler => 'Spoiler';
@@ -447,11 +369,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get listItem => 'List Item';
 
   @override
-  String participants(int count) {
-    return 'Participants ($count)';
-  }
-
-  @override
   String get markAsUnread => 'Mark unread';
 
   @override
@@ -462,16 +379,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter keywords to search topics...';
 
   @override
-  String get refresh => 'Refresh';
-
-  @override
-  String get share => 'Share';
-
-  @override
   String get viewOnWeb => 'View on Web';
-
-  @override
-  String get reply => 'Reply';
 
   @override
   String get vote => 'Vote';
@@ -517,9 +425,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get light => 'Light';
 
   @override
-  String get dark => 'Dark';
-
-  @override
   String get appearance => 'Appearance';
 
   @override
@@ -541,9 +446,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get home => 'Home';
-
-  @override
-  String get notifications => 'Notifications';
 
   @override
   String get notificationsTab => 'Alerts';
@@ -626,16 +528,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get edit => 'Edit';
-
-  @override
-  String get remove => 'Remove';
-
-  @override
   String get subject => 'Subject';
-
-  @override
-  String get message => 'Message';
 
   @override
   String get titleCannotBeEmpty => 'Title cannot be empty';
@@ -665,11 +558,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return 'Error downloading $filename: $error';
-  }
-
-  @override
-  String couldNotOpenLink(String error) {
-    return 'Could not open link: $error';
   }
 
   @override
@@ -737,39 +625,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String timeGapDaysLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count days later',
-      one: '1 day later',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapMonthsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count months later',
-      one: '1 month later',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapYearsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count years later',
-      one: '1 year later',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get profileViews => 'Views';
 
   @override
@@ -801,12 +656,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allNotificationsMarkedAsRead => 'All notifications marked as read';
 
   @override
-  String get apply => 'Apply';
-
-  @override
-  String get bookmarks => 'Bookmarks';
-
-  @override
   String reviewableBy(String username) {
     return 'By $username';
   }
@@ -822,9 +671,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearReminder => 'Clear reminder';
-
-  @override
-  String get copy => 'Copy';
 
   @override
   String get copyLink => 'Copy link';
@@ -857,9 +703,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteMessageQuestion => 'Delete message?';
 
   @override
-  String get discard => 'Discard';
-
-  @override
   String get doNotDisturb => 'Do not disturb';
 
   @override
@@ -886,9 +729,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get failedToUpdateNotificationLevel =>
       'Failed to update notification level';
-
-  @override
-  String get firstPostsOnly => 'First posts only';
 
   @override
   String get ignoredUsers => 'Ignored users';
@@ -972,9 +812,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pushNotifications => 'Push notifications';
 
   @override
-  String get relevance => 'Relevance';
-
-  @override
   String get reminderTimeMustBeInFuture =>
       'Reminder time must be in the future';
 
@@ -999,9 +836,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String requestToJoinGroup(String group) {
     return 'Request to join $group';
   }
-
-  @override
-  String get reset => 'Reset';
 
   @override
   String get resizeAndUpload => 'Resize and upload';
@@ -1053,9 +887,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return 'Stopped ignoring @$username';
   }
-
-  @override
-  String get titleOnly => 'Title only';
 
   @override
   String get tomorrow => 'Tomorrow';
@@ -1147,9 +978,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pleaseLoginToViewUserProfiles =>
       'Please login to view user profiles.';
-
-  @override
-  String get solved => 'Solved';
 
   @override
   String get hot => 'Hot';
@@ -1244,9 +1072,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get openConversationConfirmation =>
       'Open this message? It will accept new replies again.';
-
-  @override
-  String get open => 'Open';
 
   @override
   String get leaveConversation3 => 'Leave message';
@@ -1354,17 +1179,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String participantCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count participants',
-      one: '1 participant',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get chatChannels => 'Channels';
 
   @override
@@ -1464,13 +1278,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get takePhoto => 'Take photo';
 
   @override
-  String get postNeedsApprovalTitle => 'Post Needs Approval';
-
-  @override
-  String get postNeedsApprovalBody =>
-      'We\'ve received your new post but it needs to be approved by a moderator before it will appear. Please be patient.';
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return 'Maximum of $count attachment(s) allowed';
   }
@@ -1561,12 +1368,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchUser => 'Search User';
 
   @override
-  String get tapToOpen => 'Tap to open';
-
-  @override
-  String get imageNotAvailable => 'Image not available';
-
-  @override
   String postsCount(Object count) {
     return '$count Posts';
   }
@@ -1650,9 +1451,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noReactionsYet => 'No reactions yet';
 
   @override
-  String get searchFilters => 'Search filters';
-
-  @override
   String get suggestedTopics => 'Suggested Topics';
 
   @override
@@ -1686,9 +1484,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => 'Couldn\'t load categories.';
-
-  @override
-  String get tags => 'Tags';
 
   @override
   String get community => 'Community';
@@ -2036,18 +1831,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createTopic => 'Create Topic';
 
   @override
-  String get discardPostQuestion => 'Do you want to discard your post?';
-
-  @override
-  String get discardChangesQuestion => 'Do you want to discard your changes?';
-
-  @override
-  String get discardChanges => 'Discard changes';
-
-  @override
-  String get saveDraft => 'Save draft';
-
-  @override
   String get notificationSettings => 'Notification settings';
 
   @override
@@ -2124,50 +1907,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dismissedTopics => 'Dismissed';
-
-  @override
-  String topicMapViews(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'views',
-      one: 'view',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLikes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'likes',
-      one: 'like',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLinks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'links',
-      one: 'link',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapUsers(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'users',
-      one: 'user',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get markAsSolution => 'Mark as solution';
@@ -2713,12 +2452,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coverRemoved => 'Cover removed';
 
   @override
-  String get day => 'Day';
-
-  @override
-  String get month => 'Month';
-
-  @override
   String get displayName => 'Display name';
 
   @override
@@ -2977,9 +2710,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourPhoto => 'Your photo';
 
   @override
-  String get chooseEmoji => 'Choose emoji';
-
-  @override
   String get clearStatus => 'Clear status';
 
   @override
@@ -3002,9 +2732,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removeStatusAfter => 'Remove status';
-
-  @override
-  String get searchEmoji => 'Search emoji';
 
   @override
   String get setStatus => 'Set status';
@@ -3456,16 +3183,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signUp => 'Sign Up';
 
   @override
-  String get suspendUser => 'Suspend User';
-
-  @override
   String get unsuspend => 'Unsuspend';
-
-  @override
-  String get suspendUntil => 'Suspend user until';
-
-  @override
-  String get suspendForever => 'Suspend forever';
 
   @override
   String failedToSuspendUser(String error) {
@@ -3478,37 +3196,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get suspendReasonNotListening => 'Would not listen to staff feedback';
-
-  @override
-  String get suspendReasonStaffTime =>
-      'Consumed disproportionate amounts of staff time';
-
-  @override
-  String get suspendReasonCombative => 'Too combative';
-
-  @override
-  String get suspendReasonWrongPlace => 'In the wrong place';
-
-  @override
-  String get suspendReasonNoPurpose =>
-      'No constructive purpose to their actions other than creating dissent within the community';
-
-  @override
-  String get suspendReasonCustom => 'Custom…';
-
-  @override
-  String get suspendReasonQuestion =>
-      'Why are you suspending? This text will be shown to the user when they try to log in. Keep it short.';
-
-  @override
-  String get closedLabel => 'Closed';
-
-  @override
   String get flaggingPost => 'Flagging post…';
-
-  @override
-  String get pleaseSelectSuspensionEndDate => 'Choose when the suspension ends';
 
   @override
   String get suspendingUser => 'Suspending user…';
@@ -3695,9 +3383,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noForumDescription => 'No description available.';
 
   @override
-  String get dismissAllNotifications => 'Dismiss all';
-
-  @override
   String get notificationPostIdMissing =>
       'Post ID is missing. Cannot navigate to the post.';
 
@@ -3823,76 +3508,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchFiltersButtonTooltip => 'Filters';
-
-  @override
-  String get searchFilterStatusSection => 'Status';
-
-  @override
-  String get searchFilterMyActivitySection => 'My activity';
-
-  @override
-  String get searchFilterMatchTypeSection => 'Match type';
-
-  @override
-  String get searchTagsFilterHelper =>
-      'Space- or comma-separated. Each tag is required.';
-
-  @override
-  String get searchSortBy => 'Sort by';
-
-  @override
-  String get searchStatusOpen => 'Open';
-
-  @override
-  String get searchStatusArchived => 'Archived';
-
-  @override
-  String get searchStatusNoReplies => 'No replies';
-
-  @override
-  String get searchStatusPublicOnly => 'Public only';
-
-  @override
-  String get searchStatusUnsolved => 'Unsolved';
-
-  @override
-  String get searchInBookmarked => 'I bookmarked';
-
-  @override
-  String get searchInMyMessages => 'In my messages';
-
-  @override
-  String get searchInLiked => 'I liked';
-
-  @override
-  String get searchInPosted => 'I posted in';
-
-  @override
-  String get searchInWatching => 'I\'m watching';
-
-  @override
-  String get searchInTracking => 'I\'m tracking';
-
-  @override
-  String get searchInSeen => 'I read';
-
-  @override
-  String get searchInUnseen => 'I\'ve not read';
-
-  @override
-  String get searchSortLatestPost => 'Latest post';
-
-  @override
-  String get searchSortMostLiked => 'Most liked';
-
-  @override
-  String get searchSortMostViewed => 'Most viewed';
-
-  @override
-  String get searchSortLatestTopic => 'Latest topic';
-
-  @override
-  String get searchFieldHint => 'Search...';
 
   @override
   String get bookmarksUnavailable => 'Bookmarks are unavailable';
@@ -4527,12 +4142,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get postLikeAction => 'Like post';
-
-  @override
-  String get postUnlikeAction => 'Unlike post';
-
-  @override
   String get postVoteRemoveFailed =>
       'Could not remove vote (past undo window?)';
 
@@ -4856,10 +4465,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordFieldLabel => 'Password';
-
-  @override
-  String get somethingWentWrongTryAgain =>
-      'Something went wrong. Please try again.';
 
   @override
   String get unexpectedErrorTryAgain =>

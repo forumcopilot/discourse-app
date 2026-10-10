@@ -20,6 +20,7 @@ import '../views/widgets/badge_detail_sheet.dart';
 import 'site_proxy_service.dart';
 import '../views/site_home_tab.dart';
 import 'notification_route.dart';
+import '../l10n/kit_strings.dart';
 
 /// Takes the reader to a [DiscourseNotificationRoute] inside a forum that is
 /// already open.
@@ -193,7 +194,7 @@ class DiscourseRouteNavigator {
       final l10n = AppLocalizations.of(context);
       final reason = result.resultText ?? '';
       SnackbarHelper.showError(
-          context, l10n?.couldNotOpenLink(reason) ?? 'Could not open link: $reason');
+          context, l10n?.kit.couldNotOpenLink(reason) ?? 'Could not open link: $reason');
     }
     return null;
   }

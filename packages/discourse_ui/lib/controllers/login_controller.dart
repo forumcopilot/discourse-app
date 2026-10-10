@@ -29,6 +29,7 @@ import 'package:discourse_ui/utils/passkey_platform_stub.dart'
 
 import '../l10n/app_l10n.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../l10n/kit_strings.dart';
 /// Stable reason codes for push/login diagnostics.
 abstract class PushLoginReasonCode {
   static const String sessionValid = 'session_valid';
@@ -1310,7 +1311,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
             onPressed: () {
               Get.back();
             },
-            child: Text(appL10n().okButton),
+            child: Text(appL10n().kit.okButton),
           ),
         ],
         elevation: 8,
@@ -1345,7 +1346,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
             onPressed: () {
               Get.back();
             },
-            child: Text(appL10n().okButton),
+            child: Text(appL10n().kit.okButton),
           ),
         ],
         elevation: 8,

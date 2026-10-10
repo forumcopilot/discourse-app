@@ -5,6 +5,7 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../widgets/empty_state_view.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 import 'package:discourse_ui/views/widgets/discard_changes_scope.dart';
+import '../../../../l10n/kit_strings.dart';
 
 class EditConversationPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -150,7 +151,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.error(e.toString())),
+            content: Text(AppLocalizations.of(context)!.kit.error(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

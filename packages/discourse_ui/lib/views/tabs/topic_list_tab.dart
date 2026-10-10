@@ -20,6 +20,7 @@ import 'package:discourse_ui/views/widgets/forum_masthead.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import '../../l10n/kit_strings.dart';
 
 /// The rows of the active filter as slivers.
 ///
@@ -140,7 +141,7 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     return _filters.map((f) {
       switch (f) {
         case HomeView.latest:
-          return l10n.latest;
+          return l10n.kit.latest;
         case HomeView.hot:
           return l10n.hot;
         case HomeView.newTopics:

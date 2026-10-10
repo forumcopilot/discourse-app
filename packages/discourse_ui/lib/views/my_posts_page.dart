@@ -16,6 +16,7 @@ import 'post_page.dart';
 import 'widgets/activity_row.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/filter_chip_bar.dart';
+import '../l10n/kit_strings.dart';
 
 /// The signed-in reader's own posts — web's sidebar "My posts", which opens
 /// their activity stream. It used to open their whole profile (edit and
@@ -262,11 +263,11 @@ class _MyPostsPageState extends State<MyPostsPage> {
       if (_pending.isNotEmpty || _filter == MyPostsFilter.pending) MyPostsFilter.pending,
     ];
     String label(MyPostsFilter f) => switch (f) {
-          MyPostsFilter.all => l10n.all,
+          MyPostsFilter.all => l10n.kit.all,
           MyPostsFilter.topics => l10n.activityFilterTopics,
           MyPostsFilter.replies => l10n.activityFilterReplies,
           MyPostsFilter.likes => l10n.activityFilterLikes,
-          MyPostsFilter.solved => l10n.solved,
+          MyPostsFilter.solved => l10n.kit.solved,
           MyPostsFilter.pending =>
             '${l10n.activityFilterPending} (${_pending.length})',
         };

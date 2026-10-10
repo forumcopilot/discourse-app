@@ -45,6 +45,7 @@ import '../widgets/forum_icon_tile.dart';
 import '../widgets/forum_masthead.dart';
 import '../widgets/profile_stats_strip.dart';
 import '../widgets/user_badges_section.dart';
+import '../../l10n/kit_strings.dart';
 
 /// The Profile tab: the reader's account on this forum.
 ///
@@ -377,7 +378,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab>
           ),
           _Row(
             icon: Icons.bookmark_border,
-            label: l10n.bookmarks,
+            label: l10n.kit.bookmarks,
             count: summary?.bookmarkCount,
             onTap: () => _push(BookmarksPage(siteContext: site)),
           ),
@@ -441,7 +442,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialog).pop(false),
-            child: Text(l10n.cancel),
+            child: Text(l10n.kit.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialog).pop(true),

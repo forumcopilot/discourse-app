@@ -25,6 +25,7 @@ import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy;
 import '../widgets/filter_chip_bar.dart';
 import '../../utils/error_message.dart';
 import '../widgets/empty_state_view.dart';
+import '../../l10n/kit_strings.dart';
 
 class NotificationListTab extends StatefulWidget {
   final SiteContext siteContext;
@@ -595,7 +596,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(AppLocalizations.of(ctx)!.okButton),
+            child: Text(AppLocalizations.of(ctx)!.kit.okButton),
           ),
         ],
       ),
@@ -628,7 +629,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(AppLocalizations.of(context)!.okButton),
+              child: Text(AppLocalizations.of(context)!.kit.okButton),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -749,7 +750,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
   Widget _buildFilterBar() {
     return FilterChipBar(
       options: [
-        FilterChipOption(label: AppLocalizations.of(context)!.all),
+        FilterChipOption(label: AppLocalizations.of(context)!.kit.all),
         FilterChipOption(label: AppLocalizations.of(context)!.unread),
       ],
       selectedIndex: _unreadOnly ? 1 : 0,

@@ -17,16 +17,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Sua sessão mudou. Copie seu texto antes de reabrir o editor para trabalhar com rascunhos.';
 
   @override
-  String get discardFailedCloseQuestion =>
-      'Fechar mesmo assim? Um rascunho salvo antes continua em Rascunhos.';
-
-  @override
-  String get keepEditing => 'Continuar editando';
-
-  @override
-  String get closeAnyway => 'Fechar mesmo assim';
-
-  @override
   String get uploadSessionChanged =>
       'Sua sessão mudou durante o envio. Reabra esta tela antes de tentar novamente.';
 
@@ -50,16 +40,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get errorTitle => 'Erro';
 
   @override
-  String get okButton => 'OK';
-
-  @override
   String get retryButton => 'Tentar novamente';
 
   @override
   String get copyToClipboard => 'Copiar para área de transferência';
-
-  @override
-  String get copied => 'Copiado';
 
   @override
   String get errorMessageCopiedToClipboard =>
@@ -67,12 +51,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dismiss => 'Dispensar';
-
-  @override
-  String get cancel => 'Cancelar';
-
-  @override
-  String get tryAgain => 'Tentar Novamente';
 
   @override
   String get anErrorOccurred => 'Ocorreu um erro';
@@ -147,9 +125,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Você precisa estar conectado para ver seus tópicos não lidos';
 
   @override
-  String get latest => 'Recentes';
-
-  @override
   String get unread => 'Não lidos';
 
   @override
@@ -171,12 +146,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newConversation => 'Nova mensagem';
 
   @override
-  String get language => 'Idioma';
-
-  @override
-  String get all => 'Todos';
-
-  @override
   String get topicsOnly => 'Apenas tópicos';
 
   @override
@@ -196,9 +165,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Por favor, aguarde o carregamento do tópico';
 
   @override
-  String get reason => 'Motivo';
-
-  @override
   String get participantsLabel => 'Participantes';
 
   @override
@@ -213,12 +179,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get newTopic => 'Novo tópico';
-
-  @override
-  String get pleaseSpecifyReason => 'Por favor, especifique o motivo';
-
-  @override
-  String get selectDate => 'Selecionar data';
 
   @override
   String get moreOptions => 'Mais opções';
@@ -282,9 +242,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noSubject => 'Sem assunto';
 
   @override
-  String get search => 'Buscar';
-
-  @override
   String get logout => 'Sair';
 
   @override
@@ -303,16 +260,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get profile => 'Perfil';
 
   @override
-  String get messages => 'Mensagens';
-
-  @override
-  String get add => 'Adicionar';
-
-  @override
   String get retry => 'Tentar Novamente';
-
-  @override
-  String get delete => 'Excluir';
 
   @override
   String get deleteMessage => 'Excluir Mensagem';
@@ -379,18 +327,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get next => 'Próximo';
 
   @override
-  String get temporary => 'Temporário';
-
-  @override
   String get back => 'Voltar';
 
   @override
   String get confirm => 'Confirmar';
-
-  @override
-  String error(String error) {
-    return 'Erro: $error';
-  }
 
   @override
   String get removeAttachment => 'Remover Anexo';
@@ -398,9 +338,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get areYouSureYouWantToRemoveThisAttachment =>
       'Tem certeza de que deseja remover este anexo?';
-
-  @override
-  String get none => 'Nenhum';
 
   @override
   String get attachFile => 'Anexar Arquivo';
@@ -415,28 +352,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get bold => 'Negrito';
 
   @override
-  String get italic => 'Itálico';
-
-  @override
   String get underline => 'Sublinhado';
 
   @override
   String get strikethrough => 'Tachado';
 
   @override
-  String get link => 'Link';
-
-  @override
-  String get image => 'Imagem';
-
-  @override
   String get video => 'Vídeo';
-
-  @override
-  String get quote => 'Citação';
-
-  @override
-  String get code => 'Código';
 
   @override
   String get spoiler => 'Spoiler';
@@ -451,11 +373,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get listItem => 'Item da Lista';
 
   @override
-  String participants(int count) {
-    return 'Participantes ($count)';
-  }
-
-  @override
   String get markAsUnread => 'Marcar não lido';
 
   @override
@@ -466,16 +383,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Digite palavras-chave para buscar tópicos...';
 
   @override
-  String get refresh => 'Atualizar';
-
-  @override
-  String get share => 'Compartilhar';
-
-  @override
   String get viewOnWeb => 'Ver na Web';
-
-  @override
-  String get reply => 'Responder';
 
   @override
   String get vote => 'Votar';
@@ -521,9 +429,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get light => 'Claro';
 
   @override
-  String get dark => 'Escuro';
-
-  @override
   String get appearance => 'Aparência';
 
   @override
@@ -545,9 +450,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get home => 'Início';
-
-  @override
-  String get notifications => 'Notificações';
 
   @override
   String get notificationsTab => 'Avisos';
@@ -630,16 +532,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get edit => 'Editar';
-
-  @override
-  String get remove => 'Remover';
-
-  @override
   String get subject => 'Assunto';
-
-  @override
-  String get message => 'Mensagem';
 
   @override
   String get titleCannotBeEmpty => 'O título não pode estar vazio';
@@ -669,11 +562,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return 'Erro ao baixar $filename: $error';
-  }
-
-  @override
-  String couldNotOpenLink(String error) {
-    return 'Não foi possível abrir o link: $error';
   }
 
   @override
@@ -742,39 +630,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String timeGapDaysLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count dias depois',
-      one: '1 dia depois',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapMonthsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count meses depois',
-      one: '1 mês depois',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapYearsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count anos depois',
-      one: '1 ano depois',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get profileViews => 'Visualizações';
 
   @override
@@ -807,12 +662,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Todas as notificações marcadas como lidas';
 
   @override
-  String get apply => 'Aplicar';
-
-  @override
-  String get bookmarks => 'Favoritos';
-
-  @override
   String reviewableBy(String username) {
     return 'Por $username';
   }
@@ -828,9 +677,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get clearReminder => 'Remover lembrete';
-
-  @override
-  String get copy => 'Copiar';
 
   @override
   String get copyLink => 'Copiar link';
@@ -863,9 +709,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteMessageQuestion => 'Excluir mensagem?';
 
   @override
-  String get discard => 'Descartar';
-
-  @override
   String get doNotDisturb => 'Não perturbe';
 
   @override
@@ -892,9 +735,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get failedToUpdateNotificationLevel =>
       'Não foi possível atualizar o nível de notificação';
-
-  @override
-  String get firstPostsOnly => 'Apenas primeiras postagens';
 
   @override
   String get ignoredUsers => 'Usuários ignorados';
@@ -978,9 +818,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pushNotifications => 'Notificações push';
 
   @override
-  String get relevance => 'Relevância';
-
-  @override
   String get reminderTimeMustBeInFuture =>
       'O horário do lembrete deve estar no futuro';
 
@@ -1005,9 +842,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String requestToJoinGroup(String group) {
     return 'Solicitar entrada em $group';
   }
-
-  @override
-  String get reset => 'Redefinir';
 
   @override
   String get resizeAndUpload => 'Redimensionar e enviar';
@@ -1059,9 +893,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return 'Você parou de ignorar @$username';
   }
-
-  @override
-  String get titleOnly => 'Apenas título';
 
   @override
   String get tomorrow => 'Amanhã';
@@ -1153,9 +984,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get pleaseLoginToViewUserProfiles =>
       'Faça login para ver perfis de usuário.';
-
-  @override
-  String get solved => 'Resolvido';
 
   @override
   String get hot => 'Em alta';
@@ -1250,9 +1078,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get openConversationConfirmation =>
       'Abrir esta mensagem? Ela voltará a aceitar respostas novas.';
-
-  @override
-  String get open => 'Abrir';
 
   @override
   String get leaveConversation3 => 'Sair da mensagem';
@@ -1360,17 +1185,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String participantCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count participantes',
-      one: '1 participante',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get chatChannels => 'Canais';
 
   @override
@@ -1472,13 +1286,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get takePhoto => 'Tirar foto';
 
   @override
-  String get postNeedsApprovalTitle => 'A postagem precisa de aprovação';
-
-  @override
-  String get postNeedsApprovalBody =>
-      'Nós recebemos sua nova postagem, mas é necessário ter aprovação da moderação antes de ser exibida. Pedimos paciência.';
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return 'Máximo de $count anexo(s) permitido(s)';
   }
@@ -1569,12 +1376,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get searchUser => 'Pesquisar usuário';
 
   @override
-  String get tapToOpen => 'Toque para abrir';
-
-  @override
-  String get imageNotAvailable => 'Imagem indisponível';
-
-  @override
   String postsCount(Object count) {
     return '$count postagens';
   }
@@ -1659,9 +1460,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noReactionsYet => 'Nenhuma reação ainda';
 
   @override
-  String get searchFilters => 'Filtros de pesquisa';
-
-  @override
   String get suggestedTopics => 'Tópicos sugeridos';
 
   @override
@@ -1696,9 +1494,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get couldNotLoadCategories =>
       'Não foi possível carregar as categorias.';
-
-  @override
-  String get tags => 'Tags';
 
   @override
   String get community => 'Comunidade';
@@ -2048,18 +1843,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get createTopic => 'Criar Tópico';
 
   @override
-  String get discardPostQuestion => 'Você deseja excluir sua postagem?';
-
-  @override
-  String get discardChangesQuestion => 'Você deseja descartar suas alterações?';
-
-  @override
-  String get discardChanges => 'Descartar alterações';
-
-  @override
-  String get saveDraft => 'Salvar rascunho';
-
-  @override
   String get notificationSettings => 'Configurações de notificação';
 
   @override
@@ -2154,50 +1937,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dismissedTopics => 'Descartados';
-
-  @override
-  String topicMapViews(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'visualizações',
-      one: 'visualização',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLikes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'curtidas',
-      one: 'curtida',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLinks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'links',
-      one: 'link',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapUsers(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'usuários',
-      one: 'usuário',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get markAsSolution => 'Marcar como solução';
@@ -2743,12 +2482,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get coverRemoved => 'Capa removida';
 
   @override
-  String get day => 'Dia';
-
-  @override
-  String get month => 'Mês';
-
-  @override
   String get displayName => 'Nome de exibição';
 
   @override
@@ -3007,9 +2740,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get yourPhoto => 'Sua foto';
 
   @override
-  String get chooseEmoji => 'Escolher emoji';
-
-  @override
   String get clearStatus => 'Limpar status';
 
   @override
@@ -3033,9 +2763,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get removeStatusAfter => 'Remover status';
-
-  @override
-  String get searchEmoji => 'Buscar emoji';
 
   @override
   String get setStatus => 'Definir status';
@@ -3488,16 +3215,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get signUp => 'Cadastrar-se';
 
   @override
-  String get suspendUser => 'Suspender usuário(a)';
-
-  @override
   String get unsuspend => 'Readmitir';
-
-  @override
-  String get suspendUntil => 'Suspender usuário até';
-
-  @override
-  String get suspendForever => 'Suspender para sempre';
 
   @override
   String failedToSuspendUser(String error) {
@@ -3510,39 +3228,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get suspendReasonNotListening =>
-      'Não dava atenção aos comentários da equipe';
-
-  @override
-  String get suspendReasonStaffTime =>
-      'Consumia uma quantidade desproporcional de tempo da equipe';
-
-  @override
-  String get suspendReasonCombative => 'Muito agressivo(a)';
-
-  @override
-  String get suspendReasonWrongPlace => 'No lugar errado';
-
-  @override
-  String get suspendReasonNoPurpose =>
-      'Nenhum propósito construtivo em suas ações, exceto criar discórdia na comunidade';
-
-  @override
-  String get suspendReasonCustom => 'Personalizado…';
-
-  @override
-  String get suspendReasonQuestion =>
-      'Por que você está suspendendo? Este texto será exibido para o(a) usuário(a) quando tentar entrar. Seja breve.';
-
-  @override
-  String get closedLabel => 'Fechado';
-
-  @override
   String get flaggingPost => 'Sinalizando a postagem…';
-
-  @override
-  String get pleaseSelectSuspensionEndDate =>
-      'Escolha quando a suspensão termina';
 
   @override
   String get suspendingUser => 'Suspendendo usuário…';
@@ -3731,9 +3417,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noForumDescription => 'Nenhuma descrição disponível.';
 
   @override
-  String get dismissAllNotifications => 'Descartar tudo';
-
-  @override
   String get notificationPostIdMissing =>
       'O ID da postagem está faltando. Não é possível ir para a postagem.';
 
@@ -3864,76 +3547,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get searchFiltersButtonTooltip => 'Filtros';
-
-  @override
-  String get searchFilterStatusSection => 'Status';
-
-  @override
-  String get searchFilterMyActivitySection => 'Minha atividade';
-
-  @override
-  String get searchFilterMatchTypeSection => 'Tipo de correspondência';
-
-  @override
-  String get searchTagsFilterHelper =>
-      'Separadas por espaço ou vírgula. Todas as etiquetas são obrigatórias.';
-
-  @override
-  String get searchSortBy => 'Ordenar por';
-
-  @override
-  String get searchStatusOpen => 'Aberto';
-
-  @override
-  String get searchStatusArchived => 'Arquivado';
-
-  @override
-  String get searchStatusNoReplies => 'Sem respostas';
-
-  @override
-  String get searchStatusPublicOnly => 'Somente públicos';
-
-  @override
-  String get searchStatusUnsolved => 'Não solucionado';
-
-  @override
-  String get searchInBookmarked => 'Marquei como favorito';
-
-  @override
-  String get searchInMyMessages => 'Nas minhas mensagens';
-
-  @override
-  String get searchInLiked => 'Curti';
-
-  @override
-  String get searchInPosted => 'Postei em';
-
-  @override
-  String get searchInWatching => 'Estou acompanhando';
-
-  @override
-  String get searchInTracking => 'Estou monitorando';
-
-  @override
-  String get searchInSeen => 'Li';
-
-  @override
-  String get searchInUnseen => 'Não li';
-
-  @override
-  String get searchSortLatestPost => 'Última postagem';
-
-  @override
-  String get searchSortMostLiked => 'Mais curtido(a)';
-
-  @override
-  String get searchSortMostViewed => 'Mais visto(a)';
-
-  @override
-  String get searchSortLatestTopic => 'Último tópico';
-
-  @override
-  String get searchFieldHint => 'Pesquisar…';
 
   @override
   String get bookmarksUnavailable => 'Os favoritos não estão disponíveis';
@@ -4582,12 +4195,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get postLikeAction => 'Curtir a postagem';
-
-  @override
-  String get postUnlikeAction => 'Desfazer curtida';
-
-  @override
   String get postVoteRemoveFailed =>
       'Não foi possível remover o voto (o prazo para desfazer expirou?)';
 
@@ -4921,9 +4528,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get passwordFieldLabel => 'Senha';
-
-  @override
-  String get somethingWentWrongTryAgain => 'Algo deu errado. Tente novamente.';
 
   @override
   String get unexpectedErrorTryAgain =>

@@ -41,6 +41,7 @@ import 'widgets/chat_reaction_chips.dart';
 import 'widgets/chat_thread_indicator.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../l10n/app_l10n.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Embeds a single Discourse Chat channel — message list + composer —
 /// without its own Scaffold/AppBar so it can plug into a tab body or
@@ -826,12 +827,12 @@ class _ChatChannelViewState extends State<ChatChannelView> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text(AppLocalizations.of(context)!.cancel)),
+              child: Text(AppLocalizations.of(context)!.kit.cancel)),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.error),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(AppLocalizations.of(context)!.delete),
+            child: Text(AppLocalizations.of(context)!.kit.delete),
           ),
         ],
       ),

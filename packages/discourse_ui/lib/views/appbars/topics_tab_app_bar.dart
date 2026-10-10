@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../search_page.dart';
+import '../../l10n/kit_strings.dart';
 
 class TopicsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
@@ -39,7 +40,7 @@ class TopicsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildSearchButton(BuildContext context, ColorScheme colorScheme) {
     return IconButton(
       icon: const Icon(Icons.manage_search_rounded),
-      tooltip: AppLocalizations.of(context)?.search ?? 'Search',
+      tooltip: AppLocalizations.of(context)?.kit.search ?? 'Search',
       onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => SearchPage(siteContext: siteContext)),

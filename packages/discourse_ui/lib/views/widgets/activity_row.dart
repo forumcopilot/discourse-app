@@ -10,6 +10,7 @@ import '../../utils/time_utils.dart';
 import 'category_badge.dart';
 import 'topic_taxonomy_chips.dart';
 import 'user_avatar.dart';
+import '../../l10n/kit_strings.dart';
 
 /// The person a row names, when naming one says something.
 ///
@@ -351,7 +352,7 @@ class _MetaRow extends StatelessWidget {
         if ((likeCount ?? 0) > 0)
           item(Icons.favorite_border, formatNumber(context, likeCount!)),
         if (solved)
-          item(Icons.check_circle, AppLocalizations.of(context)?.solved ?? 'Solved',
+          item(Icons.check_circle, AppLocalizations.of(context)?.kit.solved ?? 'Solved',
               color: ForumColors.of(context).success),
       ],
     );

@@ -22,6 +22,7 @@ import 'widgets/empty_state_view.dart';
 import 'widgets/section_header.dart';
 import 'widgets/simple_list_app_bar.dart';
 import 'widgets/user_avatar.dart';
+import '../l10n/kit_strings.dart';
 
 /// Edit profile: everything about you the forum lets you change, as a short
 /// overview in groups. Each row shows what is set; tapping it changes just
@@ -518,7 +519,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (s.userSelectedPrimaryGroups && p.primaryGroupChoices.isNotEmpty)
         _ProfileRow(
           label: l10n.primaryGroup,
-          value: p.primaryGroup?.displayName ?? l10n.none,
+          value: p.primaryGroup?.displayName ?? l10n.kit.none,
           onTap: _changePrimaryGroup,
         ),
       if (s.allowFeaturedTopic || _fields.isNotEmpty)

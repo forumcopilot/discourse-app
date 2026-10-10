@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
+import '../../l10n/kit_strings.dart';
 
 /// One upload in the strip: a thumbnail for a photo, the file's kind
 /// otherwise, a spinner while it uploads, and a remove button (a 48dp
@@ -118,7 +119,7 @@ class UploadTile extends StatelessWidget {
                 right: 0,
                 child: IconButton.filledTonal(
                   onPressed: onRemove,
-                  tooltip: removeTooltip ?? AppLocalizations.of(context)!.remove,
+                  tooltip: removeTooltip ?? AppLocalizations.of(context)!.kit.remove,
                   iconSize: 16,
                   style: IconButton.styleFrom(
                     minimumSize: const Size.square(24),

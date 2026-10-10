@@ -8,6 +8,7 @@ import '../controllers/global_loader_controller.dart';
 import '../theme/design_tokens.dart';
 import 'error_message.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseApiException;
+import '../l10n/kit_strings.dart';
 
 /// Extracts a user-friendly error message from an exception
 /// For FCApiException, returns the message property
@@ -86,7 +87,7 @@ void showErrorDialog(String errorMessage) {
                     // Defer snackbar to next frame as well, for safety
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       Get.snackbar(
-                        l10n?.copied ?? "Copied",
+                        l10n?.kit.copied ?? "Copied",
                         l10n?.errorMessageCopiedToClipboard ?? "Error message copied to clipboard",
                         snackPosition: SnackPosition.BOTTOM,
                         backgroundColor: Get.theme.colorScheme.surfaceContainerHighest,
@@ -106,7 +107,7 @@ void showErrorDialog(String errorMessage) {
             onPressed: () {
               Get.back(); // Close the dialog
             },
-            child: Text(l10n?.okButton ?? "OK"),
+            child: Text(l10n?.kit.okButton ?? "OK"),
           ),
         ],
       ),

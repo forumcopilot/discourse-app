@@ -33,6 +33,7 @@ import '../../theme/design_tokens.dart';
 import '../../utils/error_dialog.dart';
 import '../../utils/error_message.dart';
 import '../widgets/empty_state_view.dart';
+import '../../l10n/kit_strings.dart';
 
 class PostsList extends StatefulWidget {
   const PostsList({
@@ -1395,7 +1396,7 @@ class _PostsState extends State<PostsList> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             TextButton(
               onPressed: () async {
@@ -1525,7 +1526,7 @@ class _PostsState extends State<PostsList> {
                     postActionsHandler.handleReply(context, "", widget.topicId, widget.topicTitle, _refreshWithOptionalScrollToPost);
                   },
                   icon: const Icon(Icons.reply),
-                  label: Text(AppLocalizations.of(context)?.reply ?? 'Reply'),
+                  label: Text(AppLocalizations.of(context)?.kit.reply ?? 'Reply'),
                 ),
             ],
           ),

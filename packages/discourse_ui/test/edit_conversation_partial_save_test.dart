@@ -5,6 +5,7 @@ import 'package:discourse_ui/views/private_messaging/message_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
+import 'package:discourse_ui/l10n/kit_strings.dart';
 
 /// A message's title and its open state are saved by separate requests.
 /// When the title saves and closing is refused, the editor stays open with
@@ -87,7 +88,7 @@ void main() {
     // still unsaved).
     await tester.tap(find.byType(CloseButton));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(strings.discardChanges));
+    await tester.tap(find.text(strings.kit.discardChanges));
     await tester.pumpAndSettle();
     expect(find.byType(EditConversationPage), findsNothing);
     expect(changed, isTrue,
@@ -109,7 +110,7 @@ void main() {
     expect(conversations.puts, ['/t/7.json']);
     await tester.tap(find.byType(CloseButton));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(strings.discardChanges));
+    await tester.tap(find.text(strings.kit.discardChanges));
     await tester.pumpAndSettle();
     expect(changed, isFalse);
   });

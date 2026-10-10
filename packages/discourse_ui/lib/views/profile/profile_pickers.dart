@@ -19,6 +19,7 @@ import '../widgets/cached_redirect_image.dart';
 import '../widgets/sheet_title.dart';
 import '../widgets/user_avatar.dart';
 import 'profile_common.dart';
+import '../../l10n/kit_strings.dart';
 
 /// A group picked in a sheet; a null id is "none".
 class GroupChoice {
@@ -595,7 +596,7 @@ Future<GroupChoice?> showPrimaryGroupSheet({
             Navigator.pop(sheet, GroupChoice(v == null || v < 0 ? null : v)),
         child: Column(
           children: [
-            RadioListTile<int>(value: -1, title: Text(l10n.none)),
+            RadioListTile<int>(value: -1, title: Text(l10n.kit.none)),
             for (final g in profile.primaryGroupChoices)
               RadioListTile<int>(
                 value: g.id,
@@ -978,7 +979,7 @@ class _BirthdayDialogState extends State<_BirthdayDialog> {
                 child: DropdownButtonFormField<int>(
                   initialValue: _month,
                   isExpanded: true,
-                  decoration: InputDecoration(labelText: l10n.month),
+                  decoration: InputDecoration(labelText: l10n.kit.month),
                   items: [
                     for (var m = 1; m <= 12; m++)
                       DropdownMenuItem(
@@ -993,7 +994,7 @@ class _BirthdayDialogState extends State<_BirthdayDialog> {
                 child: DropdownButtonFormField<int>(
                   initialValue: _day,
                   isExpanded: true,
-                  decoration: InputDecoration(labelText: l10n.day),
+                  decoration: InputDecoration(labelText: l10n.kit.day),
                   items: [
                     for (var d = 1; d <= _daysInMonth; d++)
                       DropdownMenuItem(value: d, child: Text('$d')),
@@ -1010,11 +1011,11 @@ class _BirthdayDialogState extends State<_BirthdayDialog> {
           TextButton(
             onPressed: () =>
                 Navigator.pop(context, const BirthdayChoice(null)),
-            child: Text(l10n.remove),
+            child: Text(l10n.kit.remove),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(l10n.kit.cancel),
         ),
         TextButton(
           onPressed: () =>
@@ -1163,7 +1164,7 @@ class _UsernameDialogState extends State<_UsernameDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => context.popOwnRoute(),
-          child: Text(l10n.cancel),
+          child: Text(l10n.kit.cancel),
         ),
         TextButton(
           onPressed: _available && !_saving ? _save : null,

@@ -11,6 +11,7 @@ import '../../controllers/post_controller.dart' show ThreadLoadException;
 import '../../utils/error_message.dart';
 import '../../controllers/global_loader_controller.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Centralized error handling system for the Forum Copilot app
 ///
@@ -294,7 +295,7 @@ class ErrorHandler {
               ),
             TextButton(
               onPressed: () => Get.back(),
-              child: Text(_l10n().okButton),
+              child: Text(_l10n().kit.okButton),
             ),
           ],
         ),

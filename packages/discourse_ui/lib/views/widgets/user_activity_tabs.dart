@@ -9,6 +9,7 @@ import 'profile_section.dart';
 import 'user_created_topics.dart';
 import 'user_replied_posts.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/kit_strings.dart';
 
 /// The profile's activity feeds. Web offers ten; these are the ones a
 /// *viewer* can actually read — `/user_actions.json` answers 403 to
@@ -35,7 +36,7 @@ enum ActivityTab {
         replies => l10n.activityFilterReplies,
         topics => l10n.activityFilterTopics,
         likes => l10n.activityFilterLikes,
-        solved => l10n.solved,
+        solved => l10n.kit.solved,
       };
 
   String emptyLabel(AppLocalizations l10n) => switch (this) {

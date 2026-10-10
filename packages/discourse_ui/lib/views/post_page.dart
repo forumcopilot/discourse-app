@@ -24,6 +24,7 @@ import 'widgets/feature_topic_sheet.dart';
 import 'private_messaging/message_actions.dart';
 import 'private_messaging/message_participants_sheet.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../l10n/kit_strings.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({
@@ -475,7 +476,7 @@ class _PostPageState extends State<PostPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -587,7 +588,7 @@ class _PostPageState extends State<PostPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.cancel),
+            child: Text(l10n.kit.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(

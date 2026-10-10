@@ -16,6 +16,7 @@ import '../widgets/empty_state_view.dart';
 import '../../utils/error_message.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/l10n/app_l10n.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Discourse-native moderator review queue (`/review.json`). Staff (and
 /// reviewer-group members) see flagged posts, queued posts, and queued
@@ -226,7 +227,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(AppLocalizations.of(context)!.kit.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -256,7 +257,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
             TextField(
               controller: controller,
               decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.reason,
+                labelText: AppLocalizations.of(context)!.kit.reason,
                 hintText: AppLocalizations.of(context)!.reviewRejectReasonHint,
                 border: const OutlineInputBorder(),
               ),
@@ -267,7 +268,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(null),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(AppLocalizations.of(context)!.kit.cancel),
           ),
           FilledButton(
             onPressed: () =>

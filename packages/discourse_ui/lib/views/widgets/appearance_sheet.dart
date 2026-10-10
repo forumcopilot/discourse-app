@@ -5,6 +5,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../settings_context.dart';
 import 'sheet_title.dart';
 import '../../theme/design_tokens.dart';
+import '../../l10n/kit_strings.dart';
 
 /// The label for [mode] as the Appearance picker shows it.
 String appearanceLabel(BuildContext context, ThemeMode mode) {
@@ -12,7 +13,7 @@ String appearanceLabel(BuildContext context, ThemeMode mode) {
   return switch (mode) {
     ThemeMode.system => l10n.appearanceSystem,
     ThemeMode.light => l10n.light,
-    ThemeMode.dark => l10n.dark,
+    ThemeMode.dark => l10n.kit.dark,
   };
 }
 

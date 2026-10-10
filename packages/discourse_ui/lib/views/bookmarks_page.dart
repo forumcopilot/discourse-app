@@ -26,6 +26,7 @@ import 'widgets/empty_state_view.dart';
 import 'widgets/filter_chip_bar.dart';
 import 'widgets/topic_taxonomy_chips.dart';
 import 'widgets/user_avatar.dart';
+import '../l10n/kit_strings.dart';
 
 /// The reader's bookmarks (`/u/{me}/bookmarks.json`), in the style of the
 /// topic page and My posts.
@@ -241,7 +242,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialog).pop(),
-            child: Text(l10n.cancel),
+            child: Text(l10n.kit.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialog).pop(controller.text),
@@ -331,7 +332,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.bookmarks)),
+      appBar: AppBar(title: Text(l10n.kit.bookmarks)),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: CustomScrollView(
@@ -376,7 +377,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
                 color: colorScheme.surface,
                 child: FilterChipBar(
                   options: [
-                    FilterChipOption(label: l10n.all),
+                    FilterChipOption(label: l10n.kit.all),
                     FilterChipOption(
                         label: l10n.bookmarksFilterReminders,
                         icon: Icons.alarm),

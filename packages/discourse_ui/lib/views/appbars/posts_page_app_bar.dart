@@ -6,6 +6,7 @@ import '../../utils/emoji_shortcodes.dart';
 import '../widgets/adaptive_app_bar_title.dart';
 import '../widgets/topic_status.dart' show notificationLevelLabel;
 import 'package:discourse_core/discourse_core.dart' show DiscourseTopicStatus;
+import '../../l10n/kit_strings.dart';
 
 /// What the app bar offers when the topic page shows a private message (a
 /// Discourse message is a topic): who is on it, and filing it away. Its
@@ -196,7 +197,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
       if (message != null)
         IconButton(
           icon: const Icon(Icons.people_outline_rounded),
-          tooltip: l10n.participants(message.participantCount),
+          tooltip: l10n.kit.participants(message.participantCount),
           onPressed: message.onParticipants,
         ),
       PopupMenuButton<String>(
@@ -208,11 +209,11 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
           borderRadius: BorderRadius.circular(DesignTokens.radiusM),
         ),
         itemBuilder: (context) => [
-          item('refresh', Icons.refresh_rounded, l10n.refresh),
+          item('refresh', Icons.refresh_rounded, l10n.kit.refresh),
           if (widget.siteContext.isLoggedIn && widget.onNotifications != null)
             // The bell of the reader's level, as web's tracking button.
             item('notifications', notificationLevelLabel(l10n, level).$2,
-                l10n.notifications),
+                l10n.kit.notifications),
           // A message's own actions, as its page used to offer them.
           if (message != null) ...[
             message.isArchived
@@ -227,7 +228,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   : item('msg_close', Icons.lock_outline, l10n.closeConversation),
           ],
           if (widget.onShare != null)
-            item('share', Icons.share_rounded, l10n.share),
+            item('share', Icons.share_rounded, l10n.kit.share),
           if (widget.onViewOnWeb != null)
             item('view_on_web', Icons.open_in_browser_rounded, l10n.viewOnWeb),
           if (staffItems.isNotEmpty) ...[
@@ -329,7 +330,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             FilledButton(
               onPressed: () {

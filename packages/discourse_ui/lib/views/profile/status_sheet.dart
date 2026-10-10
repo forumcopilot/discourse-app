@@ -14,6 +14,7 @@ import '../../utils/error_message.dart';
 import '../settings/do_not_disturb_tile.dart';
 import '../widgets/reaction_glyph.dart';
 import '../widgets/sheet_title.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Whether this forum offers statuses (`enable_user_status`). False until
 /// its settings are read.
@@ -245,7 +246,7 @@ class _StatusSheetState extends State<_StatusSheet> {
                       ),
                       onPressed: _saving ? null : _pickEmoji,
                       child: Semantics(
-                        label: l10n.chooseEmoji,
+                        label: l10n.kit.chooseEmoji,
                         child: _emoji == null
                             ? Icon(Icons.add_reaction_outlined,
                                 color: colorScheme.onSurfaceVariant)
@@ -337,7 +338,7 @@ class _StatusSheetState extends State<_StatusSheet> {
                   const Spacer(),
                   TextButton(
                     onPressed: _saving ? null : () => context.popOwnRoute(false),
-                    child: Text(l10n.cancel),
+                    child: Text(l10n.kit.cancel),
                   ),
                   const SizedBox(width: DesignTokens.spacingS),
                   FilledButton(

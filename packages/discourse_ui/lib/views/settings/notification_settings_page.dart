@@ -20,6 +20,7 @@ import '../../utils/snackbar_helper.dart';
 import '../widgets/sheet_title.dart';
 import '../widgets/section_header.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Phase 5.20b — notification preferences screen, rebuilt to sync
 /// against Discourse's user_option API.
@@ -630,7 +631,7 @@ Future<bool> confirmStopPush(BuildContext context,
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialog).pop(false),
-          child: Text(l10n.cancel),
+          child: Text(l10n.kit.cancel),
         ),
         TextButton(
           style: TextButton.styleFrom(

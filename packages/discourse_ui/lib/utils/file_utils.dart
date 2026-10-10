@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 import '../l10n/app_l10n.dart';
+import '../l10n/kit_strings.dart';
 
 /// Returns a human-readable file type for a given filename or extension, in
 /// the app's language — a label to show, not to match on ([getFileIcon] and
@@ -24,7 +25,7 @@ String getFileType(String filename) {
     case 'svg':
     case 'heic':
     case 'heif':
-      return appL10n().image;
+      return appL10n().kit.image;
 
     // Media
     case 'mp4':

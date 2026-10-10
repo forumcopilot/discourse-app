@@ -30,6 +30,7 @@ import '../../utils/error_message.dart';
 import '../../utils/snackbar_helper.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 import 'package:discourse_ui/views/widgets/discard_changes_scope.dart';
+import '../../l10n/kit_strings.dart';
 
 class MessageComposePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -714,14 +715,14 @@ class _MessageComposePageState extends State<MessageComposePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(AppLocalizations.of(context)!.kit.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.error,
               ),
-              child: Text(AppLocalizations.of(context)!.delete),
+              child: Text(AppLocalizations.of(context)!.kit.delete),
             ),
           ],
         );
@@ -1165,7 +1166,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_italic, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.italic),
+                        Text(AppLocalizations.of(context)!.kit.italic),
                       ],
                     ),
                   ),
@@ -1197,7 +1198,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.link, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.link),
+                        Text(AppLocalizations.of(context)!.kit.link),
                       ],
                     ),
                   ),
@@ -1207,7 +1208,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.image, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.image),
+                        Text(AppLocalizations.of(context)!.kit.image),
                       ],
                     ),
                   ),
@@ -1229,7 +1230,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_quote, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.quote),
+                        Text(AppLocalizations.of(context)!.kit.quote),
                       ],
                     ),
                   ),
@@ -1239,7 +1240,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.code, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.code),
+                        Text(AppLocalizations.of(context)!.kit.code),
                       ],
                     ),
                   ),

@@ -6,6 +6,7 @@ import '../../theme/design_tokens.dart';
 import '../../utils/app_navigation.dart';
 import '../../utils/discourse_markup.dart';
 import '../widgets/discard_changes_scope.dart';
+import '../../l10n/kit_strings.dart';
 
 /// A one-line profile text (display name, location, website) in a dialog
 /// that saves it. Stays open, with what was typed, when the save fails.
@@ -111,7 +112,7 @@ class _ProfileTextDialogState extends State<_ProfileTextDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => context.popOwnRoute(false),
-          child: Text(l10n.cancel),
+          child: Text(l10n.kit.cancel),
         ),
         TextButton(
           onPressed: _canSave && !_saving ? _save : null,
@@ -238,12 +239,12 @@ class _AboutMePageState extends State<AboutMePage> {
                   icon: const Icon(Icons.format_bold),
                 ),
                 IconButton(
-                  tooltip: l10n.italic,
+                  tooltip: l10n.kit.italic,
                   onPressed: _saving ? null : () => _format('I'),
                   icon: const Icon(Icons.format_italic),
                 ),
                 IconButton(
-                  tooltip: l10n.link,
+                  tooltip: l10n.kit.link,
                   onPressed: _saving ? null : () => _format('URL'),
                   icon: const Icon(Icons.link),
                 ),
@@ -499,7 +500,7 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> {
           ),
           items: [
             if (!f.required)
-              DropdownMenuItem<String>(value: null, child: Text(l10n.none)),
+              DropdownMenuItem<String>(value: null, child: Text(l10n.kit.none)),
             for (final o in f.options)
               DropdownMenuItem<String>(value: o, child: Text(o)),
           ],

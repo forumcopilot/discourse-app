@@ -34,6 +34,7 @@ import '../widgets/resettable_widget.dart';
 import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/kit_strings.dart';
 
 /// DM channel titles come back from the serializer already filled with
 /// the other members' usernames (channel_serializer.rb:
@@ -465,7 +466,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: AppLocalizations.of(context)!.refresh,
+            tooltip: AppLocalizations.of(context)!.kit.refresh,
             onPressed: _loading ? null : _refresh,
           ),
         ],

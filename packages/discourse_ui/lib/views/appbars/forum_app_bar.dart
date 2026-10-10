@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import '../search_page.dart';
 import '../users_directory_page.dart';
 import '../login_page.dart';
+import '../../l10n/kit_strings.dart';
 
 class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
@@ -75,7 +76,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildSearchButton(BuildContext context, ColorScheme colorScheme) {
     return IconButton(
       icon: const Icon(Icons.manage_search_rounded),
-      tooltip: AppLocalizations.of(context)!.search,
+      tooltip: AppLocalizations.of(context)!.kit.search,
       onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => SearchPage(siteContext: siteContext)),

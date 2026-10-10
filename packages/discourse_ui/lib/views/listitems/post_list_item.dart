@@ -55,6 +55,7 @@ import '../widgets/bookmark_reminder_sheet.dart';
 import '../private_messaging/message_participants_row.dart';
 import '../../services/site_proxy_service.dart';
 import '../../theme/forum_colors.dart';
+import '../../l10n/kit_strings.dart';
 
 class _PostContentData {
   /// Cooked HTML ready for `RichTextContent`, which draws the post's
@@ -1007,7 +1008,7 @@ class _PostListItemState extends State<PostListItem> {
     return PostActionButton(
       icon: Icons.reply_rounded,
       emphasized: true,
-      semanticLabel: AppLocalizations.of(context)!.reply,
+      semanticLabel: AppLocalizations.of(context)!.kit.reply,
       onTap: () {
         showDialog(
           context: context,
@@ -1023,7 +1024,7 @@ class _PostListItemState extends State<PostListItem> {
                     leading:
                         Icon(Icons.reply_rounded, color: colorScheme.primary),
                     title: Text(
-                      AppLocalizations.of(context)!.reply,
+                      AppLocalizations.of(context)!.kit.reply,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.onSurface,
                       ),
@@ -1108,7 +1109,7 @@ class _PostListItemState extends State<PostListItem> {
               Icon(Icons.share_outlined,
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
-              Text(AppLocalizations.of(context)!.share),
+              Text(AppLocalizations.of(context)!.kit.share),
             ],
           ),
         ),
@@ -1165,7 +1166,7 @@ class _PostListItemState extends State<PostListItem> {
               Icon(Icons.edit,
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
-              Text(AppLocalizations.of(context)!.edit),
+              Text(AppLocalizations.of(context)!.kit.edit),
             ],
           ),
         ),
@@ -1180,7 +1181,7 @@ class _PostListItemState extends State<PostListItem> {
               Icon(Icons.delete,
                   color: Theme.of(context).colorScheme.error),
               const SizedBox(width: DesignTokens.spacingM),
-              Text(AppLocalizations.of(context)!.delete),
+              Text(AppLocalizations.of(context)!.kit.delete),
             ],
           ),
         ),
@@ -1608,7 +1609,7 @@ class _PostListItemState extends State<PostListItem> {
         widget.post.isSolution = wasSolution;
       });
       messenger.showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))),
+        SnackBar(content: Text(AppLocalizations.of(context)!.kit.error(e.toString()))),
       );
     }
   }

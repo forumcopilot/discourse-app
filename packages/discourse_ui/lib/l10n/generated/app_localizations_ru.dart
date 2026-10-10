@@ -17,16 +17,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Сеанс входа изменился. Скопируйте текст, прежде чем снова открыть редактор для работы с черновиками.';
 
   @override
-  String get discardFailedCloseQuestion =>
-      'Всё равно закрыть? Сохранённый ранее черновик останется в разделе «Черновики».';
-
-  @override
-  String get keepEditing => 'Продолжить';
-
-  @override
-  String get closeAnyway => 'Всё равно закрыть';
-
-  @override
   String get uploadSessionChanged =>
       'Во время загрузки изменился сеанс входа. Откройте этот экран заново, прежде чем повторить попытку.';
 
@@ -50,16 +40,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get errorTitle => 'Ошибка';
 
   @override
-  String get okButton => 'ОК';
-
-  @override
   String get retryButton => 'Повторить';
 
   @override
   String get copyToClipboard => 'Копировать в буфер обмена';
-
-  @override
-  String get copied => 'Скопировано';
 
   @override
   String get errorMessageCopiedToClipboard =>
@@ -67,12 +51,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dismiss => 'Закрыть';
-
-  @override
-  String get cancel => 'Отмена';
-
-  @override
-  String get tryAgain => 'Попробовать Снова';
 
   @override
   String get anErrorOccurred => 'Произошла ошибка';
@@ -148,9 +126,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Вам нужно войти, чтобы просмотреть ваши непрочитанные темы';
 
   @override
-  String get latest => 'Последние';
-
-  @override
   String get unread => 'Непрочитанные';
 
   @override
@@ -172,12 +147,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newConversation => 'Новое сообщение';
 
   @override
-  String get language => 'Язык';
-
-  @override
-  String get all => 'Все';
-
-  @override
   String get topicsOnly => 'Только темы';
 
   @override
@@ -196,9 +165,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Пожалуйста, подождите, пока тема загрузится';
 
   @override
-  String get reason => 'Причина';
-
-  @override
   String get participantsLabel => 'Участники';
 
   @override
@@ -213,12 +179,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get newTopic => 'Новая тема';
-
-  @override
-  String get pleaseSpecifyReason => 'Пожалуйста, укажите причину';
-
-  @override
-  String get selectDate => 'Выбрать дату';
 
   @override
   String get moreOptions => 'Дополнительные опции';
@@ -282,9 +242,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noSubject => 'Без темы';
 
   @override
-  String get search => 'Поиск';
-
-  @override
   String get logout => 'Выйти';
 
   @override
@@ -303,16 +260,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profile => 'Профиль';
 
   @override
-  String get messages => 'Сообщения';
-
-  @override
-  String get add => 'Добавить';
-
-  @override
   String get retry => 'Повторить';
-
-  @override
-  String get delete => 'Удалить';
 
   @override
   String get deleteMessage => 'Удалить Сообщение';
@@ -379,18 +327,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get next => 'Далее';
 
   @override
-  String get temporary => 'Временный';
-
-  @override
   String get back => 'Назад';
 
   @override
   String get confirm => 'Подтвердить';
-
-  @override
-  String error(String error) {
-    return 'Ошибка: $error';
-  }
 
   @override
   String get removeAttachment => 'Удалить Вложение';
@@ -398,9 +338,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get areYouSureYouWantToRemoveThisAttachment =>
       'Вы уверены, что хотите удалить это вложение?';
-
-  @override
-  String get none => 'Нет';
 
   @override
   String get attachFile => 'Прикрепить Файл';
@@ -415,28 +352,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get bold => 'Жирный';
 
   @override
-  String get italic => 'Курсив';
-
-  @override
   String get underline => 'Подчеркнутый';
 
   @override
   String get strikethrough => 'Зачеркнутый';
 
   @override
-  String get link => 'Ссылка';
-
-  @override
-  String get image => 'Изображение';
-
-  @override
   String get video => 'Видео';
-
-  @override
-  String get quote => 'Цитата';
-
-  @override
-  String get code => 'Код';
 
   @override
   String get spoiler => 'Спойлер';
@@ -451,11 +373,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get listItem => 'Элемент Списка';
 
   @override
-  String participants(int count) {
-    return 'Участники ($count)';
-  }
-
-  @override
   String get markAsUnread => 'Отметить как непрочитанное';
 
   @override
@@ -466,16 +383,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Введите ключевые слова для поиска тем...';
 
   @override
-  String get refresh => 'Обновить';
-
-  @override
-  String get share => 'Поделиться';
-
-  @override
   String get viewOnWeb => 'Открыть в браузере';
-
-  @override
-  String get reply => 'Ответить';
 
   @override
   String get vote => 'Голосовать';
@@ -523,9 +431,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get light => 'Светлая';
 
   @override
-  String get dark => 'Тёмная';
-
-  @override
   String get appearance => 'Оформление';
 
   @override
@@ -547,9 +452,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get home => 'Главная';
-
-  @override
-  String get notifications => 'Уведомления';
 
   @override
   String get notificationsTab => 'Оповещения';
@@ -633,16 +535,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get edit => 'Редактировать';
-
-  @override
-  String get remove => 'Удалить';
-
-  @override
   String get subject => 'Тема';
-
-  @override
-  String get message => 'Сообщение';
 
   @override
   String get titleCannotBeEmpty => 'Заголовок не может быть пустым';
@@ -672,11 +565,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return 'Ошибка при загрузке $filename: $error';
-  }
-
-  @override
-  String couldNotOpenLink(String error) {
-    return 'Не удалось открыть ссылку: $error';
   }
 
   @override
@@ -743,42 +631,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String timeGapDaysLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count дней спустя',
-      few: '$count дня спустя',
-      one: '1 день спустя',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapMonthsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count месяцев спустя',
-      few: '$count месяца спустя',
-      one: '1 месяц спустя',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String timeGapYearsLater(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count лет спустя',
-      few: '$count года спустя',
-      one: '1 год спустя',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get profileViews => 'Просмотры';
 
   @override
@@ -812,12 +664,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Все уведомления отмечены как прочитанные';
 
   @override
-  String get apply => 'Применить';
-
-  @override
-  String get bookmarks => 'Закладки';
-
-  @override
   String reviewableBy(String username) {
     return 'Автор: $username';
   }
@@ -833,9 +679,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get clearReminder => 'Убрать напоминание';
-
-  @override
-  String get copy => 'Копировать';
 
   @override
   String get copyLink => 'Скопировать ссылку';
@@ -868,9 +711,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteMessageQuestion => 'Удалить сообщение?';
 
   @override
-  String get discard => 'Отменить';
-
-  @override
   String get doNotDisturb => 'Не беспокоить';
 
   @override
@@ -897,9 +737,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get failedToUpdateNotificationLevel =>
       'Не удалось изменить уровень уведомлений';
-
-  @override
-  String get firstPostsOnly => 'Только первые сообщения';
 
   @override
   String get ignoredUsers => 'Игнорируемые пользователи';
@@ -984,9 +821,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pushNotifications => 'Push-уведомления';
 
   @override
-  String get relevance => 'Релевантность';
-
-  @override
   String get reminderTimeMustBeInFuture =>
       'Время напоминания должно быть в будущем';
 
@@ -1011,9 +845,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String requestToJoinGroup(String group) {
     return 'Запросить вступление в $group';
   }
-
-  @override
-  String get reset => 'Сбросить';
 
   @override
   String get resizeAndUpload => 'Уменьшить и загрузить';
@@ -1064,9 +895,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return '@$username больше не игнорируется';
   }
-
-  @override
-  String get titleOnly => 'Только заголовок';
 
   @override
   String get tomorrow => 'Завтра';
@@ -1157,9 +985,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get pleaseLoginToViewUserProfiles =>
       'Войдите, чтобы просматривать профили.';
-
-  @override
-  String get solved => 'Решено';
 
   @override
   String get hot => 'Популярное';
@@ -1254,9 +1079,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get openConversationConfirmation =>
       'Открыть это сообщение? В нём снова можно будет отвечать.';
-
-  @override
-  String get open => 'Открыть';
 
   @override
   String get leaveConversation3 => 'Покинуть сообщение';
@@ -1364,19 +1186,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String participantCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count участника',
-      many: '$count участников',
-      few: '$count участника',
-      one: '$count участник',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get chatChannels => 'Каналы';
 
   @override
@@ -1476,13 +1285,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get takePhoto => 'Сделать фото';
 
   @override
-  String get postNeedsApprovalTitle => 'Сообщение требует одобрения';
-
-  @override
-  String get postNeedsApprovalBody =>
-      'Сообщение получено, но оно требует проверки и утверждения модератором перед публикацией. Будьте терпеливы.';
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return 'Не более $count вложений';
   }
@@ -1573,12 +1375,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get searchUser => 'Поиск пользователя';
 
   @override
-  String get tapToOpen => 'Нажмите, чтобы открыть';
-
-  @override
-  String get imageNotAvailable => 'Изображение недоступно';
-
-  @override
   String postsCount(Object count) {
     return 'Сообщений: $count';
   }
@@ -1664,9 +1460,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noReactionsYet => 'Реакций пока нет';
 
   @override
-  String get searchFilters => 'Фильтры поиска';
-
-  @override
   String get suggestedTopics => 'Похожие темы';
 
   @override
@@ -1700,9 +1493,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => 'Не удалось загрузить категории.';
-
-  @override
-  String get tags => 'Теги';
 
   @override
   String get community => 'Сообщество';
@@ -2050,18 +1840,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createTopic => 'Создать тему';
 
   @override
-  String get discardPostQuestion => 'Отказаться от сообщения?';
-
-  @override
-  String get discardChangesQuestion => 'Отменить изменения?';
-
-  @override
-  String get discardChanges => 'Отменить изменения';
-
-  @override
-  String get saveDraft => 'Сохранить черновик';
-
-  @override
   String get notificationSettings => 'Настройки уведомлений';
 
   @override
@@ -2156,58 +1934,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dismissedTopics => 'Отложено';
-
-  @override
-  String topicMapViews(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'просмотра',
-      many: 'просмотров',
-      few: 'просмотра',
-      one: 'просмотр',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLikes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'лайка',
-      many: 'лайков',
-      few: 'лайка',
-      one: 'лайк',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapLinks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'ссылки',
-      many: 'ссылок',
-      few: 'ссылки',
-      one: 'ссылка',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String topicMapUsers(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'пользователя',
-      many: 'пользователей',
-      few: 'пользователя',
-      one: 'пользователь',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get markAsSolution => 'Отметить как решение';
@@ -2765,12 +2491,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get coverRemoved => 'Обложка удалена';
 
   @override
-  String get day => 'День';
-
-  @override
-  String get month => 'Месяц';
-
-  @override
   String get displayName => 'Отображаемое имя';
 
   @override
@@ -3022,9 +2742,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get yourPhoto => 'Ваше фото';
 
   @override
-  String get chooseEmoji => 'Выбрать эмодзи';
-
-  @override
   String get clearStatus => 'Очистить статус';
 
   @override
@@ -3048,9 +2765,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get removeStatusAfter => 'Убрать статус';
-
-  @override
-  String get searchEmoji => 'Поиск эмодзи';
 
   @override
   String get setStatus => 'Установить статус';
@@ -3518,16 +3232,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get signUp => 'Регистрация';
 
   @override
-  String get suspendUser => 'Блокировка пользователя';
-
-  @override
   String get unsuspend => 'Разблокировать';
-
-  @override
-  String get suspendUntil => 'Блокировка пользователя до';
-
-  @override
-  String get suspendForever => 'Бессрочная блокировка';
 
   @override
   String failedToSuspendUser(String error) {
@@ -3540,39 +3245,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get suspendReasonNotListening =>
-      'Не прислушался к рекомендациям персонала';
-
-  @override
-  String get suspendReasonStaffTime =>
-      'Потрачено слишком много времени персонала';
-
-  @override
-  String get suspendReasonCombative => 'Агрессивное поведение';
-
-  @override
-  String get suspendReasonWrongPlace => 'Обсуждение не в том месте';
-
-  @override
-  String get suspendReasonNoPurpose =>
-      'У действий пользователя нет никакой конструктивной цели, кроме внесения раскола в сообщество';
-
-  @override
-  String get suspendReasonCustom => 'Другое…';
-
-  @override
-  String get suspendReasonQuestion =>
-      'Укажите причину блокировки. Этот текст будет показан пользователю, когда он попытается войти в систему. Введите краткое описание.';
-
-  @override
-  String get closedLabel => 'Закрыта';
-
-  @override
   String get flaggingPost => 'Отправка жалобы…';
-
-  @override
-  String get pleaseSelectSuspensionEndDate =>
-      'Выберите, когда закончится блокировка';
 
   @override
   String get suspendingUser => 'Блокировка пользователя…';
@@ -3761,9 +3434,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noForumDescription => 'Описание отсутствует.';
 
   @override
-  String get dismissAllNotifications => 'Отклонить всё';
-
-  @override
   String get notificationPostIdMissing =>
       'Отсутствует ID сообщения. Невозможно перейти к сообщению.';
 
@@ -3891,76 +3561,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get searchFiltersButtonTooltip => 'Фильтры';
-
-  @override
-  String get searchFilterStatusSection => 'Статус';
-
-  @override
-  String get searchFilterMyActivitySection => 'Моя активность';
-
-  @override
-  String get searchFilterMatchTypeSection => 'Тип совпадения';
-
-  @override
-  String get searchTagsFilterHelper =>
-      'Через пробел или запятую. Нужны все указанные теги.';
-
-  @override
-  String get searchSortBy => 'Сортировка';
-
-  @override
-  String get searchStatusOpen => 'Открыта';
-
-  @override
-  String get searchStatusArchived => 'В архиве';
-
-  @override
-  String get searchStatusNoReplies => 'Без ответов';
-
-  @override
-  String get searchStatusPublicOnly => 'Только публичные';
-
-  @override
-  String get searchStatusUnsolved => 'Не решено';
-
-  @override
-  String get searchInBookmarked => 'В моих закладках';
-
-  @override
-  String get searchInMyMessages => 'В моих сообщениях';
-
-  @override
-  String get searchInLiked => 'Понравившиеся';
-
-  @override
-  String get searchInPosted => 'В которых я отвечал(а)';
-
-  @override
-  String get searchInWatching => 'За которыми я наблюдаю';
-
-  @override
-  String get searchInTracking => 'За которыми я слежу';
-
-  @override
-  String get searchInSeen => 'Прочитанные';
-
-  @override
-  String get searchInUnseen => 'Непрочитанные';
-
-  @override
-  String get searchSortLatestPost => 'По недавним сообщениям';
-
-  @override
-  String get searchSortMostLiked => 'По количеству лайков';
-
-  @override
-  String get searchSortMostViewed => 'По количеству просмотров';
-
-  @override
-  String get searchSortLatestTopic => 'По недавним темам';
-
-  @override
-  String get searchFieldHint => 'Поиск…';
 
   @override
   String get bookmarksUnavailable => 'Закладки недоступны';
@@ -4619,12 +4219,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get postLikeAction => 'Поставить лайк сообщению';
-
-  @override
-  String get postUnlikeAction => 'Убрать лайк';
-
-  @override
   String get postVoteRemoveFailed =>
       'Не удалось отозвать голос (время на отмену истекло?)';
 
@@ -4952,10 +4546,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get passwordFieldLabel => 'Пароль';
-
-  @override
-  String get somethingWentWrongTryAgain =>
-      'Что-то пошло не так. Повторите попытку.';
 
   @override
   String get unexpectedErrorTryAgain =>

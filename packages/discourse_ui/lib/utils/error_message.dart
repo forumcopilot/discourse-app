@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../l10n/app_l10n.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../l10n/kit_strings.dart';
 
 /// Turns a caught error into something worth showing a person.
 ///
@@ -25,7 +26,7 @@ String describeError(Object? error, {String? fallback, BuildContext? context}) {
   final ctx = context ?? Get.context;
   final l10n = (ctx == null ? null : AppLocalizations.of(ctx)) ?? appL10n();
   final text =
-      _describe(error, fallback: fallback ?? l10n.somethingWentWrongTryAgain);
+      _describe(error, fallback: fallback ?? l10n.kit.somethingWentWrongTryAgain);
   final kind = error is DiscourseApiException ? error.kind : discourseErrorKindOf(text);
   if (kind == null) return text;
   return switch (kind) {

@@ -7,6 +7,7 @@ import '../../theme/design_tokens.dart';
 import 'sheet_title.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../../l10n/kit_strings.dart';
 
 /// A bottom-sheet picker that mirrors Discourse's per-topic / per-category
 /// / per-tag notification-level dropdown. Supports the full 4-level enum:
@@ -262,7 +263,7 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SheetTitle(l10n.notifications),
+            SheetTitle(l10n.kit.notifications),
             // The theme's selected row (primary icon and text) plus a
             // check, as the trust-level sheet does; the colours and weight
             // were set by hand here, and the descriptions were 12sp.

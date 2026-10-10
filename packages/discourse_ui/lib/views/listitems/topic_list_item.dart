@@ -13,6 +13,7 @@ import '../../theme/forum_colors.dart';
 import '../widgets/topic_taxonomy_chips.dart';
 import '../widgets/unread_badge.dart';
 import '../../utils/topic_read_mark.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Widget para representar un ítem de la lista de foros
 class TopicListItem extends StatelessWidget {
@@ -274,9 +275,9 @@ class _MetaRow extends StatelessWidget {
     final (IconData, String, Color)? badge = topicIcon != null
         ? (topicIcon!, l10n.topicStatusPinnedGloballyTitle, metaColor)
         : topic.isSolved
-            ? (Icons.check_circle, l10n.solved, ForumColors.of(context).success)
+            ? (Icons.check_circle, l10n.kit.solved, ForumColors.of(context).success)
             : topic.isClosed
-                ? (Icons.lock_outlined, l10n.closedLabel, metaColor)
+                ? (Icons.lock_outlined, l10n.kit.closedLabel, metaColor)
                 : topic.isHot
                     ? (Icons.local_fire_department, l10n.hot, Colors.deepOrange.shade400)
                     : topic.isPinned

@@ -16,6 +16,7 @@ import '../forum_topics_page.dart';
 import '../listitems/topic_list_item.dart';
 import '../post_page.dart';
 import 'category_badge.dart';
+import '../../l10n/kit_strings.dart';
 
 /// What to read next, under a topic's last post: Discourse's suggested
 /// topics and, where the forum has them (discourse-ai), its related ones —
@@ -194,7 +195,7 @@ class _SuggestedTopicsCardState extends State<SuggestedTopicsCard> {
       buttons.add(OutlinedButton.icon(
         onPressed: () => follow('/my/messages'),
         icon: const Icon(Icons.mail_outline, size: DesignTokens.iconSizeS),
-        label: Text(l10n.messages),
+        label: Text(l10n.kit.messages),
       ));
     } else {
       final categoryId = widget.categoryId;

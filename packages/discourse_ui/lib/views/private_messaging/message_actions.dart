@@ -8,6 +8,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../utils/error_message.dart';
 import 'conversation/pages/edit_conversation_page.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import '../../l10n/kit_strings.dart';
 
 /// What a private message offers beyond a topic — archive, mark unread,
 /// close, leave, edit the title — for the topic page, which reads messages
@@ -46,7 +47,7 @@ class MessageActions {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialog, false),
-                child: Text(l10n.cancel),
+                child: Text(l10n.kit.cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(dialog, true),
@@ -121,7 +122,7 @@ class MessageActions {
       body: close
           ? l10n.closeConversationConfirmation
           : l10n.openConversationConfirmation,
-      action: close ? l10n.close : l10n.open,
+      action: close ? l10n.close : l10n.kit.open,
     );
     if (!confirmed || !context.mounted) return false;
     final proxy = SiteProxyFactory.getPrivateConversationProxy();
@@ -191,7 +192,7 @@ class MessageActions {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialog, false),
-            child: Text(l10n.cancel),
+            child: Text(l10n.kit.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -199,7 +200,7 @@ class MessageActions {
               foregroundColor: Theme.of(dialog).colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(dialog, true),
-            child: Text(l10n.delete),
+            child: Text(l10n.kit.delete),
           ),
         ],
       ),

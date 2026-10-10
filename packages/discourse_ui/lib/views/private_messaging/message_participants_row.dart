@@ -10,6 +10,7 @@ import '../../theme/design_tokens.dart';
 import '../../utils/avatar_cache_utils.dart';
 import '../widgets/user_avatar.dart';
 import 'message_participants_sheet.dart';
+import '../../l10n/kit_strings.dart';
 
 /// Who is on a private message, under its title where a topic shows its
 /// category and tags: overlapping avatars and "N participants", a 48dp
@@ -108,7 +109,7 @@ class MessageParticipantsRow extends StatelessWidget {
                 ],
                 Flexible(
                   child: Text(
-                    AppLocalizations.of(context)!.participantCount(count),
+                    AppLocalizations.of(context)!.kit.participantCount(count),
                     style: textTheme.bodyMedium
                         ?.copyWith(color: colorScheme.onSurfaceVariant),
                     maxLines: 1,
