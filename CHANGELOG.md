@@ -6,6 +6,15 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.52] - 2026-10-10
+
+### Added
+- **Host apps can sign their members' posts.** A host app can end each new topic, reply and message with a small "Sent from" line naming the app (ABDA: "Sent from ABDA", linked to betterdiscourse.app), which members turn off in the host's settings. The name is a link only where the forum lets the member post one (trust level 1 and up), so a new member's posts are never refused or flagged for it, and a post the forum would refuse on its own, too short or all in capitals, goes without the line. Edits, chat and whole-post quotes never carry it. The template app adds nothing.
+- **Retry audio and video that failed to load**, without leaving the screen. A clip or video that fails to start or stops partway offers Retry once the connection is back, and audio can also be opened in the browser. Screen readers announce the failure.
+
+### Fixed
+- **An audio clip's duration stays readable with large text** on a narrow screen, instead of running past the edge of the post.
+
 ## [1.0.51] - 2026-10-10
 
 ### Changed
