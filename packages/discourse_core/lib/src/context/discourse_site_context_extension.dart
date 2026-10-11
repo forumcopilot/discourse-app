@@ -139,9 +139,10 @@ extension DiscourseSiteContextExtension on SiteContext {
     data.remove('userApiClientId');
     data.remove('userApiPushEnabled');
     _noteCredentialsForReadCache();
-    // The reader's sidebar and trust level go with the session.
+    // The reader's sidebar, trust level and link access go with the session.
     setSidebar();
     setTrustLevel(null);
+    setLinkPostingAccess(null);
 
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
@@ -397,6 +398,21 @@ extension DiscourseSiteContextExtension on SiteContext {
       _trustLevel.remove(_prefsPrefix());
     } else {
       _trustLevel[_prefsPrefix()] = level;
+    }
+  }
+
+  /// Whether the signed-in reader may post links (`current_user`'s
+  /// `link_posting_access`): "full", "limited" (only the forum's allowlisted
+  /// domains) or "none". Null when unknown, or on a forum that predates it.
+  String? get linkPostingAccess => _linkPostingAccess[_prefsPrefix()];
+
+  static final Map<String, String> _linkPostingAccess = {};
+
+  void setLinkPostingAccess(String? access) {
+    if (access == null) {
+      _linkPostingAccess.remove(_prefsPrefix());
+    } else {
+      _linkPostingAccess[_prefsPrefix()] = access;
     }
   }
 

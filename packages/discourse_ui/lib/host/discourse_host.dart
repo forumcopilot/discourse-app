@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscoursePostSignature;
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 
 import '../services/notification_route.dart';
@@ -41,4 +42,18 @@ class DiscourseHost {
   ///   `AppearanceSync.apply(mode)` when that setting changes, so forum
   ///   pages in web views and native UI still follow it.
   static bool showAppearanceSetting = true;
+
+  /// A small "Sent from ABDA" line (the host names the app) at the end of
+  /// each new topic, reply and message a member writes, the name linked to
+  /// the app's homepage where the forum lets them post the link.
+  /// DiscoursePostSignature has the rules: never on an edit or in chat, and
+  /// never on a post the forum would refuse without it. Null (the default):
+  /// posts go as written.
+  ///
+  /// A host that sets it puts `PostSignatureSwitch` in its settings, so
+  /// members can turn the line off.
+  static DiscoursePostSignature? get postSignature =>
+      DiscoursePostSignature.current;
+  static set postSignature(DiscoursePostSignature? signature) =>
+      DiscoursePostSignature.current = signature;
 }

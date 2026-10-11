@@ -1454,5 +1454,8 @@
   "chatChannelStatusReadOnly": "読み取り専用",
   "chatChannelStatusClosed": "閉鎖",
   "chatChannelStatusArchived": "アーカイブ済み",
-  "failedToLoadAudio": "音声を読み込めませんでした"
+  "failedToLoadAudio": "音声を読み込めませんでした",
+  "postingSettings": "投稿",
+  "postSignatureTitle": "投稿に「Sent from {appName}」を追加",
+  "postSignatureDescription": "作成したトピック、返信、メッセージの末尾に小さく表示されます"
 }

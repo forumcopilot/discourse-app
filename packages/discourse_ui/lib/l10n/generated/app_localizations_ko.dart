@@ -4665,4 +4665,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => '오디오를 불러오지 못했습니다';
+
+  @override
+  String get postingSettings => '게시';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return '내 게시물에 “Sent from $appName” 추가';
+  }
+
+  @override
+  String get postSignatureDescription => '작성한 주제, 답글, 메시지 끝에 작은 글씨로 표시됩니다';
 }

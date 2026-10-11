@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscoursePostSignature;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
@@ -26,10 +27,20 @@ class SettingsContext {
   /// ask each time; true means resize and say so without interrupting.
   final RxBool alwaysResizeOversizedImages = false.obs;
 
+  /// Whether the host's "Sent from" line ends the member's posts
+  /// (DiscourseHost.postSignature). On until they turn it off; change it
+  /// through [setPostSignature].
+  final RxBool postSignature = true.obs;
+
   // Initialize settings from device
   Future<void> loadFromDevice() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+
+      // First, so nothing that fails below can leave a member's "off"
+      // unread when they post.
+      postSignature.value = prefs.getBool('post_signature') ?? true;
+      DiscoursePostSignature.enabled = postSignature.value;
 
       // Load theme mode
       final String? themeModeStr = prefs.getString('theme_mode');
@@ -125,6 +136,19 @@ class SettingsContext {
     pagePerSize.value = 20;
     locale.value = null; // Use system locale
     await saveToDevice();
+  }
+
+  /// Turns the host's "Sent from" line on or off for every forum, and
+  /// remembers it.
+  Future<void> setPostSignature(bool value) async {
+    postSignature.value = value;
+    DiscoursePostSignature.enabled = value;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('post_signature', value);
+    } catch (e) {
+      AppLogger.debug('Failed to persist post signature preference: $e');
+    }
   }
 
   /// Persists the "don't ask again" choice from the resize prompt.

@@ -4947,4 +4947,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => 'Audio konnte nicht geladen werden';
+
+  @override
+  String get postingSettings => 'Beiträge';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return '„Sent from $appName“ unter meine Beiträge setzen';
+  }
+
+  @override
+  String get postSignatureDescription =>
+      'Eine kleine Zeile am Ende deiner Themen, Antworten und Nachrichten';
 }

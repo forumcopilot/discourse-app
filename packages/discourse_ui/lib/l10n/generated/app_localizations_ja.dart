@@ -4666,4 +4666,15 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => '音声を読み込めませんでした';
+
+  @override
+  String get postingSettings => '投稿';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return '投稿に「Sent from $appName」を追加';
+  }
+
+  @override
+  String get postSignatureDescription => '作成したトピック、返信、メッセージの末尾に小さく表示されます';
 }

@@ -7937,6 +7937,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load audio'**
   String get failedToLoadAudio;
+
+  /// Section header in a host app's settings for how the member's posts are written
+  ///
+  /// In en, this message translates to:
+  /// **'Posting'**
+  String get postingSettings;
+
+  /// Switch that adds a small 'Sent from <app name>' line to the member's new posts. The quoted text stays in English: it is what the post shows.
+  ///
+  /// In en, this message translates to:
+  /// **'Add “Sent from {appName}” to my posts'**
+  String postSignatureTitle(String appName);
+
+  /// Subtitle of the switch that adds the Sent from line
+  ///
+  /// In en, this message translates to:
+  /// **'A small line at the end of the topics, replies and messages you write'**
+  String get postSignatureDescription;
 }
 
 class _AppLocalizationsDelegate

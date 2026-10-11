@@ -6178,5 +6178,23 @@
   "failedToLoadAudio": "Failed to load audio",
   "@failedToLoadAudio": {
     "description": "Inline audio player error with retry and browser actions"
+  },
+  "postingSettings": "Posting",
+  "@postingSettings": {
+    "description": "Section header in a host app's settings for how the member's posts are written"
+  },
+  "postSignatureTitle": "Add “Sent from {appName}” to my posts",
+  "@postSignatureTitle": {
+    "description": "Switch that adds a small 'Sent from <app name>' line to the member's new posts. The quoted text stays in English: it is what the post shows.",
+    "placeholders": {
+      "appName": {
+        "type": "String",
+        "example": "ABDA"
+      }
+    }
+  },
+  "postSignatureDescription": "A small line at the end of the topics, replies and messages you write",
+  "@postSignatureDescription": {
+    "description": "Subtitle of the switch that adds the Sent from line"
   }
 }

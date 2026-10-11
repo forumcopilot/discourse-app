@@ -4935,4 +4935,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => 'Impossible de charger le fichier audio';
+
+  @override
+  String get postingSettings => 'Publication';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return 'Ajouter « Sent from $appName » à mes messages';
+  }
+
+  @override
+  String get postSignatureDescription =>
+      'Une petite ligne à la fin des sujets, réponses et messages que vous écrivez';
 }

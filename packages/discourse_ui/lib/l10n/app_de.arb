@@ -1454,5 +1454,8 @@
   "chatChannelStatusReadOnly": "Schreibgeschützt",
   "chatChannelStatusClosed": "Geschlossen",
   "chatChannelStatusArchived": "Archiviert",
-  "failedToLoadAudio": "Audio konnte nicht geladen werden"
+  "failedToLoadAudio": "Audio konnte nicht geladen werden",
+  "postingSettings": "Beiträge",
+  "postSignatureTitle": "„Sent from {appName}“ unter meine Beiträge setzen",
+  "postSignatureDescription": "Eine kleine Zeile am Ende deiner Themen, Antworten und Nachrichten"
 }

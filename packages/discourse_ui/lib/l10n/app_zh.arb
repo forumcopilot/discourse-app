@@ -1454,5 +1454,8 @@
   "chatChannelStatusReadOnly": "只读",
   "chatChannelStatusClosed": "已关闭",
   "chatChannelStatusArchived": "已归档",
-  "failedToLoadAudio": "无法加载音频"
+  "failedToLoadAudio": "无法加载音频",
+  "postingSettings": "发帖",
+  "postSignatureTitle": "在我的帖子末尾添加“Sent from {appName}”",
+  "postSignatureDescription": "在你发布的话题、回复和私信末尾显示一行小字"
 }

@@ -4855,4 +4855,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => 'Failed to load audio';
+
+  @override
+  String get postingSettings => 'Posting';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return 'Add “Sent from $appName” to my posts';
+  }
+
+  @override
+  String get postSignatureDescription =>
+      'A small line at the end of the topics, replies and messages you write';
 }
