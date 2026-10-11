@@ -4915,4 +4915,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get chatChannelStatusArchived => 'Arquivado';
+
+  @override
+  String get failedToLoadAudio => 'Não foi possível carregar o áudio';
 }

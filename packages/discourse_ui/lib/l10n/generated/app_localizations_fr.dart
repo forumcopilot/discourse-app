@@ -4932,4 +4932,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get chatChannelStatusArchived => 'Archivé';
+
+  @override
+  String get failedToLoadAudio => 'Impossible de charger le fichier audio';
 }

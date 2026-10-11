@@ -4597,4 +4597,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatChannelStatusArchived => '已归档';
+
+  @override
+  String get failedToLoadAudio => '无法加载音频';
 }

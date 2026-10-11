@@ -1453,5 +1453,6 @@
   "mediaPause": "Pausieren",
   "chatChannelStatusReadOnly": "Schreibgeschützt",
   "chatChannelStatusClosed": "Geschlossen",
-  "chatChannelStatusArchived": "Archiviert"
+  "chatChannelStatusArchived": "Archiviert",
+  "failedToLoadAudio": "Audio konnte nicht geladen werden"
 }

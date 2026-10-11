@@ -4852,4 +4852,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatChannelStatusArchived => 'Archived';
+
+  @override
+  String get failedToLoadAudio => 'Failed to load audio';
 }

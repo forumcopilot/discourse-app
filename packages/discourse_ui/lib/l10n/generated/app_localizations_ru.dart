@@ -4951,4 +4951,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatChannelStatusArchived => 'Архивирован';
+
+  @override
+  String get failedToLoadAudio => 'Не удалось загрузить аудио';
 }
