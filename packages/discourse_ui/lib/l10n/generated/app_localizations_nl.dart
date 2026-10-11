@@ -4901,4 +4901,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => 'Audio laden mislukt';
+
+  @override
+  String get postingSettings => 'Berichten plaatsen';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return '‘Sent from $appName’ onder mijn berichten zetten';
+  }
+
+  @override
+  String get postSignatureDescription =>
+      'Een kleine regel onder de topics, antwoorden en berichten die je schrijft';
 }

@@ -4954,4 +4954,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => 'Не удалось загрузить аудио';
+
+  @override
+  String get postingSettings => 'Публикация';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return 'Добавлять «Sent from $appName» к моим сообщениям';
+  }
+
+  @override
+  String get postSignatureDescription =>
+      'Небольшая строка в конце ваших тем, ответов и сообщений';
 }

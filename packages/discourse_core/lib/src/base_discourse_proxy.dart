@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/network/fc_call_result.dart';
 
 import 'network/discourse_client.dart';
 import 'network/discourse_composer_timing.dart';
+import 'network/discourse_post_signature.dart';
 import 'data/attachment/discourse_upload_metadata.dart';
 
 /// Common base for every `Discourse*Proxy`.
@@ -69,6 +70,9 @@ abstract class BaseDiscourseProxy {
     // sends it — without it a new user's first post is held as "typed too
     // fast". See DiscourseComposerTiming.
     body = DiscourseComposerTiming.instance.applyTo(path, body);
+    // …and, in a host that names itself (ABDA), a "Sent from" line at the
+    // end. See DiscoursePostSignature.
+    body = DiscoursePostSignature.applyTo(siteContext, path, body);
     final result =
         await _client.post(siteContext, path, query: query, body: body);
     return _decode(result, method: 'POST', path: path);

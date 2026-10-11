@@ -224,6 +224,19 @@ class DiscourseSiteCapabilities {
   /// asks for one will take.
   int minPersonalMessageLength = 10;
 
+  /// `min_post_length`: the shortest reply the forum takes.
+  int minPostLength = 20;
+
+  /// `min_first_post_length`: the shortest first post of a topic.
+  int minFirstPostLength = 20;
+
+  /// `max_post_length`: the longest post the forum takes.
+  int maxPostLength = 32000;
+
+  /// `prevent_uploads_only_posts`: uploads don't count toward a post's
+  /// minimum length.
+  bool preventUploadsOnlyPosts = false;
+
   /// True once a real payload has been parsed for this forum. Distinguishes
   /// "asked, offers nothing" from "never asked".
   bool resolved = false;
@@ -421,13 +434,21 @@ class DiscourseSiteCapabilities {
         split(settings['default_navigation_menu_tags']);
     caps.profileSettings =
         DiscourseProfileSettings.fromClientSettings(settings, siteUrl: pluginUrl);
-    final minMessage = settings['min_personal_message_post_length'];
-    final parsedMin = minMessage is num
-        ? minMessage.toInt()
-        : int.tryParse(minMessage?.toString() ?? '');
-    if (parsedMin != null && parsedMin > 0) {
-      caps.minPersonalMessageLength = parsedMin;
+    int? positive(String key) {
+      final v = settings[key];
+      final parsed = v is num ? v.toInt() : int.tryParse(v?.toString() ?? '');
+      return parsed != null && parsed > 0 ? parsed : null;
     }
+
+    caps.minPersonalMessageLength =
+        positive('min_personal_message_post_length') ??
+            caps.minPersonalMessageLength;
+    caps.minPostLength = positive('min_post_length') ?? caps.minPostLength;
+    caps.minFirstPostLength =
+        positive('min_first_post_length') ?? caps.minFirstPostLength;
+    caps.maxPostLength = positive('max_post_length') ?? caps.maxPostLength;
+    caps.preventUploadsOnlyPosts =
+        settings['prevent_uploads_only_posts'] == true;
   }
 
   /// Records each category's topics of the past week from a

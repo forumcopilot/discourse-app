@@ -1454,5 +1454,8 @@
   "chatChannelStatusReadOnly": "Somente leitura",
   "chatChannelStatusClosed": "Fechado",
   "chatChannelStatusArchived": "Arquivado",
-  "failedToLoadAudio": "Não foi possível carregar o áudio"
+  "failedToLoadAudio": "Não foi possível carregar o áudio",
+  "postingSettings": "Publicação",
+  "postSignatureTitle": "Adicionar “Sent from {appName}” às minhas publicações",
+  "postSignatureDescription": "Uma pequena linha no fim dos tópicos, respostas e mensagens que você escreve"
 }

@@ -1454,5 +1454,8 @@
   "chatChannelStatusReadOnly": "읽기 전용",
   "chatChannelStatusClosed": "닫힘",
   "chatChannelStatusArchived": "보관됨",
-  "failedToLoadAudio": "오디오를 불러오지 못했습니다"
+  "failedToLoadAudio": "오디오를 불러오지 못했습니다",
+  "postingSettings": "게시",
+  "postSignatureTitle": "내 게시물에 “Sent from {appName}” 추가",
+  "postSignatureDescription": "작성한 주제, 답글, 메시지 끝에 작은 글씨로 표시됩니다"
 }

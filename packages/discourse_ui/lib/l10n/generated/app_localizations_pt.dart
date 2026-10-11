@@ -4918,4 +4918,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => 'Não foi possível carregar o áudio';
+
+  @override
+  String get postingSettings => 'Publicação';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return 'Adicionar “Sent from $appName” às minhas publicações';
+  }
+
+  @override
+  String get postSignatureDescription =>
+      'Uma pequena linha no fim dos tópicos, respostas e mensagens que você escreve';
 }

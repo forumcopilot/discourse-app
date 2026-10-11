@@ -1454,5 +1454,8 @@
   "chatChannelStatusReadOnly": "Только для чтения",
   "chatChannelStatusClosed": "Закрыт",
   "chatChannelStatusArchived": "Архивирован",
-  "failedToLoadAudio": "Не удалось загрузить аудио"
+  "failedToLoadAudio": "Не удалось загрузить аудио",
+  "postingSettings": "Публикация",
+  "postSignatureTitle": "Добавлять «Sent from {appName}» к моим сообщениям",
+  "postSignatureDescription": "Небольшая строка в конце ваших тем, ответов и сообщений"
 }

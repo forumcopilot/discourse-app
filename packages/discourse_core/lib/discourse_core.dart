@@ -49,6 +49,7 @@ export 'src/network/discourse_client.dart';
 export 'src/network/discourse_auth_manager.dart';
 export 'src/network/discourse_message_bus.dart';
 export 'src/network/discourse_composer_timing.dart';
+export 'src/network/discourse_post_signature.dart';
 
 // Context extensions
 export 'src/context/discourse_site_context_extension.dart';

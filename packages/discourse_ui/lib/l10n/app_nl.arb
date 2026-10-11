@@ -1583,5 +1583,8 @@
   "chatChannelStatusReadOnly": "Alleen-lezen",
   "chatChannelStatusClosed": "Gesloten",
   "chatChannelStatusArchived": "Gearchiveerd",
-  "failedToLoadAudio": "Audio laden mislukt"
+  "failedToLoadAudio": "Audio laden mislukt",
+  "postingSettings": "Berichten plaatsen",
+  "postSignatureTitle": "‘Sent from {appName}’ onder mijn berichten zetten",
+  "postSignatureDescription": "Een kleine regel onder de topics, antwoorden en berichten die je schrijft"
 }

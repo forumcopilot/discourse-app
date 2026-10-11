@@ -1,3 +1,5 @@
+import '../network/discourse_post_signature.dart';
+
 /// Preparing a post's raw Markdown to be quoted.
 ///
 /// Discourse never nests a quote inside a quote. On web the quote button is
@@ -30,7 +32,8 @@ class DiscourseQuoteMarkup {
   );
 
   /// The quotable body of [raw]: the post's own words, with any quotes it
-  /// was itself carrying removed.
+  /// was itself carrying and an app's "Sent from" line removed
+  /// (DiscoursePostSignature.withoutLine).
   ///
   /// Loops because quotes nest — one pass leaves the outer levels behind.
   ///
@@ -48,7 +51,7 @@ class DiscourseQuoteMarkup {
       body = body.replaceAll(_quoteBlock, '');
       if (body == before) break;
     }
-    final trimmed = body.trim();
+    final trimmed = DiscoursePostSignature.withoutLine(body).trim();
     return trimmed.isEmpty ? null : trimmed;
   }
 }

@@ -4600,4 +4600,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failedToLoadAudio => '无法加载音频';
+
+  @override
+  String get postingSettings => '发帖';
+
+  @override
+  String postSignatureTitle(String appName) {
+    return '在我的帖子末尾添加“Sent from $appName”';
+  }
+
+  @override
+  String get postSignatureDescription => '在你发布的话题、回复和私信末尾显示一行小字';
 }

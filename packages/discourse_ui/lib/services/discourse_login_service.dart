@@ -775,6 +775,10 @@ class DiscourseLoginService {
     siteContext.setSidebar(categoryIds: ids, tags: tags);
     final tl = cu['trust_level'];
     siteContext.setTrustLevel(tl is int ? tl : int.tryParse('${tl ?? ''}'));
+    // Whether a post may carry a link, which the host's "Sent from" line
+    // checks before linking (DiscoursePostSignature).
+    final links = cu['link_posting_access'];
+    siteContext.setLinkPostingAccess(links is String ? links : null);
   }
 
   /// Build the [FCLoginResult] stored on the [SiteContext] (and cached as

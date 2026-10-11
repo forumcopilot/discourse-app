@@ -68,4 +68,19 @@ outermost words''';
     const raw = 'Plain **markdown** with a [link](https://example.com).';
     expect(DiscourseQuoteMarkup.quotableBody(raw), raw);
   });
+
+  test("drops an app's Sent from line, linked or not", () {
+    for (final line in [
+      '<small>Sent from [ABDA](https://betterdiscourse.app)</small>',
+      '<small>Sent from ABDA</small>',
+    ]) {
+      expect(
+          DiscourseQuoteMarkup.quotableBody('That fixed it.\n\n$line\n'),
+          'That fixed it.');
+    }
+    expect(DiscourseQuoteMarkup.quotableBody('<small>Sent from ABDA</small>'),
+        isNull);
+    const own = 'Sent from <small>my phone</small> on the train.';
+    expect(DiscourseQuoteMarkup.quotableBody(own), own);
+  });
 }
